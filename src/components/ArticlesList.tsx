@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -8,12 +7,14 @@ interface ArticlesListProps {
   limit?: number;
   filterByCategory?: string;
   filterByLanguage?: string;
+  searchQuery?: string;
 }
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
   limit = 6,
   filterByCategory,
   filterByLanguage,
+  searchQuery,
 }) => {
   const { toast } = useToast();
   const [articles, setArticles] = useState<ArticleProps[]>([]);
@@ -40,11 +41,17 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           .eq("is_published", true)
           .order("published_at", { ascending: false });
 
-        // Apply filters if provided
+        // Apply search filter if provided
+        if (searchQuery) {
+          query = query.or(`title.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`);
+        }
+
+        // Apply category filter if provided
         if (filterByCategory) {
           query = query.eq("category", filterByCategory);
         }
 
+        // Apply language filter if provided
         if (filterByLanguage) {
           query = query.eq("language", filterByLanguage);
         }
@@ -120,7 +127,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
     };
 
     fetchArticles();
-  }, [filterByCategory, filterByLanguage, limit, toast]);
+  }, [filterByCategory, filterByLanguage, limit, searchQuery, toast]);
 
   if (isLoading) {
     return (

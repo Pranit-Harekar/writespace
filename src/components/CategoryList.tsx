@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 
@@ -24,21 +24,44 @@ const categories: Category[] = [
 ];
 
 export const CategoryList = () => {
+  const { category } = useParams<{ category: string }>();
+  const location = useLocation();
+  const isSearchPage = location.pathname.includes('/search');
+  
+  const preserveSearchParams = () => {
+    if (isSearchPage) {
+      const searchParams = new URLSearchParams(location.search);
+      const query = searchParams.get('q');
+      return query ? `?q=${query}` : '';
+    }
+    return '';
+  };
+
   return (
     <div className="my-6">
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex space-x-2 p-1">
-          <Button variant="outline" className="rounded-full" asChild>
-            <Link to="/">All</Link>
+          <Button 
+            variant={!category ? "default" : "outline"} 
+            className="rounded-full" 
+            asChild
+          >
+            <Link to={isSearchPage ? `/search${preserveSearchParams()}` : "/"}>All</Link>
           </Button>
-          {categories.map((category) => (
+          
+          {categories.map((cat) => (
             <Button
-              key={category.id}
-              variant="outline"
+              key={cat.id}
+              variant={category === cat.id ? "default" : "outline"}
               className="rounded-full"
               asChild
             >
-              <Link to={`/category/${category.id}`}>{category.name}</Link>
+              <Link to={isSearchPage 
+                ? `/search/category/${cat.id}${preserveSearchParams()}` 
+                : `/category/${cat.id}`}
+              >
+                {cat.name}
+              </Link>
             </Button>
           ))}
         </div>

@@ -14,6 +14,7 @@ import ArticleView from "./pages/ArticleView";
 import ArticleEditor from "./pages/ArticleEditor";
 import MyArticles from "./pages/MyArticles";
 import CategoryView from "./pages/CategoryView";
+import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/search/category/:category" element={<SearchResults />} />
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />

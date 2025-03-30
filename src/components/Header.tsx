@@ -1,6 +1,6 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, Search, User, LogIn, LogOut, FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -17,6 +17,8 @@ import {
 
 export const Header = () => {
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getInitials = (name: string) => {
     return name
@@ -24,6 +26,13 @@ export const Header = () => {
       .map((n) => n[0])
       .join("")
       .toUpperCase();
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -37,11 +46,15 @@ export const Header = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-1 relative w-1/3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search articles..."
-            className="pl-10 bg-background"
-          />
+          <form onSubmit={handleSearchSubmit} className="w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search articles..."
+              className="pl-10 bg-background"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
         </div>
 
         <div className="flex items-center gap-3">
@@ -123,7 +136,12 @@ export const Header = () => {
             </div>
           )}
           
-          <Button variant="ghost" size="icon" className="md:hidden">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="md:hidden"
+            onClick={() => navigate('/search')}
+          >
             <Search className="h-5 w-5" />
           </Button>
           
