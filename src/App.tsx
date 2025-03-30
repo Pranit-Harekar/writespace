@@ -10,6 +10,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import ArticleView from "./pages/ArticleView";
+import ArticleEditor from "./pages/ArticleEditor";
+import MyArticles from "./pages/MyArticles";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +33,22 @@ const App = () => (
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/article/:id" element={<ArticleView />} />
+              <Route path="/article/new" element={
+                <ProtectedRoute>
+                  <ArticleEditor />
+                </ProtectedRoute>
+              } />
+              <Route path="/article/edit/:id" element={
+                <ProtectedRoute>
+                  <ArticleEditor />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-articles" element={
+                <ProtectedRoute>
+                  <MyArticles />
                 </ProtectedRoute>
               } />
               <Route path="*" element={<NotFound />} />
