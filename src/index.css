@@ -1,6 +1,74 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import 'tailwindcss';
+
+@config '../tailwind.config.ts';
+
+@theme {
+  --font-geist: 'Geist', sans;
+  --font-geist-mono: 'Geist Mono', monospace;
+  --font-spectral: 'Spectral', serif;
+  --font-sans: var(--font-geist);
+  --font-serif: var(--font-spectral);
+  --font-mono: var(--font-geist-mono);
+}
+
+@utility prose {
+  & blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 dark:text-gray-400 my-4;
+  }
+
+  & h1 {
+    @apply text-3xl font-bold my-6;
+  }
+
+  & h2 {
+    @apply text-2xl font-bold my-5;
+  }
+
+  & h3 {
+    @apply text-xl font-bold my-4;
+  }
+
+  & h4 {
+    @apply text-lg font-bold my-3;
+  }
+
+  & h5 {
+    @apply text-base font-bold my-3;
+  }
+
+  & h6 {
+    @apply text-sm font-bold my-2;
+  }
+
+  & p {
+    @apply my-3;
+  }
+
+  & ul {
+    @apply list-disc pl-5 my-3;
+  }
+
+  & ol {
+    @apply list-decimal pl-5 my-3;
+  }
+
+  & a {
+    @apply text-primary underline underline-offset-4 decoration-sky-400 hover:text-primary hover:decoration-2;
+  }
+
+  & img {
+    @apply max-w-full h-auto my-4 rounded;
+  }
+
+  & code {
+    @apply bg-gray-100 dark:bg-gray-800 py-0.5 rounded text-gray-800 dark:text-gray-100 font-mono text-sm;
+  }
+
+  & pre {
+    @apply bg-gray-100 dark:bg-gray-800 p-4 rounded my-4 overflow-x-auto;
+  }
+}
 
 @layer base {
   :root {
@@ -33,22 +101,6 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -79,14 +131,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -97,5 +141,50 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* TipTap placeholder styles */
+  .is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  /* Remove focus outline from editor content */
+  .ProseMirror:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Additional styles to remove outlines from all editor components */
+  .ProseMirror {
+    outline: none !important;
+  }
+
+  .tiptap:focus,
+  .tiptap:focus-visible,
+  .tiptap *:focus,
+  .tiptap *:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure the title and subtitle editors don't have focus rings */
+  h1.ProseMirror:focus,
+  p.ProseMirror:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+
+  /* Add styles for sticky toolbar */
+  .sticky-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
   }
 }

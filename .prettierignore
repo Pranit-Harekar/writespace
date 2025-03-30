@@ -1,0 +1,26 @@
+
+# Build outputs
+dist
+build
+coverage
+
+# Node modules
+node_modules
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Vite
+vite.config.ts.timestamp-*
+
+# Other
+.DS_Store
+.cache
