@@ -13,7 +13,8 @@ export const FeaturedArticleSection = () => {
   useEffect(() => {
     const fetchFeaturedArticle = async () => {
       try {
-        const { data, error } = await supabase
+        // First try to find an article with an image
+        const { data: featuredArticleData, error: featuredError } = await supabase
           .from("articles")
           .select(`
             id, 
@@ -24,12 +25,7 @@ export const FeaturedArticleSection = () => {
             read_time, 
             featured_image,
             published_at,
-            profiles:author_id (
-              id, 
-              username, 
-              full_name, 
-              avatar_url
-            )
+            author_id
           `)
           .eq("is_published", true)
           .not("featured_image", "is", null)
@@ -37,8 +33,8 @@ export const FeaturedArticleSection = () => {
           .limit(1)
           .single();
 
-        if (error) {
-          // If no featured article with image is found, try to find any article
+        // If no featured article with image found, try to find any article
+        if (featuredError) {
           const { data: fallbackData, error: fallbackError } = await supabase
             .from("articles")
             .select(`
@@ -50,12 +46,7 @@ export const FeaturedArticleSection = () => {
               read_time, 
               featured_image,
               published_at,
-              profiles:author_id (
-                id, 
-                username, 
-                full_name, 
-                avatar_url
-              )
+              author_id
             `)
             .eq("is_published", true)
             .order("published_at", { ascending: false })
@@ -64,42 +55,101 @@ export const FeaturedArticleSection = () => {
 
           if (fallbackError) throw fallbackError;
           
-          const formattedArticle = {
-            id: fallbackData.id,
-            title: fallbackData.title,
-            excerpt: fallbackData.excerpt || "",
-            author: {
-              id: fallbackData.profiles.id,
-              name: fallbackData.profiles.full_name || fallbackData.profiles.username || "Anonymous",
-              profileImage: fallbackData.profiles.avatar_url || undefined,
-            },
-            publishedAt: fallbackData.published_at || "",
-            category: fallbackData.category || "Uncategorized",
-            language: fallbackData.language,
-            readTime: fallbackData.read_time || 5,
-            featuredImage: fallbackData.featured_image || undefined,
-          };
-          
-          setArticle(formattedArticle);
+          // Now get the author profile
+          const { data: authorData, error: authorError } = await supabase
+            .from("profiles")
+            .select("id, username, full_name, avatar_url")
+            .eq("id", fallbackData.author_id)
+            .single();
+
+          if (authorError) {
+            console.warn("Author profile not found:", authorError);
+            // Create a formatted article without author details
+            const formattedArticle = {
+              id: fallbackData.id,
+              title: fallbackData.title,
+              excerpt: fallbackData.excerpt || "",
+              author: {
+                id: fallbackData.author_id,
+                name: "Anonymous",
+                profileImage: undefined,
+              },
+              publishedAt: fallbackData.published_at || "",
+              category: fallbackData.category || "Uncategorized",
+              language: fallbackData.language,
+              readTime: fallbackData.read_time || 5,
+              featuredImage: fallbackData.featured_image || undefined,
+            };
+            
+            setArticle(formattedArticle);
+          } else {
+            // Format the article with author details
+            const formattedArticle = {
+              id: fallbackData.id,
+              title: fallbackData.title,
+              excerpt: fallbackData.excerpt || "",
+              author: {
+                id: authorData.id,
+                name: authorData.full_name || authorData.username || "Anonymous",
+                profileImage: authorData.avatar_url || undefined,
+              },
+              publishedAt: fallbackData.published_at || "",
+              category: fallbackData.category || "Uncategorized",
+              language: fallbackData.language,
+              readTime: fallbackData.read_time || 5,
+              featuredImage: fallbackData.featured_image || undefined,
+            };
+            
+            setArticle(formattedArticle);
+          }
         } else {
-          // Format the featured article with image
-          const formattedArticle = {
-            id: data.id,
-            title: data.title,
-            excerpt: data.excerpt || "",
-            author: {
-              id: data.profiles.id,
-              name: data.profiles.full_name || data.profiles.username || "Anonymous",
-              profileImage: data.profiles.avatar_url || undefined,
-            },
-            publishedAt: data.published_at || "",
-            category: data.category || "Uncategorized",
-            language: data.language,
-            readTime: data.read_time || 5,
-            featuredImage: data.featured_image || undefined,
-          };
-          
-          setArticle(formattedArticle);
+          // We have a featured article with image, now get the author profile
+          const { data: authorData, error: authorError } = await supabase
+            .from("profiles")
+            .select("id, username, full_name, avatar_url")
+            .eq("id", featuredArticleData.author_id)
+            .single();
+
+          if (authorError) {
+            console.warn("Author profile not found:", authorError);
+            // Create a formatted article without author details
+            const formattedArticle = {
+              id: featuredArticleData.id,
+              title: featuredArticleData.title,
+              excerpt: featuredArticleData.excerpt || "",
+              author: {
+                id: featuredArticleData.author_id,
+                name: "Anonymous",
+                profileImage: undefined,
+              },
+              publishedAt: featuredArticleData.published_at || "",
+              category: featuredArticleData.category || "Uncategorized",
+              language: featuredArticleData.language,
+              readTime: featuredArticleData.read_time || 5,
+              featuredImage: featuredArticleData.featured_image || undefined,
+            };
+            
+            setArticle(formattedArticle);
+          } else {
+            // Format the featured article with author details
+            const formattedArticle = {
+              id: featuredArticleData.id,
+              title: featuredArticleData.title,
+              excerpt: featuredArticleData.excerpt || "",
+              author: {
+                id: authorData.id,
+                name: authorData.full_name || authorData.username || "Anonymous",
+                profileImage: authorData.avatar_url || undefined,
+              },
+              publishedAt: featuredArticleData.published_at || "",
+              category: featuredArticleData.category || "Uncategorized",
+              language: featuredArticleData.language,
+              readTime: featuredArticleData.read_time || 5,
+              featuredImage: featuredArticleData.featured_image || undefined,
+            };
+            
+            setArticle(formattedArticle);
+          }
         }
       } catch (error: any) {
         console.error("Error fetching featured article:", error);

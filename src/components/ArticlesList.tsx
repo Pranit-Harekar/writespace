@@ -35,12 +35,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             read_time, 
             featured_image,
             published_at,
-            profiles:author_id (
-              id, 
-              username, 
-              full_name, 
-              avatar_url
-            )
+            author_id
           `)
           .eq("is_published", true)
           .order("published_at", { ascending: false });
@@ -57,26 +52,59 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         // Apply limit
         query = query.limit(limit);
 
-        const { data, error } = await query;
+        const { data: articlesData, error: articlesError } = await query;
 
-        if (error) throw error;
+        if (articlesError) throw articlesError;
+
+        // If no articles found, return early
+        if (!articlesData || articlesData.length === 0) {
+          setArticles([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Extract author_ids to fetch profiles
+        const authorIds = [...new Set(articlesData.map(article => article.author_id))];
+
+        // Fetch author profiles
+        const { data: profilesData, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, username, full_name, avatar_url")
+          .in("id", authorIds);
+
+        if (profilesError) throw profilesError;
+
+        // Create a lookup map for profiles
+        const profileMap = new Map();
+        profilesData?.forEach(profile => {
+          profileMap.set(profile.id, profile);
+        });
 
         // Transform data to match ArticleProps
-        const formattedArticles = data.map((item) => ({
-          id: item.id,
-          title: item.title,
-          excerpt: item.excerpt || "",
-          author: {
-            id: item.profiles.id,
-            name: item.profiles.full_name || item.profiles.username || "Anonymous",
-            profileImage: item.profiles.avatar_url || undefined,
-          },
-          publishedAt: item.published_at || "",
-          category: item.category || "Uncategorized",
-          language: item.language,
-          readTime: item.read_time || 5,
-          featuredImage: item.featured_image || undefined,
-        }));
+        const formattedArticles = articlesData.map((item) => {
+          const profile = profileMap.get(item.author_id) || { 
+            id: item.author_id, 
+            username: 'Anonymous', 
+            full_name: null, 
+            avatar_url: null 
+          };
+
+          return {
+            id: item.id,
+            title: item.title,
+            excerpt: item.excerpt || "",
+            author: {
+              id: profile.id,
+              name: profile.full_name || profile.username || "Anonymous",
+              profileImage: profile.avatar_url || undefined,
+            },
+            publishedAt: item.published_at || "",
+            category: item.category || "Uncategorized",
+            language: item.language,
+            readTime: item.read_time || 5,
+            featuredImage: item.featured_image || undefined,
+          };
+        });
 
         setArticles(formattedArticles);
       } catch (error: any) {
