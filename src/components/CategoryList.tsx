@@ -1,32 +1,42 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Category {
   id: string;
   name: string;
 }
 
-const categories: Category[] = [
-  { id: "technology", name: "Technology" },
-  { id: "health", name: "Health" },
-  { id: "education", name: "Education" },
-  { id: "culture", name: "Culture" },
-  { id: "politics", name: "Politics" },
-  { id: "business", name: "Business" },
-  { id: "science", name: "Science" },
-  { id: "entertainment", name: "Entertainment" },
-  { id: "sports", name: "Sports" },
-  { id: "travel", name: "Travel" },
-  { id: "food", name: "Food" },
-];
-
 export const CategoryList = () => {
   const { category } = useParams<{ category: string }>();
   const location = useLocation();
   const isSearchPage = location.pathname.includes('/search');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // Fetch categories from the database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('categories')
+          .select('id, name')
+          .order('name', { ascending: true });
+          
+        if (error) throw error;
+        setCategories(data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
   
   const preserveSearchParams = () => {
     if (isSearchPage) {
@@ -49,16 +59,16 @@ export const CategoryList = () => {
             <Link to={isSearchPage ? `/search${preserveSearchParams()}` : "/"}>All</Link>
           </Button>
           
-          {categories.map((cat) => (
+          {!isLoading && categories.map((cat) => (
             <Button
               key={cat.id}
-              variant={category === cat.id ? "default" : "outline"}
+              variant={category === cat.name.toLowerCase() ? "default" : "outline"}
               className="rounded-full"
               asChild
             >
               <Link to={isSearchPage 
-                ? `/search/category/${cat.id}${preserveSearchParams()}` 
-                : `/category/${cat.id}`}
+                ? `/search/category/${cat.name.toLowerCase()}${preserveSearchParams()}` 
+                : `/search/category/${cat.name.toLowerCase()}`}
               >
                 {cat.name}
               </Link>

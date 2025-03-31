@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { CategorySelector } from "@/components/CategorySelector";
 import {
   Form,
   FormControl,
@@ -53,6 +54,7 @@ const ArticleEditor = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const isEditing = Boolean(id);
 
   const form = useForm<ArticleFormValues>({
@@ -77,7 +79,7 @@ const ArticleEditor = () => {
       try {
         const { data, error } = await supabase
           .from("articles")
-          .select("*")
+          .select("*, categories:category_id(id, name)")
           .eq("id", id)
           .single();
 
@@ -94,11 +96,14 @@ const ArticleEditor = () => {
           return;
         }
 
+        // Set the category ID
+        setCategoryId(data.category_id);
+
         form.reset({
           title: data.title,
           content: data.content,
           excerpt: data.excerpt || "",
-          category: data.category || "",
+          category: data.category || (data.categories ? data.categories.name : ""),
           language: data.language,
           featured_image: data.featured_image || "",
           read_time: data.read_time || 5,
@@ -119,6 +124,11 @@ const ArticleEditor = () => {
     fetchArticle();
   }, [id, user, navigate, toast, form]);
 
+  const handleCategoryChange = (categoryName: string, id: string | null) => {
+    form.setValue("category", categoryName);
+    setCategoryId(id);
+  };
+
   const onSubmit = async (values: ArticleFormValues) => {
     if (!user) {
       toast({
@@ -135,6 +145,7 @@ const ArticleEditor = () => {
       const articleData = {
         ...values,
         author_id: user.id,
+        category_id: categoryId,
         published_at: values.is_published ? new Date().toISOString() : null,
       };
 
@@ -274,7 +285,11 @@ const ArticleEditor = () => {
                       <FormItem>
                         <FormLabel>Category</FormLabel>
                         <FormControl>
-                          <Input placeholder="E.g. Technology, Health" {...field} />
+                          <CategorySelector 
+                            value={field.value} 
+                            categoryId={categoryId}
+                            onChange={handleCategoryChange}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

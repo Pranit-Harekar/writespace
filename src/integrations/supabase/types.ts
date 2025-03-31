@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           author_id: string
           category: string | null
+          category_id: string | null
           content: string
           created_at: string
           excerpt: string | null
@@ -28,6 +29,7 @@ export type Database = {
         Insert: {
           author_id: string
           category?: string | null
+          category_id?: string | null
           content: string
           created_at?: string
           excerpt?: string | null
@@ -43,6 +45,7 @@ export type Database = {
         Update: {
           author_id?: string
           category?: string | null
+          category_id?: string | null
           content?: string
           created_at?: string
           excerpt?: string | null
@@ -54,6 +57,32 @@ export type Database = {
           read_time?: number | null
           title?: string
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +33,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             title, 
             excerpt, 
             category, 
+            category_id,
             language, 
             read_time, 
             featured_image,
@@ -46,9 +48,22 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           query = query.or(`title.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`);
         }
 
-        // Apply category filter if provided
+        // If category filter is provided
         if (filterByCategory) {
-          query = query.eq("category", filterByCategory);
+          // First, try to get the category ID from the name
+          const { data: categoryData, error: categoryError } = await supabase
+            .from('categories')
+            .select('id')
+            .ilike('name', filterByCategory)
+            .single();
+            
+          if (categoryError) {
+            // Fall back to the category column if no match in categories table
+            query = query.ilike("category", filterByCategory);
+          } else if (categoryData) {
+            // Use the category_id if we found a match
+            query = query.eq("category_id", categoryData.id);
+          }
         }
 
         // Apply language filter if provided

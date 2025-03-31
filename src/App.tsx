@@ -13,7 +13,6 @@ import Profile from "./pages/Profile";
 import ArticleView from "./pages/ArticleView";
 import ArticleEditor from "./pages/ArticleEditor";
 import MyArticles from "./pages/MyArticles";
-import CategoryView from "./pages/CategoryView";
 import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -55,7 +54,8 @@ const App = () => (
                   <MyArticles />
                 </ProtectedRoute>
               } />
-              <Route path="/category/:category" element={<CategoryView />} />
+              {/* Redirect old category URLs to the new structure */}
+              <Route path="/category/:category" element={<CategoryRedirect />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
