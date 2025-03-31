@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
 import FullEditor from './editor/FullEditor';
@@ -53,6 +54,11 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     onUpdate: ({ editor }) => {
       onContentChange(editor.getHTML());
     },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md focus:outline-none',
+      },
+    },
   });
 
   return (
@@ -64,7 +70,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           initialValue={initialTitle}
           onValueChange={onTitleChange}
           placeholder="Title"
-          className="text-4xl font-bold outline-none relative"
+          className="text-4xl font-bold outline-none focus:outline-none relative"
           tagName="h1"
         />
 
@@ -72,7 +78,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           initialValue={initialSubtitle}
           onValueChange={onSubtitleChange}
           placeholder="Add a subtitle..."
-          className="text-lg text-gray-500 outline-none relative"
+          className="text-lg text-gray-500 outline-none focus:outline-none relative"
           tagName="p"
         />
 
@@ -80,7 +86,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           initialValue={initialContent}
           onValueChange={onContentChange}
           placeholder="Start writing..."
-          className="prose prose-lg max-w-none outline-none min-h-[50vh] text-md"
+          className="prose prose-lg max-w-none outline-none focus:outline-none min-h-[50vh] text-md"
           editorInstance={editor}
         />
       </div>

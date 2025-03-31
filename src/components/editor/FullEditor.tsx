@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -48,7 +49,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: className,
+        class: `${className} focus:outline-none`,
       },
     },
   });
@@ -70,7 +71,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
     }
   }, [initialValue, editorInstance]);
 
-  return <EditorContent editor={editor} className={className} />;
+  return <EditorContent editor={editor} className={`${className} focus:outline-none`} />;
 };
 
 export default FullEditor;

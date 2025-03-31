@@ -83,6 +83,33 @@
     height: 0;
     pointer-events: none;
   }
+  
+  /* Remove focus outline from editor content */
+  .ProseMirror:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Additional styles to remove outlines from all editor components */
+  .ProseMirror {
+    outline: none !important;
+  }
+  
+  .tiptap:focus, 
+  .tiptap:focus-visible, 
+  .tiptap *:focus,
+  .tiptap *:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Ensure the title and subtitle editors don't have focus rings */
+  h1.ProseMirror:focus, 
+  p.ProseMirror:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
 }
 
 @layer utilities {
