@@ -17,6 +17,8 @@ import {
   AlignJustify,
   Undo,
   Redo,
+  ChevronDown,
+  RemoveFormatting,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -75,7 +77,10 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
       
       <Menubar className="border-none p-0">
         <MenubarMenu>
-          <MenubarTrigger className="font-normal px-3">Style</MenubarTrigger>
+          <MenubarTrigger className="font-normal px-3 flex items-center">
+            Style
+            <ChevronDown className="h-4 w-4 ml-1" />
+          </MenubarTrigger>
           <MenubarContent>
             <MenubarItem onSelect={() => onFormatText("heading1")}>Heading 1</MenubarItem>
             <MenubarItem onSelect={() => onFormatText("heading2")}>Heading 2</MenubarItem>
@@ -126,6 +131,16 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
         title="Code"
       >
         <Code className="h-4 w-4" />
+      </Button>
+      
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => onFormatText("clearFormatting")}
+        className="h-8 w-8"
+        title="Clear Formatting"
+      >
+        <RemoveFormatting className="h-4 w-4" />
       </Button>
       
       <Separator orientation="vertical" className="mx-1 h-6" />
@@ -196,7 +211,10 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
       
       <Menubar className="border-none p-0">
         <MenubarMenu>
-          <MenubarTrigger className="font-normal px-3">Button</MenubarTrigger>
+          <MenubarTrigger className="font-normal px-3 flex items-center">
+            Button
+            <ChevronDown className="h-4 w-4 ml-1" />
+          </MenubarTrigger>
           <MenubarContent>
             <MenubarItem onSelect={() => onInsertMedia("button")}>Insert Button</MenubarItem>
           </MenubarContent>
@@ -205,7 +223,10 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
       
       <Menubar className="border-none p-0">
         <MenubarMenu>
-          <MenubarTrigger className="font-normal px-3">More</MenubarTrigger>
+          <MenubarTrigger className="font-normal px-3 flex items-center">
+            More
+            <ChevronDown className="h-4 w-4 ml-1" />
+          </MenubarTrigger>
           <MenubarContent>
             <MenubarItem onSelect={() => onAlignText("left")}>
               <AlignLeft className="h-4 w-4 mr-2" />

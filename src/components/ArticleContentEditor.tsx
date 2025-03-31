@@ -69,22 +69,65 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     return () => clearInterval(timerId);
   }, [onContentChange, undoStack, currentPosition, isInitialized]);
 
+  // Prevent paste with formatting in title and excerpt
+  const handlePasteInPlainElements = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  };
+
+  // Prevent keydown events that might allow formatting in title and excerpt
+  const handleKeyDownInPlainElements = (e: React.KeyboardEvent) => {
+    // Prevent formatting keyboard shortcuts
+    if ((e.ctrlKey || e.metaKey) && 
+        ['b', 'i', 'u'].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+    }
+  };
+
   // Handle title and excerpt changes without affecting cursor
   const handleTitleBlur = () => {
     if (titleRef.current) {
-      onTitleChange(titleRef.current.textContent || "");
+      // Strip any HTML formatting that might have been applied
+      const plainText = titleRef.current.textContent || "";
+      titleRef.current.textContent = plainText;
+      onTitleChange(plainText);
+      
+      // Set placeholder if empty
+      if (!plainText.trim()) {
+        titleRef.current.dataset.empty = "true";
+      } else {
+        titleRef.current.dataset.empty = "false";
+      }
     }
   };
   
   const handleExcerptBlur = () => {
     if (excerptRef.current) {
-      onExcerptChange(excerptRef.current.textContent || "");
+      // Strip any HTML formatting that might have been applied
+      const plainText = excerptRef.current.textContent || "";
+      excerptRef.current.textContent = plainText;
+      onExcerptChange(plainText);
+      
+      // Set placeholder if empty
+      if (!plainText.trim()) {
+        excerptRef.current.dataset.empty = "true";
+      } else {
+        excerptRef.current.dataset.empty = "false";
+      }
     }
   };
   
   const handleContentBlur = () => {
     if (contentRef.current) {
       onContentChange(contentRef.current.innerHTML);
+      
+      // Set placeholder if empty
+      if (!contentRef.current.textContent?.trim()) {
+        contentRef.current.dataset.empty = "true";
+      } else {
+        contentRef.current.dataset.empty = "false";
+      }
     }
   };
 
@@ -116,6 +159,12 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   };
 
   const handleFormatText = (format: string) => {
+    // Only allow formatting in the main content
+    if (!contentRef.current) return;
+    
+    // Make sure the content area is focused
+    contentRef.current.focus();
+    
     document.execCommand("styleWithCSS", false, "true");
     
     switch (format) {
@@ -138,6 +187,9 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           range.deleteContents();
           range.insertNode(codeElement);
         }
+        break;
+      case "clearFormatting":
+        document.execCommand("removeFormat", false);
         break;
       case "heading1":
         document.execCommand("formatBlock", false, "<h1>");
@@ -164,13 +216,14 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       default:
         break;
     }
-    
-    if (contentRef.current) {
-      contentRef.current.focus();
-    }
   };
   
   const handleInsertMedia = (type: string) => {
+    // Make sure the content area is focused
+    if (contentRef.current) {
+      contentRef.current.focus();
+    }
+    
     switch (type) {
       case "link":
         const url = prompt("Enter URL:", "https://");
@@ -236,13 +289,13 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       default:
         break;
     }
-    
-    if (contentRef.current) {
-      contentRef.current.focus();
-    }
   };
   
   const handleAlignText = (alignment: string) => {
+    // Only allow alignment in the main content
+    if (!contentRef.current) return;
+    contentRef.current.focus();
+    
     switch (alignment) {
       case "left":
         document.execCommand("justifyLeft", false);
@@ -258,10 +311,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         break;
       default:
         break;
-    }
-    
-    if (contentRef.current) {
-      contentRef.current.focus();
     }
   };
   
@@ -279,35 +328,42 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       <div className="py-6 px-8 max-w-4xl mx-auto">
         <h1
           ref={titleRef}
-          className="text-4xl font-bold mb-4 outline-none"
+          className="text-4xl font-bold mb-4 outline-none relative"
           contentEditable
           suppressContentEditableWarning
-          data-placeholder="Title"
+          onPaste={handlePasteInPlainElements}
+          onKeyDown={handleKeyDownInPlainElements}
           onBlur={handleTitleBlur}
+          data-placeholder="Title"
+          data-empty={!initialTitle ? "true" : "false"}
         >
-          {!isInitialized && (initialTitle || "Title")}
+          {!isInitialized && (initialTitle || "")}
         </h1>
         
         <p
           ref={excerptRef}
-          className="text-lg text-gray-500 mb-8 outline-none"
+          className="text-lg text-gray-500 mb-8 outline-none relative"
           contentEditable
           suppressContentEditableWarning
-          data-placeholder="Add a subtitle..."
+          onPaste={handlePasteInPlainElements}
+          onKeyDown={handleKeyDownInPlainElements}
           onBlur={handleExcerptBlur}
+          data-placeholder="Add a subtitle..."
+          data-empty={!initialExcerpt ? "true" : "false"}
         >
-          {!isInitialized && (initialExcerpt || "Add a subtitle...")}
+          {!isInitialized && (initialExcerpt || "")}
         </p>
         
         <div
           ref={contentRef}
-          className="prose prose-lg max-w-none outline-none min-h-[50vh]"
+          className="prose prose-lg max-w-none outline-none min-h-[50vh] relative"
           contentEditable
           suppressContentEditableWarning
-          data-placeholder="Start writing..."
           onBlur={handleContentBlur}
+          data-placeholder="Start writing..."
+          data-empty={!initialContent ? "true" : "false"}
         >
-          {!isInitialized && (initialContent || "<p>Start writing...</p>")}
+          {!isInitialized && (initialContent || "")}
         </div>
       </div>
     </div>
@@ -315,3 +371,19 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 };
 
 export default ArticleContentEditor;
+
+// Add CSS for placeholders
+const style = document.createElement('style');
+style.innerHTML = `
+  [contenteditable][data-placeholder]:empty:before,
+  [contenteditable][data-empty="true"]:before {
+    content: attr(data-placeholder);
+    color: #9ca3af;
+    font-style: italic;
+    cursor: text;
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+  }
+`;
+document.head.appendChild(style);
