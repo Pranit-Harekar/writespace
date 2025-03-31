@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Calendar, Clock, Pencil, ChevronLeft } from "lucide-react";
@@ -177,7 +178,6 @@ const ArticleView = () => {
                 {article.categories?.name || article.category}
               </Badge>
             )}
-            <Badge variant="secondary">{article.language === 'en' ? 'English' : article.language}</Badge>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold mb-6">{article.title}</h1>

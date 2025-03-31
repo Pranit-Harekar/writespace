@@ -13,7 +13,6 @@ export const mockArticles: ArticleProps[] = [
     },
     publishedAt: "2023-05-15T10:30:00Z",
     category: "Technology",
-    language: "English",
     readTime: 8,
     featuredImage: "https://images.unsplash.com/photo-1677442135133-4da2706d8032?q=80&w=1932&auto=format&fit=crop"
   },
@@ -28,7 +27,6 @@ export const mockArticles: ArticleProps[] = [
     },
     publishedAt: "2023-06-20T14:45:00Z",
     category: "Food",
-    language: "Hindi",
     readTime: 6,
     featuredImage: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?q=80&w=2036&auto=format&fit=crop"
   },
@@ -43,7 +41,6 @@ export const mockArticles: ArticleProps[] = [
     },
     publishedAt: "2023-07-10T09:15:00Z",
     category: "Culture",
-    language: "Bengali",
     readTime: 10,
     featuredImage: "https://images.unsplash.com/photo-1533669955142-6a73332af4db?q=80&w=2074&auto=format&fit=crop"
   },
@@ -58,7 +55,6 @@ export const mockArticles: ArticleProps[] = [
     },
     publishedAt: "2023-08-05T16:20:00Z",
     category: "Environment",
-    language: "Tamil",
     readTime: 7,
     featuredImage: "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2072&auto=format&fit=crop"
   },
@@ -73,7 +69,6 @@ export const mockArticles: ArticleProps[] = [
     },
     publishedAt: "2023-09-12T11:40:00Z",
     category: "Business",
-    language: "Telugu",
     readTime: 9,
     featuredImage: "https://images.unsplash.com/photo-1580745194333-d293b008277a?q=80&w=2070&auto=format&fit=crop"
   },
@@ -88,7 +83,6 @@ export const mockArticles: ArticleProps[] = [
     },
     publishedAt: "2023-10-18T13:25:00Z",
     category: "Finance",
-    language: "English",
     readTime: 5,
     featuredImage: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?q=80&w=2070&auto=format&fit=crop"
   }
