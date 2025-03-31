@@ -38,7 +38,6 @@ const TipTapEditor: React.FC<EditorProps> = ({
       }),
       Placeholder.configure({
         placeholder,
-        emptyEditorClass: 'is-editor-empty',
       }),
     ],
     content: initialValue,

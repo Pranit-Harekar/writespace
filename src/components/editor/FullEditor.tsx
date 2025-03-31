@@ -39,7 +39,6 @@ const FullEditor: React.FC<FullEditorProps> = ({
       }),
       Placeholder.configure({
         placeholder,
-        emptyEditorClass: 'is-editor-empty',
       }),
     ],
     content: initialValue,
@@ -62,7 +61,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
 
   return (
     <div className="bg-white border rounded-md shadow-sm">
-      <RichTextToolbar />
+      <RichTextToolbar editor={editor} />
       <div className="p-4">
         <EditorContent editor={editor} className={className} />
       </div>

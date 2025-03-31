@@ -1,12 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Editor, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import Placeholder from '@tiptap/extension-placeholder';
+import React from 'react';
+import { Editor } from '@tiptap/react';
 import {
   Bold,
   Italic,
@@ -37,24 +31,11 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar';
 
-const RichTextToolbar: React.FC = () => {
-  // Create our own editor for the toolbar
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Image,
-      Link.configure({
-        openOnClick: false,
-      }),
-      Underline,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Placeholder,
-    ],
-    content: '',
-  });
+interface RichTextToolbarProps {
+  editor: Editor | null;
+}
 
+const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
   if (!editor) {
     return null;
   }
