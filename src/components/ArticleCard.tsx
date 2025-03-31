@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { stripHtml } from '@/lib/textUtils';
 
 export interface ArticleProps {
   id: string;
@@ -57,7 +59,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground mb-3">{excerpt}</p>
+        <p className="text-muted-foreground mb-3">{stripHtml(excerpt)}</p>
       </CardContent>
       <CardFooter className="flex justify-between pt-2 border-t text-sm text-muted-foreground">
         <div className="flex items-center gap-2">

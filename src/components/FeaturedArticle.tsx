@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
@@ -5,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ArticleProps } from './ArticleCard';
+import { stripHtml } from '@/lib/textUtils';
 
 export const FeaturedArticle: React.FC<ArticleProps> = ({
   id,
@@ -28,7 +30,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
           <h1 className="text-2xl md:text-3xl font-bold mb-4 hover:text-primary transition-colors">
             <Link to={`/article/${id}`}>{title}</Link>
           </h1>
-          <p className="text-muted-foreground mb-6">{excerpt}</p>
+          <p className="text-muted-foreground mb-6">{stripHtml(excerpt)}</p>
         </div>
         <div className="flex flex-wrap justify-between items-center">
           <div className="flex items-center gap-3 mb-3 md:mb-0">

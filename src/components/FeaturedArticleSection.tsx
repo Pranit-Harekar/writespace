@@ -3,17 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { FeaturedArticle } from '@/components/FeaturedArticle';
 import { ArticleProps } from '@/components/ArticleCard';
-
-// Helper function to extract excerpt from content
-const extractExcerpt = (content: string, maxLength: number = 160): string => {
-  // Remove HTML tags
-  const plainText = content
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  // Return a truncated version
-  return plainText.length > maxLength ? plainText.substring(0, maxLength) + '...' : plainText;
-};
+import { extractExcerpt } from '@/lib/textUtils';
 
 export const FeaturedArticleSection = () => {
   const { toast } = useToast();
@@ -84,8 +74,7 @@ export const FeaturedArticleSection = () => {
 
           if (authorError) {
             console.warn('Author profile not found:', authorError);
-            // Create a formatted article without author details
-
+            
             // Get category name from the categories relation or fall back to the category field
             const categoryName = fallbackData.categories
               ? fallbackData.categories.name

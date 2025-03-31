@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
+import { extractExcerpt } from '@/lib/textUtils';
 
 interface ArticlesListProps {
   limit?: number;
@@ -9,17 +10,6 @@ interface ArticlesListProps {
   filterByLanguage?: string;
   searchQuery?: string;
 }
-
-// Helper function to extract excerpt from content
-const extractExcerpt = (content: string, maxLength: number = 150): string => {
-  // Remove HTML tags
-  const plainText = content
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  // Return a truncated version
-  return plainText.length > maxLength ? plainText.substring(0, maxLength) + '...' : plainText;
-};
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
   limit = 6,
@@ -131,7 +121,9 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           const categoryName = item.categories ? item.categories.name : item.category;
 
           // Use explicit subtitle or generate from content
-          const excerptText = item.subtitle?.trim() ? item.subtitle : extractExcerpt(item.content);
+          const excerptText = item.subtitle?.trim() 
+            ? item.subtitle 
+            : extractExcerpt(item.content);
 
           return {
             id: item.id,
