@@ -13,14 +13,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { 
-  Form, 
-  FormControl, 
-  FormDescription, 
-  FormField, 
-  FormItem, 
-  FormLabel 
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { CategorySelector } from "@/components/CategorySelector";
 import { Input } from "@/components/ui/input";
 import {
@@ -69,7 +62,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           <div className="space-y-2">
             <div className="flex items-center">
               <Tag className="h-4 w-4 mr-2" />
-              <FormLabel className="text-sm font-medium">Category</FormLabel>
+              <Label className="text-sm font-medium">Category</Label>
             </div>
             <CategorySelector
               value={categoryName}
@@ -81,7 +74,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           <div className="space-y-2">
             <div className="flex items-center">
               <Globe className="h-4 w-4 mr-2" />
-              <FormLabel className="text-sm font-medium">Language</FormLabel>
+              <Label className="text-sm font-medium">Language</Label>
             </div>
             <Select 
               value={language} 
@@ -102,7 +95,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           <div className="space-y-2">
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-2" />
-              <FormLabel className="text-sm font-medium">Read Time (minutes)</FormLabel>
+              <Label className="text-sm font-medium">Read Time (minutes)</Label>
             </div>
             <Input
               type="number"
@@ -115,7 +108,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           <div className="space-y-2">
             <div className="flex items-center">
               <ImageIcon className="h-4 w-4 mr-2" />
-              <FormLabel className="text-sm font-medium">Featured Image URL</FormLabel>
+              <Label className="text-sm font-medium">Featured Image URL</Label>
             </div>
             <Input
               type="text"
@@ -141,16 +134,16 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <CalendarCheck className="h-4 w-4 mr-2" />
-                <FormLabel className="text-sm font-medium">Publish Article</FormLabel>
+                <Label className="text-sm font-medium">Publish Article</Label>
               </div>
               <Switch 
                 checked={isPublished} 
                 onCheckedChange={onPublishChange} 
               />
             </div>
-            <FormDescription className="mt-1 text-xs">
+            <p className="mt-1 text-xs text-muted-foreground">
               {isPublished ? "This article is visible to all users" : "This article is in draft mode"}
-            </FormDescription>
+            </p>
           </div>
         </CardContent>
       </Card>
