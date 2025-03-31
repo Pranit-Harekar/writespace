@@ -1,30 +1,29 @@
-
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, Search, User, LogIn, LogOut, FileText, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { BookOpen, Search, User, LogIn, LogOut, FileText, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 export const Header = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase();
   };
 
@@ -59,7 +58,7 @@ export const Header = () => {
 
         <div className="flex items-center gap-3">
           <LanguageSelector />
-          
+
           {user ? (
             <>
               <div className="hidden sm:flex gap-2">
@@ -74,14 +73,14 @@ export const Header = () => {
                   </Link>
                 </Button>
               </div>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar>
-                      <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || ""} />
+                      <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || ''} />
                       <AvatarFallback>
-                        {profile?.full_name ? getInitials(profile.full_name) : "U"}
+                        {profile?.full_name ? getInitials(profile.full_name) : 'U'}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -89,12 +88,8 @@ export const Header = () => {
                 <DropdownMenuContent align="end">
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      {profile?.full_name && (
-                        <p className="font-medium">{profile.full_name}</p>
-                      )}
-                      {user?.email && (
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                      )}
+                      {profile?.full_name && <p className="font-medium">{profile.full_name}</p>}
+                      {user?.email && <p className="text-sm text-muted-foreground">{user.email}</p>}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
@@ -135,16 +130,16 @@ export const Header = () => {
               </Button>
             </div>
           )}
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
+
+          <Button
+            variant="ghost"
+            size="icon"
             className="md:hidden"
             onClick={() => navigate('/search')}
           >
             <Search className="h-5 w-5" />
           </Button>
-          
+
           {!user && (
             <Button variant="ghost" size="icon" className="sm:hidden" asChild>
               <Link to="/login">

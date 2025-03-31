@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { useEditorHistory } from './editor/useEditorHistory';
 import EditorTitle from './editor/EditorTitle';
@@ -39,6 +38,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 
     const timerId = setInterval(saveContent, 3000);
     return () => clearInterval(timerId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleUndo = () => {
@@ -255,7 +255,7 @@ style.innerHTML = `
     left: 0;
     pointer-events: none;
   }
-  
+
   /* Make sure placeholders don't show when content exists */
   [contenteditable][data-placeholder][data-empty="false"]:before {
     content: none;

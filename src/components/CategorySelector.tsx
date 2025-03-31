@@ -40,11 +40,11 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
       if (error) throw error;
       setCategories(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching categories:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to load categories',
+        description: error['message'] || 'Failed to load categories',
         variant: 'destructive',
       });
     } finally {
@@ -54,6 +54,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   useEffect(() => {
     fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle selection of existing category

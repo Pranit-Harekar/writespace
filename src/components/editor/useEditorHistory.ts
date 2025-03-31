@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 export function useEditorHistory(initialContent: string) {
@@ -19,10 +18,10 @@ export function useEditorHistory(initialContent: string) {
     if (currentPosition > 0) {
       const newPosition = currentPosition - 1;
       setCurrentPosition(newPosition);
-      
+
       const newRedoStack = [...redoStack, undoStack[currentPosition]];
       setRedoStack(newRedoStack);
-      
+
       return undoStack[newPosition];
     }
     return null;
@@ -31,12 +30,12 @@ export function useEditorHistory(initialContent: string) {
   const redo = () => {
     if (redoStack.length > 0) {
       const newContent = redoStack[redoStack.length - 1];
-      
+
       const newUndoStack = [...undoStack, newContent];
       setUndoStack(newUndoStack);
       setRedoStack(redoStack.slice(0, -1));
       setCurrentPosition(newUndoStack.length - 1);
-      
+
       return newContent;
     }
     return null;
@@ -47,6 +46,6 @@ export function useEditorHistory(initialContent: string) {
     undo,
     redo,
     canUndo: currentPosition > 0,
-    canRedo: redoStack.length > 0
+    canRedo: redoStack.length > 0,
   };
 }

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { ArticleCard, ArticleProps } from "@/components/ArticleCard";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 
 interface ArticlesListProps {
   limit?: number;
@@ -13,11 +13,12 @@ interface ArticlesListProps {
 // Helper function to extract excerpt from content
 const extractExcerpt = (content: string, maxLength: number = 150): string => {
   // Remove HTML tags
-  const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const plainText = content
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   // Return a truncated version
-  return plainText.length > maxLength 
-    ? plainText.substring(0, maxLength) + '...' 
-    : plainText;
+  return plainText.length > maxLength ? plainText.substring(0, maxLength) + '...' : plainText;
 };
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
@@ -36,27 +37,31 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
       try {
         // Start building the query
         let query = supabase
-          .from("articles")
-          .select(`
-            id, 
-            title, 
-            subtitle, 
+          .from('articles')
+          .select(
+            `
+            id,
+            title,
+            subtitle,
             content,
-            category, 
+            category,
             category_id,
             categories:category_id(id, name),
-            language, 
-            read_time, 
+            language,
+            read_time,
             featured_image,
             published_at,
             author_id
-          `)
-          .eq("is_published", true)
-          .order("published_at", { ascending: false });
+          `,
+          )
+          .eq('is_published', true)
+          .order('published_at', { ascending: false });
 
         // Apply search filter if provided
         if (searchQuery) {
-          query = query.or(`title.ilike.%${searchQuery}%,subtitle.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`);
+          query = query.or(
+            `title.ilike.%${searchQuery}%,subtitle.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`,
+          );
         }
 
         // If category filter is provided
@@ -67,19 +72,19 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             .select('id')
             .ilike('name', filterByCategory)
             .single();
-            
+
           if (categoryError) {
             // Fall back to the category column if no match in categories table
-            query = query.ilike("category", filterByCategory);
+            query = query.ilike('category', filterByCategory);
           } else if (categoryData) {
             // Use the category_id if we found a match
-            query = query.eq("category_id", categoryData.id);
+            query = query.eq('category_id', categoryData.id);
           }
         }
 
         // Apply language filter if provided
         if (filterByLanguage) {
-          query = query.eq("language", filterByLanguage);
+          query = query.eq('language', filterByLanguage);
         }
 
         // Apply limit
@@ -97,38 +102,36 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         }
 
         // Extract author_ids to fetch profiles
-        const authorIds = [...new Set(articlesData.map(article => article.author_id))];
+        const authorIds = [...new Set(articlesData.map((article) => article.author_id))];
 
         // Fetch author profiles
         const { data: profilesData, error: profilesError } = await supabase
-          .from("profiles")
-          .select("id, username, full_name, avatar_url")
-          .in("id", authorIds);
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .in('id', authorIds);
 
         if (profilesError) throw profilesError;
 
         // Create a lookup map for profiles
         const profileMap = new Map();
-        profilesData?.forEach(profile => {
+        profilesData?.forEach((profile) => {
           profileMap.set(profile.id, profile);
         });
 
         // Transform data to match ArticleProps
         const formattedArticles = articlesData.map((item) => {
-          const profile = profileMap.get(item.author_id) || { 
-            id: item.author_id, 
-            username: 'Anonymous', 
-            full_name: null, 
-            avatar_url: null 
+          const profile = profileMap.get(item.author_id) || {
+            id: item.author_id,
+            username: 'Anonymous',
+            full_name: null,
+            avatar_url: null,
           };
 
           // Get category name from the categories relation or fall back to the category field
           const categoryName = item.categories ? item.categories.name : item.category;
 
           // Use explicit subtitle or generate from content
-          const excerptText = item.subtitle?.trim() 
-            ? item.subtitle
-            : extractExcerpt(item.content);
+          const excerptText = item.subtitle?.trim() ? item.subtitle : extractExcerpt(item.content);
 
           return {
             id: item.id,
@@ -136,11 +139,11 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             excerpt: excerptText,
             author: {
               id: profile.id,
-              name: profile.full_name || profile.username || "Anonymous",
+              name: profile.full_name || profile.username || 'Anonymous',
               profileImage: profile.avatar_url || undefined,
             },
-            publishedAt: item.published_at || "",
-            category: categoryName || "Uncategorized",
+            publishedAt: item.published_at || '',
+            category: categoryName || 'Uncategorized',
             language: item.language,
             readTime: item.read_time || 5,
             featuredImage: item.featured_image || undefined,
@@ -148,12 +151,12 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         });
 
         setArticles(formattedArticles);
-      } catch (error: any) {
-        console.error("Error fetching articles:", error);
+      } catch (error: unknown) {
+        console.error('Error fetching articles:', error);
         toast({
-          title: "Error",
-          description: error.message || "Failed to load articles",
-          variant: "destructive",
+          title: 'Error',
+          description: error['message'] || 'Failed to load articles',
+          variant: 'destructive',
         });
       } finally {
         setIsLoading(false);
@@ -169,10 +172,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         {Array(limit)
           .fill(null)
           .map((_, index) => (
-            <div
-              key={index}
-              className="border rounded-lg p-4 h-64 animate-pulse"
-            >
+            <div key={index} className="border rounded-lg p-4 h-64 animate-pulse">
               <div className="bg-muted h-1/3 mb-4 rounded"></div>
               <div className="bg-muted h-4 mb-2 rounded w-3/4"></div>
               <div className="bg-muted h-4 mb-4 rounded w-1/2"></div>
@@ -189,8 +189,8 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         <h2 className="text-xl font-medium mb-2">No articles found</h2>
         <p className="text-muted-foreground">
           {filterByCategory || filterByLanguage
-            ? "Try changing your filters or check back later."
-            : "Check back later for new content."}
+            ? 'Try changing your filters or check back later.'
+            : 'Check back later for new content.'}
         </p>
       </div>
     );

@@ -1,11 +1,10 @@
-
-import React from "react";
-import { Link } from "react-router-dom";
-import { Calendar } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { ArticleProps } from "./ArticleCard";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Calendar } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { ArticleProps } from './ArticleCard';
 
 export const FeaturedArticle: React.FC<ArticleProps> = ({
   id,
@@ -38,10 +37,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
               <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <Link
-                to={`/profile/${author.id}`}
-                className="font-medium hover:text-primary"
-              >
+              <Link to={`/profile/${author.id}`} className="font-medium hover:text-primary">
                 {author.name}
               </Link>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -60,11 +56,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
       </div>
       <div className="md:col-span-2 order-1 md:order-2 h-48 md:h-auto">
         {featuredImage ? (
-          <img
-            src={featuredImage}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
+          <img src={featuredImage} alt={title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center">
             <span className="text-muted-foreground">No image available</span>

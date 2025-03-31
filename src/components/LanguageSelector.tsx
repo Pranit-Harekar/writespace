@@ -1,14 +1,12 @@
-
-import React from "react";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useLanguage, LANGUAGES, Language } from "@/contexts/LanguageContext";
+} from '@/components/ui/dropdown-menu';
+import { useLanguage, LANGUAGES, Language } from '@/contexts/LanguageContext';
 
 export const LanguageSelector = () => {
   const { language, setLanguage } = useLanguage();
@@ -26,7 +24,7 @@ export const LanguageSelector = () => {
           <DropdownMenuItem
             key={code}
             onClick={() => setLanguage(code as Language)}
-            className={language === code ? "bg-accent" : ""}
+            className={language === code ? 'bg-accent' : ''}
           >
             {lang.name}
           </DropdownMenuItem>

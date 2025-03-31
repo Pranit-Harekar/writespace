@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 
 interface EditorContentProps {
@@ -9,7 +8,7 @@ interface EditorContentProps {
 const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChange }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   // Initialize content only once
   useEffect(() => {
     if (!isInitialized && contentRef.current) {
@@ -35,7 +34,7 @@ const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChan
     if (contentRef.current) {
       const content = contentRef.current.innerHTML;
       onValueChange(content);
-      
+
       const hasText = contentRef.current.textContent?.trim() !== '';
       contentRef.current.dataset.empty = hasText ? 'false' : 'true';
     }
