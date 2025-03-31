@@ -23,31 +23,38 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   const [undoStack, setUndoStack] = useState<string[]>([initialContent]);
   const [redoStack, setRedoStack] = useState<string[]>([]);
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const excerptRef = useRef<HTMLParagraphElement>(null);
 
   // Set initial content only once on mount
   useEffect(() => {
-    if (contentRef.current && initialContent) {
-      contentRef.current.innerHTML = initialContent;
+    if (!isInitialized) {
+      if (contentRef.current && initialContent) {
+        contentRef.current.innerHTML = initialContent;
+      }
+      if (titleRef.current && initialTitle) {
+        titleRef.current.textContent = initialTitle;
+      }
+      if (excerptRef.current && initialExcerpt) {
+        excerptRef.current.textContent = initialExcerpt;
+      }
+      setIsInitialized(true);
     }
-    if (titleRef.current && initialTitle) {
-      titleRef.current.textContent = initialTitle;
-    }
-    if (excerptRef.current && initialExcerpt) {
-      excerptRef.current.textContent = initialExcerpt;
-    }
-  }, []);
+  }, [initialContent, initialTitle, initialExcerpt, isInitialized]);
 
   // Handle auto-save without resetting cursor position
   useEffect(() => {
+    if (!isInitialized) return; // Skip auto-save until initialized
+    
     const saveContent = () => {
       if (contentRef.current) {
         const newContent = contentRef.current.innerHTML;
         
-        // Only update if content actually changed
-        if (undoStack[currentPosition] !== newContent) {
+        // Only update if content actually changed and not empty
+        if (undoStack[currentPosition] !== newContent && newContent !== "") {
+          // Prevent double encoding of HTML entities
           onContentChange(newContent);
           
           const newUndoStack = [...undoStack.slice(0, currentPosition + 1), newContent];
@@ -60,7 +67,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 
     const timerId = setInterval(saveContent, 1000);
     return () => clearInterval(timerId);
-  }, [onContentChange, undoStack, currentPosition]);
+  }, [onContentChange, undoStack, currentPosition, isInitialized]);
 
   // Handle title and excerpt changes without affecting cursor
   const handleTitleBlur = () => {
@@ -278,7 +285,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           data-placeholder="Title"
           onBlur={handleTitleBlur}
         >
-          {initialTitle || "Title"}
+          {!isInitialized && (initialTitle || "Title")}
         </h1>
         
         <p
@@ -289,7 +296,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           data-placeholder="Add a subtitle..."
           onBlur={handleExcerptBlur}
         >
-          {initialExcerpt || "Add a subtitle..."}
+          {!isInitialized && (initialExcerpt || "Add a subtitle...")}
         </p>
         
         <div
@@ -300,7 +307,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           data-placeholder="Start writing..."
           onBlur={handleContentBlur}
         >
-          {initialContent || "<p>Start writing...</p>"}
+          {!isInitialized && (initialContent || "<p>Start writing...</p>")}
         </div>
       </div>
     </div>
