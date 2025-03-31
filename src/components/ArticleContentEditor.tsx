@@ -44,7 +44,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
-        validateUrl: url => /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
+        validate: url => /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
       }),
       Underline,
       TextAlign.configure({

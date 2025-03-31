@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@tiptap/react';
 import {
@@ -74,20 +73,25 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
       checkForLink();
     };
 
-    // Also check when the user clicks in the editor
-    const handleClick = () => {
-      checkForLink();
-    };
-
     editor.on('selectionUpdate', handleSelectionUpdate);
-    editor.on('click', handleClick);
+    
+    // Register for mousedown events to detect link clicks
+    const editorElement = editor.view.dom;
+    
+    const handleMouseDown = () => {
+      setTimeout(() => {
+        checkForLink();
+      }, 10);
+    };
+    
+    editorElement.addEventListener('mousedown', handleMouseDown);
     
     // Initial check
     handleSelectionUpdate();
     
     return () => {
       editor.off('selectionUpdate', handleSelectionUpdate);
-      editor.off('click', handleClick);
+      editorElement.removeEventListener('mousedown', handleMouseDown);
     };
   }, [editor, checkForLink]);
 
