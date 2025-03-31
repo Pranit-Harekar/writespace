@@ -1,51 +1,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { ChevronLeft, Save, Trash2, Eye, Clock, Globe } from "lucide-react";
+import { ChevronLeft, Save, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { CategorySelector } from "@/components/CategorySelector";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-
-type ArticleFormValues = {
-  title: string;
-  content: string;
-  excerpt: string;
-  category: string;
-  language: string;
-  featured_image: string;
-  read_time: number;
-  is_published: boolean;
-};
+import ArticleContentEditor from "@/components/ArticleContentEditor";
+import ArticleMetaSidebar from "@/components/ArticleMetaSidebar";
 
 const ArticleEditor = () => {
   const { id } = useParams();
@@ -54,21 +17,21 @@ const ArticleEditor = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  
+  // Article content state
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [excerpt, setExcerpt] = useState<string>("");
+  
+  // Article metadata state
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [categoryName, setCategoryName] = useState<string>("");
+  const [language, setLanguage] = useState<string>("en");
+  const [readTime, setReadTime] = useState<number>(5);
+  const [featuredImage, setFeaturedImage] = useState<string>("");
+  const [isPublished, setIsPublished] = useState<boolean>(false);
+  
   const isEditing = Boolean(id);
-
-  const form = useForm<ArticleFormValues>({
-    defaultValues: {
-      title: "",
-      content: "",
-      excerpt: "",
-      category: "",
-      language: "en",
-      featured_image: "",
-      read_time: 5,
-      is_published: false,
-    },
-  });
 
   // Fetch article if editing
   useEffect(() => {
@@ -96,19 +59,18 @@ const ArticleEditor = () => {
           return;
         }
 
-        // Set the category ID
+        // Set the article content
+        setTitle(data.title);
+        setContent(data.content);
+        setExcerpt(data.excerpt || "");
+        
+        // Set the metadata
         setCategoryId(data.category_id);
-
-        form.reset({
-          title: data.title,
-          content: data.content,
-          excerpt: data.excerpt || "",
-          category: data.category || (data.categories ? data.categories.name : ""),
-          language: data.language,
-          featured_image: data.featured_image || "",
-          read_time: data.read_time || 5,
-          is_published: data.is_published || false,
-        });
+        setCategoryName(data.category || (data.categories ? data.categories.name : ""));
+        setLanguage(data.language);
+        setReadTime(data.read_time || 5);
+        setFeaturedImage(data.featured_image || "");
+        setIsPublished(data.is_published || false);
       } catch (error: any) {
         console.error("Error fetching article:", error);
         toast({
@@ -122,14 +84,14 @@ const ArticleEditor = () => {
     };
 
     fetchArticle();
-  }, [id, user, navigate, toast, form]);
+  }, [id, user, navigate, toast]);
 
   const handleCategoryChange = (categoryName: string, id: string | null) => {
-    form.setValue("category", categoryName);
+    setCategoryName(categoryName);
     setCategoryId(id);
   };
 
-  const onSubmit = async (values: ArticleFormValues) => {
+  const handleSave = async () => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -139,14 +101,29 @@ const ArticleEditor = () => {
       return;
     }
 
+    if (!title.trim()) {
+      toast({
+        title: "Title required",
+        description: "Please provide a title for your article",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
       const articleData = {
-        ...values,
+        title,
+        content,
+        excerpt,
         author_id: user.id,
         category_id: categoryId,
-        published_at: values.is_published ? new Date().toISOString() : null,
+        language,
+        featured_image: featuredImage,
+        read_time: readTime,
+        is_published: isPublished,
+        published_at: isPublished ? new Date().toISOString() : null,
       };
 
       let response;
@@ -224,6 +201,19 @@ const ArticleEditor = () => {
     }
   };
 
+  if (isLoading && isEditing) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="container mx-auto px-4 py-8 flex-1">
+          <div className="flex items-center justify-center h-full">
+            <p>Loading article...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -248,7 +238,7 @@ const ArticleEditor = () => {
               </Button>
             )}
             <Button 
-              onClick={form.handleSubmit(onSubmit)}
+              onClick={handleSave}
               disabled={isLoading}
             >
               <Save className="h-4 w-4 mr-2" /> Save
@@ -256,176 +246,34 @@ const ArticleEditor = () => {
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{isEditing ? "Edit Article" : "Create New Article"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter article title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <FormControl>
-                          <CategorySelector 
-                            value={field.value} 
-                            categoryId={categoryId}
-                            onChange={handleCategoryChange}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="language"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Language</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="es">Spanish</SelectItem>
-                            <SelectItem value="fr">French</SelectItem>
-                            <SelectItem value="de">German</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="featured_image"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Featured Image URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://example.com/image.jpg" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Provide a URL to an image for your article
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="read_time"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Read Time (minutes)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="1"
-                            placeholder="5" 
-                            {...field} 
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="excerpt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Excerpt</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="A brief summary of your article" 
-                          rows={3}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        This will be displayed in article previews
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Write your article content here..." 
-                          rows={15}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="is_published"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Publish Article</FormLabel>
-                        <FormDescription>
-                          When enabled, your article will be visible to all users
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <ArticleContentEditor
+              initialContent={content}
+              initialTitle={title}
+              initialExcerpt={excerpt}
+              onContentChange={setContent}
+              onTitleChange={setTitle}
+              onExcerptChange={setExcerpt}
+            />
+          </div>
+          
+          <div className="lg:col-span-1">
+            <ArticleMetaSidebar
+              categoryId={categoryId}
+              categoryName={categoryName}
+              language={language}
+              readTime={readTime}
+              featuredImage={featuredImage}
+              isPublished={isPublished}
+              onCategoryChange={handleCategoryChange}
+              onLanguageChange={setLanguage}
+              onReadTimeChange={setReadTime}
+              onFeaturedImageChange={setFeaturedImage}
+              onPublishChange={setIsPublished}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

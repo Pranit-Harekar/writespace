@@ -1,0 +1,161 @@
+
+import React from "react";
+import { 
+  Clock, 
+  Globe, 
+  CalendarCheck, 
+  Tag, 
+  Image as ImageIcon
+} from "lucide-react";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { 
+  Form, 
+  FormControl, 
+  FormDescription, 
+  FormField, 
+  FormItem, 
+  FormLabel 
+} from "@/components/ui/form";
+import { CategorySelector } from "@/components/CategorySelector";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+
+interface ArticleMetaSidebarProps {
+  categoryId: string | null;
+  categoryName: string;
+  language: string;
+  readTime: number;
+  featuredImage: string;
+  isPublished: boolean;
+  onCategoryChange: (name: string, id: string | null) => void;
+  onLanguageChange: (lang: string) => void;
+  onReadTimeChange: (time: number) => void;
+  onFeaturedImageChange: (url: string) => void;
+  onPublishChange: (isPublished: boolean) => void;
+}
+
+const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
+  categoryId,
+  categoryName,
+  language,
+  readTime,
+  featuredImage,
+  isPublished,
+  onCategoryChange,
+  onLanguageChange,
+  onReadTimeChange,
+  onFeaturedImageChange,
+  onPublishChange,
+}) => {
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Article Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <Tag className="h-4 w-4 mr-2" />
+              <FormLabel className="text-sm font-medium">Category</FormLabel>
+            </div>
+            <CategorySelector
+              value={categoryName}
+              categoryId={categoryId}
+              onChange={onCategoryChange}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <Globe className="h-4 w-4 mr-2" />
+              <FormLabel className="text-sm font-medium">Language</FormLabel>
+            </div>
+            <Select 
+              value={language} 
+              onValueChange={onLanguageChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="es">Spanish</SelectItem>
+                <SelectItem value="fr">French</SelectItem>
+                <SelectItem value="de">German</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <Clock className="h-4 w-4 mr-2" />
+              <FormLabel className="text-sm font-medium">Read Time (minutes)</FormLabel>
+            </div>
+            <Input
+              type="number"
+              min="1"
+              value={readTime}
+              onChange={(e) => onReadTimeChange(parseInt(e.target.value) || 1)}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              <FormLabel className="text-sm font-medium">Featured Image URL</FormLabel>
+            </div>
+            <Input
+              type="text"
+              placeholder="https://example.com/image.jpg"
+              value={featuredImage}
+              onChange={(e) => onFeaturedImageChange(e.target.value)}
+            />
+            {featuredImage && (
+              <div className="mt-2 rounded-md overflow-hidden border">
+                <img 
+                  src={featuredImage} 
+                  alt="Featured" 
+                  className="w-full h-32 object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/placeholder.svg";
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          
+          <div className="pt-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <CalendarCheck className="h-4 w-4 mr-2" />
+                <FormLabel className="text-sm font-medium">Publish Article</FormLabel>
+              </div>
+              <Switch 
+                checked={isPublished} 
+                onCheckedChange={onPublishChange} 
+              />
+            </div>
+            <FormDescription className="mt-1 text-xs">
+              {isPublished ? "This article is visible to all users" : "This article is in draft mode"}
+            </FormDescription>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ArticleMetaSidebar;
