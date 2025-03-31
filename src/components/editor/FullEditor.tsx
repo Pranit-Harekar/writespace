@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -71,11 +70,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
     }
   }, [initialValue, editorInstance]);
 
-  return (
-    <div className="p-4">
-      <EditorContent editor={editor} className={className} />
-    </div>
-  );
+  return <EditorContent editor={editor} className={className} />;
 };
 
 export default FullEditor;

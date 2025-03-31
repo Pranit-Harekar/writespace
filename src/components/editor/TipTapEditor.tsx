@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -15,11 +14,11 @@ interface EditorProps {
   className?: string;
 }
 
-const TipTapEditor: React.FC<EditorProps> = ({ 
-  initialValue, 
-  onValueChange, 
+const TipTapEditor: React.FC<EditorProps> = ({
+  initialValue,
+  onValueChange,
   placeholder = 'Start writing...',
-  className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md' 
+  className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md',
 }) => {
   const editor = useEditor({
     extensions: [
@@ -58,9 +57,7 @@ const TipTapEditor: React.FC<EditorProps> = ({
     }
   }, [initialValue, editor]);
 
-  return (
-    <EditorContent editor={editor} className={className} />
-  );
+  return <EditorContent editor={editor} className={className} />;
 };
 
 export default TipTapEditor;

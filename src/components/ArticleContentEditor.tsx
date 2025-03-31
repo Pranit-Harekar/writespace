@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
 import FullEditor from './editor/FullEditor';
@@ -29,7 +28,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   onSubtitleChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   // Create a shared editor for the toolbar that will control the content editor
   const editor = useEditor({
     extensions: [
@@ -62,7 +61,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         <div className="bg-white border rounded-md shadow-sm mb-4">
           <RichTextToolbar editor={editor} />
         </div>
-        
+
         <TipTapPlainTextEditor
           initialValue={initialTitle}
           onValueChange={onTitleChange}
