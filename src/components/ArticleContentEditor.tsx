@@ -2,6 +2,14 @@
 import React, { useRef } from 'react';
 import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
 import FullEditor from './editor/FullEditor';
+import RichTextToolbar from './RichTextToolbar';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import Placeholder from '@tiptap/extension-placeholder';
 
 interface ArticleContentEditorProps {
   initialContent: string;
@@ -21,10 +29,40 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   onSubtitleChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  
+  // Create a shared editor for the toolbar that will control the content editor
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Image,
+      Link.configure({
+        openOnClick: false,
+      }),
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Placeholder.configure({
+        placeholder: 'Start writing...',
+      }),
+    ],
+    content: initialContent,
+    onUpdate: ({ editor }) => {
+      onContentChange(editor.getHTML());
+    },
+  });
 
   return (
     <div className="bg-white">
       <div className="py-6 px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
+        <div className="bg-white border rounded-md shadow-sm mb-4">
+          <RichTextToolbar editor={editor} />
+        </div>
+        
         <TipTapPlainTextEditor
           initialValue={initialTitle}
           onValueChange={onTitleChange}
@@ -46,6 +84,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           onValueChange={onContentChange}
           placeholder="Start writing..."
           className="prose prose-lg max-w-none outline-none min-h-[50vh] text-md"
+          editorInstance={editor}
         />
       </div>
     </div>

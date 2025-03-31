@@ -1,19 +1,19 @@
 
 import React, { useEffect } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
-import RichTextToolbar from '../RichTextToolbar';
 
 interface FullEditorProps {
   initialValue: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  editorInstance?: Editor | null;
 }
 
 const FullEditor: React.FC<FullEditorProps> = ({
@@ -21,8 +21,10 @@ const FullEditor: React.FC<FullEditorProps> = ({
   onValueChange,
   placeholder = 'Start writing...',
   className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md',
+  editorInstance,
 }) => {
-  const editor = useEditor({
+  // Only create a local editor if no external editor is provided
+  const localEditor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
@@ -52,19 +54,26 @@ const FullEditor: React.FC<FullEditorProps> = ({
     },
   });
 
-  // Update content when initialValue changes
+  // Determine which editor to use
+  const editor = editorInstance || localEditor;
+
+  // Update content when initialValue changes for local editor
   useEffect(() => {
-    if (editor && initialValue !== editor.getHTML()) {
-      editor.commands.setContent(initialValue);
+    if (localEditor && initialValue !== localEditor.getHTML()) {
+      localEditor.commands.setContent(initialValue);
     }
-  }, [initialValue, editor]);
+  }, [initialValue, localEditor]);
+
+  // For external editor, ensure content matches initialValue
+  useEffect(() => {
+    if (editorInstance && initialValue !== editorInstance.getHTML()) {
+      editorInstance.commands.setContent(initialValue);
+    }
+  }, [initialValue, editorInstance]);
 
   return (
-    <div className="bg-white border rounded-md shadow-sm">
-      <RichTextToolbar editor={editor} />
-      <div className="p-4">
-        <EditorContent editor={editor} className={className} />
-      </div>
+    <div className="p-4">
+      <EditorContent editor={editor} className={className} />
     </div>
   );
 };
