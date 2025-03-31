@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 
 interface EditorExcerptProps {
@@ -14,6 +15,7 @@ const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChan
         excerptRef.current.textContent = initialValue;
         excerptRef.current.dataset.empty = 'false';
       } else {
+        excerptRef.current.textContent = '';
         excerptRef.current.dataset.empty = 'true';
       }
     }
@@ -29,6 +31,17 @@ const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChan
     // Prevent formatting keyboard shortcuts
     if ((e.ctrlKey || e.metaKey) && ['b', 'i', 'u'].includes(e.key.toLowerCase())) {
       e.preventDefault();
+    }
+  };
+
+  const handleInput = () => {
+    if (excerptRef.current) {
+      const plainText = excerptRef.current.textContent || '';
+      if (!plainText.trim()) {
+        excerptRef.current.dataset.empty = 'true';
+      } else {
+        excerptRef.current.dataset.empty = 'false';
+      }
     }
   };
 
@@ -54,6 +67,7 @@ const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChan
       suppressContentEditableWarning
       onPaste={handlePaste}
       onKeyDown={handleKeyDown}
+      onInput={handleInput}
       onBlur={handleBlur}
       data-placeholder="Add a subtitle..."
     />

@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 
 interface EditorTitleProps {
@@ -17,6 +18,7 @@ const EditorTitle: React.FC<EditorTitleProps> = ({
         titleRef.current.textContent = initialValue;
         titleRef.current.dataset.empty = 'false';
       } else {
+        titleRef.current.textContent = '';
         titleRef.current.dataset.empty = 'true';
       }
     }
@@ -35,6 +37,17 @@ const EditorTitle: React.FC<EditorTitleProps> = ({
       ['b', 'i', 'u'].includes(e.key.toLowerCase())
     ) {
       e.preventDefault();
+    }
+  };
+
+  const handleInput = () => {
+    if (titleRef.current) {
+      const plainText = titleRef.current.textContent || '';
+      if (!plainText.trim()) {
+        titleRef.current.dataset.empty = 'true';
+      } else {
+        titleRef.current.dataset.empty = 'false';
+      }
     }
   };
 
@@ -60,6 +73,7 @@ const EditorTitle: React.FC<EditorTitleProps> = ({
       suppressContentEditableWarning
       onPaste={handlePaste}
       onKeyDown={handleKeyDown}
+      onInput={handleInput}
       onBlur={handleBlur}
       data-placeholder="Title"
     />

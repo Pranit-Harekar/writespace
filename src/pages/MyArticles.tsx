@@ -22,6 +22,11 @@ interface ArticleListItem {
   id: string;
   title: string;
   category: string | null;
+  category_id: string | null;
+  categories: {
+    id: string;
+    name: string;
+  } | null;
   language: string;
   created_at: string;
   updated_at: string;
@@ -46,7 +51,17 @@ const MyArticles = () => {
       try {
         const { data, error } = await supabase
           .from("articles")
-          .select("id, title, category, language, created_at, updated_at, is_published")
+          .select(`
+            id, 
+            title, 
+            category, 
+            category_id,
+            categories:category_id(id, name),
+            language, 
+            created_at, 
+            updated_at, 
+            is_published
+          `)
           .eq("author_id", user.id)
           .order("updated_at", { ascending: false });
 
@@ -119,7 +134,9 @@ const MyArticles = () => {
               {articles.map((article) => (
                 <TableRow key={article.id}>
                   <TableCell className="font-medium">{article.title}</TableCell>
-                  <TableCell>{article.category || "—"}</TableCell>
+                  <TableCell>
+                    {article.categories?.name || article.category || "—"}
+                  </TableCell>
                   <TableCell>{article.language === 'en' ? 'English' : article.language}</TableCell>
                   <TableCell>
                     <Badge variant={article.is_published ? "default" : "outline"}>

@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { useEditorHistory } from './editor/useEditorHistory';
 import EditorTitle from './editor/EditorTitle';
@@ -243,7 +244,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 
 export default ArticleContentEditor;
 
-// Add CSS for placeholders
+// Add improved CSS for placeholders
 const style = document.createElement('style');
 style.innerHTML = `
   [contenteditable][data-placeholder][data-empty="true"]:before {
@@ -253,6 +254,11 @@ style.innerHTML = `
     position: absolute;
     left: 0;
     pointer-events: none;
+  }
+  
+  /* Make sure placeholders don't show when content exists */
+  [contenteditable][data-placeholder][data-empty="false"]:before {
+    content: none;
   }
 `;
 document.head.appendChild(style);

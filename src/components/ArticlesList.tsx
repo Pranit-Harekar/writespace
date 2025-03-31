@@ -34,6 +34,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             excerpt, 
             category, 
             category_id,
+            categories:category_id(id, name),
             language, 
             read_time, 
             featured_image,
@@ -111,6 +112,9 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             avatar_url: null 
           };
 
+          // Get category name from the categories relation or fall back to the category field
+          const categoryName = item.categories ? item.categories.name : item.category;
+
           return {
             id: item.id,
             title: item.title,
@@ -121,7 +125,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
               profileImage: profile.avatar_url || undefined,
             },
             publishedAt: item.published_at || "",
-            category: item.category || "Uncategorized",
+            category: categoryName || "Uncategorized",
             language: item.language,
             readTime: item.read_time || 5,
             featuredImage: item.featured_image || undefined,

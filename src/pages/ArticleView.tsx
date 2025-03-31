@@ -17,6 +17,11 @@ interface Article {
   excerpt: string | null;
   author_id: string;
   category: string | null;
+  category_id: string | null;
+  categories: {
+    id: string;
+    name: string;
+  } | null;
   language: string;
   read_time: number | null;
   featured_image: string | null;
@@ -50,11 +55,24 @@ const ArticleView = () => {
         // Fetch article
         const { data: articleData, error: articleError } = await supabase
           .from("articles")
-          .select("*")
+          .select(`
+            *,
+            categories:category_id(id, name)
+          `)
           .eq("id", id)
-          .single();
+          .maybeSingle();
 
         if (articleError) throw articleError;
+        
+        if (!articleData) {
+          toast({
+            title: "Article not found",
+            description: "The article you're looking for doesn't exist",
+            variant: "destructive",
+          });
+          navigate("/");
+          return;
+        }
         
         // Check if article is published or if user is the author
         if (!articleData.is_published && (!user || user.id !== articleData.author_id)) {
@@ -155,8 +173,10 @@ const ArticleView = () => {
           )}
 
           <div className="flex gap-2 mb-4">
-            {article.category && (
-              <Badge variant="outline">{article.category}</Badge>
+            {(article.categories?.name || article.category) && (
+              <Badge variant="outline">
+                {article.categories?.name || article.category}
+              </Badge>
             )}
             <Badge variant="secondary">{article.language === 'en' ? 'English' : article.language}</Badge>
           </div>

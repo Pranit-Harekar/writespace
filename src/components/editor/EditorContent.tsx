@@ -24,6 +24,15 @@ const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChan
     }
   }, [initialValue, isInitialized]);
 
+  const handleInput = () => {
+    if (contentRef.current) {
+      const content = contentRef.current.innerHTML;
+      const hasText = contentRef.current.textContent?.trim() !== '';
+      
+      contentRef.current.dataset.empty = hasText ? 'false' : 'true';
+    }
+  };
+
   const handleBlur = () => {
     if (contentRef.current) {
       const content = contentRef.current.innerHTML;
@@ -43,6 +52,7 @@ const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChan
       className="prose prose-lg max-w-none outline-none min-h-[50vh] relative"
       contentEditable
       suppressContentEditableWarning
+      onInput={handleInput}
       onBlur={handleBlur}
       data-placeholder="Start writing..."
     />
