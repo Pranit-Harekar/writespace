@@ -34,6 +34,9 @@ const FullEditor: React.FC<FullEditorProps> = ({
       Image,
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-orange-500 underline hover:text-orange-600',
+        },
       }),
       Underline,
       TextAlign.configure({
@@ -71,7 +74,11 @@ const FullEditor: React.FC<FullEditorProps> = ({
     }
   }, [initialValue, editorInstance]);
 
-  return <EditorContent editor={editor} className={`${className} focus:outline-none`} />;
+  return (
+    <div className="relative">
+      <EditorContent editor={editor} className={`${className} focus:outline-none ProseMirror`} />
+    </div>
+  );
 };
 
 export default FullEditor;

@@ -44,6 +44,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
+        validateUrl: url => /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
       }),
       Underline,
       TextAlign.configure({
@@ -85,13 +86,15 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           tagName="p"
         />
 
-        <FullEditor
-          initialValue={initialContent}
-          onValueChange={onContentChange}
-          placeholder="Start writing..."
-          className="prose prose-lg max-w-none outline-none focus:outline-none min-h-[50vh] text-md relative"
-          editorInstance={editor}
-        />
+        <div className="relative">
+          <FullEditor
+            initialValue={initialContent}
+            onValueChange={onContentChange}
+            placeholder="Start writing..."
+            className="prose prose-lg max-w-none outline-none focus:outline-none min-h-[50vh] text-md relative"
+            editorInstance={editor}
+          />
+        </div>
       </div>
     </div>
   );

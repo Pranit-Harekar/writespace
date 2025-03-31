@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@tiptap/react';
 import {
   Popover,
@@ -20,36 +20,76 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isLinkMenuOpen, setIsLinkMenuOpen] = useState<boolean>(false);
   const [currentLink, setCurrentLink] = useState<string>('');
+  const [activeLinkPosition, setActiveLinkPosition] = useState<{ top: number; left: number } | null>(null);
 
-  useEffect(() => {
-    // When selection changes, check if a link is selected
-    const handleSelectionUpdate = () => {
-      if (editor.isActive('link')) {
-        const linkAttrs = editor.getAttributes('link');
-        setCurrentLink(linkAttrs.href || '');
-        setIsEditing(true);
-      } else {
-        setIsEditing(false);
-        
-        // Get selected text
-        const { from, to } = editor.state.selection;
-        const text = editor.state.doc.textBetween(from, to, ' ');
-        setSelectedText(text);
-        
-        // Reset url input if not editing
-        if (!isEditing) {
-          setUrl('');
+  // Function to check if the current selection is on a link
+  const checkForLink = useCallback(() => {
+    if (!editor) return;
+
+    if (editor.isActive('link')) {
+      const linkAttrs = editor.getAttributes('link');
+      setCurrentLink(linkAttrs.href || '');
+      setIsEditing(true);
+
+      // Calculate position for the floating link menu
+      if (window.getSelection) {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          
+          // Get editor container position
+          const editorElement = editor.view.dom.closest('.ProseMirror');
+          if (editorElement) {
+            const editorRect = editorElement.getBoundingClientRect();
+            
+            setActiveLinkPosition({
+              top: rect.top - editorRect.top - 40, // Position above the link
+              left: rect.left - editorRect.left,
+            });
+          }
         }
       }
+    } else {
+      setIsEditing(false);
+      setActiveLinkPosition(null);
+      
+      // Get selected text
+      const { from, to } = editor.state.selection;
+      const text = editor.state.doc.textBetween(from, to, ' ');
+      setSelectedText(text);
+      
+      // Reset url input if not editing
+      if (!isEditing) {
+        setUrl('');
+      }
+    }
+  }, [editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    // Check for link on selection change
+    const handleSelectionUpdate = () => {
+      checkForLink();
+    };
+
+    // Also check when the user clicks in the editor
+    const handleClick = () => {
+      checkForLink();
     };
 
     editor.on('selectionUpdate', handleSelectionUpdate);
-    handleSelectionUpdate(); // Initial check
+    editor.on('click', handleClick);
+    
+    // Initial check
+    handleSelectionUpdate();
     
     return () => {
       editor.off('selectionUpdate', handleSelectionUpdate);
+      editor.off('click', handleClick);
     };
-  }, [editor]);
+  }, [editor, checkForLink]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +115,8 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
   const removeLink = () => {
     editor.chain().focus().unsetLink().run();
     setIsLinkMenuOpen(false);
+    setIsEditing(false);
+    setActiveLinkPosition(null);
   };
 
   const openEditMenu = () => {
@@ -83,38 +125,42 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
   };
 
   // If a link is active in the editor, show the edit/remove menu
-  if (isEditing) {
+  if (isEditing && activeLinkPosition) {
     return (
       <Popover open={isLinkMenuOpen} onOpenChange={setIsLinkMenuOpen}>
-        <PopoverTrigger asChild>
-          <div className="absolute -top-10 left-0 z-50 bg-white rounded-md shadow-md border border-gray-200 px-3 py-2 flex items-center gap-2">
-            <ExternalLink className="h-4 w-4 text-orange-500" />
-            <a 
-              href={currentLink} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-orange-500 text-sm underline hover:text-orange-600"
-              onClick={(e) => e.preventDefault()}
-            >
-              {currentLink}
-            </a>
-            <Button 
-              variant="ghost" 
-              className="h-auto p-1 text-gray-500 hover:text-gray-700"
-              onClick={openEditMenu}
-            >
-              Change
-            </Button>
-            <span className="text-gray-400">|</span>
-            <Button 
-              variant="ghost" 
-              className="h-auto p-1 text-gray-500 hover:text-gray-700"
-              onClick={removeLink}
-            >
-              Remove
-            </Button>
-          </div>
-        </PopoverTrigger>
+        <div 
+          className="absolute z-50 bg-white rounded-md shadow-md border border-gray-200 px-3 py-2 flex items-center gap-2"
+          style={{ 
+            top: `${activeLinkPosition.top}px`, 
+            left: `${activeLinkPosition.left}px`,
+          }}
+        >
+          <ExternalLink className="h-4 w-4 text-orange-500" />
+          <a 
+            href={currentLink} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-orange-500 text-sm underline hover:text-orange-600"
+            onClick={(e) => e.preventDefault()}
+          >
+            {currentLink}
+          </a>
+          <Button 
+            variant="ghost" 
+            className="h-auto p-1 text-gray-500 hover:text-gray-700"
+            onClick={openEditMenu}
+          >
+            Change
+          </Button>
+          <span className="text-gray-400">|</span>
+          <Button 
+            variant="ghost" 
+            className="h-auto p-1 text-gray-500 hover:text-gray-700"
+            onClick={removeLink}
+          >
+            Remove
+          </Button>
+        </div>
         <PopoverContent className="w-80 p-0" align="start">
           <div className="p-4">
             <h3 className="font-medium mb-3">Edit link</h3>
