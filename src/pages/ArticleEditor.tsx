@@ -20,7 +20,7 @@ const ArticleEditor = () => {
   // Article content state
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
-  const [excerpt, setExcerpt] = useState<string>('');
+  const [subtitle, setSubtitle] = useState<string>('');
 
   // Article metadata state
   const [categoryId, setCategoryId] = useState<string | null>(null);
@@ -61,7 +61,7 @@ const ArticleEditor = () => {
         // Set the article content
         setTitle(data.title);
         setContent(data.content);
-        setExcerpt(data.excerpt || '');
+        setSubtitle(data.subtitle || '');
 
         // Set the metadata
         setCategoryId(data.category_id);
@@ -115,7 +115,7 @@ const ArticleEditor = () => {
       const articleData = {
         title,
         content,
-        excerpt,
+        subtitle,
         author_id: user.id,
         category_id: categoryId,
         language,
@@ -237,10 +237,10 @@ const ArticleEditor = () => {
             <ArticleContentEditor
               initialContent={content}
               initialTitle={title}
-              initialExcerpt={excerpt}
+              initialSubtitle={subtitle}
               onContentChange={setContent}
               onTitleChange={setTitle}
-              onExcerptChange={setExcerpt}
+              onSubtitleChange={setSubtitle}
             />
           </div>
 

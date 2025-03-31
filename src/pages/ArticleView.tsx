@@ -14,7 +14,7 @@ interface Article {
   id: string;
   title: string;
   content: string;
-  excerpt: string | null;
+  subtitle: string | null;
   author_id: string;
   category: string | null;
   category_id: string | null;
@@ -183,8 +183,8 @@ const ArticleView = () => {
 
           <h1 className="text-3xl md:text-4xl font-bold mb-6">{article.title}</h1>
           
-          {article.excerpt && (
-            <p className="text-xl text-gray-500 mb-6">{article.excerpt}</p>
+          {article.subtitle && (
+            <p className="text-xl text-gray-500 mb-6">{article.subtitle}</p>
           )}
 
           <div className="flex items-center gap-4 mb-8">

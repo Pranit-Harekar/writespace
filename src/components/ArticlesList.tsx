@@ -41,7 +41,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           .select(`
             id, 
             title, 
-            excerpt, 
+            subtitle, 
             content,
             category, 
             category_id,
@@ -57,7 +57,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
 
         // Apply search filter if provided
         if (searchQuery) {
-          query = query.or(`title.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`);
+          query = query.or(`title.ilike.%${searchQuery}%,subtitle.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`);
         }
 
         // If category filter is provided
@@ -126,9 +126,9 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           // Get category name from the categories relation or fall back to the category field
           const categoryName = item.categories ? item.categories.name : item.category;
 
-          // Use explicit excerpt or generate from content
-          const excerptText = item.excerpt?.trim() 
-            ? item.excerpt
+          // Use explicit subtitle or generate from content
+          const excerptText = item.subtitle?.trim() 
+            ? item.subtitle
             : extractExcerpt(item.content);
 
           return {

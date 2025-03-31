@@ -31,7 +31,7 @@ export const FeaturedArticleSection = () => {
               `
             id, 
             title, 
-            excerpt, 
+            subtitle, 
             content,
             category, 
             category_id,
@@ -57,7 +57,7 @@ export const FeaturedArticleSection = () => {
               `
               id, 
               title, 
-              excerpt, 
+              subtitle, 
               content,
               category, 
               category_id,
@@ -90,9 +90,9 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = fallbackData.categories ? fallbackData.categories.name : fallbackData.category || 'Uncategorized';
             
-            // Use explicit excerpt or generate from content
-            const excerptText = fallbackData.excerpt?.trim() 
-              ? fallbackData.excerpt
+            // Use explicit subtitle or generate from content
+            const excerptText = fallbackData.subtitle?.trim() 
+              ? fallbackData.subtitle
               : extractExcerpt(fallbackData.content);
               
             const formattedArticle = {
@@ -118,9 +118,9 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = fallbackData.categories ? fallbackData.categories.name : fallbackData.category || 'Uncategorized';
             
-            // Use explicit excerpt or generate from content
-            const excerptText = fallbackData.excerpt?.trim() 
-              ? fallbackData.excerpt
+            // Use explicit subtitle or generate from content
+            const excerptText = fallbackData.subtitle?.trim() 
+              ? fallbackData.subtitle
               : extractExcerpt(fallbackData.content);
               
             const formattedArticle = {
@@ -156,9 +156,9 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = featuredArticleData.categories ? featuredArticleData.categories.name : featuredArticleData.category || 'Uncategorized';
             
-            // Use explicit excerpt or generate from content
-            const excerptText = featuredArticleData.excerpt?.trim() 
-              ? featuredArticleData.excerpt
+            // Use explicit subtitle or generate from content
+            const excerptText = featuredArticleData.subtitle?.trim() 
+              ? featuredArticleData.subtitle
               : extractExcerpt(featuredArticleData.content);
               
             // Create a formatted article without author details
@@ -183,9 +183,9 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = featuredArticleData.categories ? featuredArticleData.categories.name : featuredArticleData.category || 'Uncategorized';
             
-            // Use explicit excerpt or generate from content
-            const excerptText = featuredArticleData.excerpt?.trim() 
-              ? featuredArticleData.excerpt
+            // Use explicit subtitle or generate from content
+            const excerptText = featuredArticleData.subtitle?.trim() 
+              ? featuredArticleData.subtitle
               : extractExcerpt(featuredArticleData.content);
               
             // Format the featured article with author details

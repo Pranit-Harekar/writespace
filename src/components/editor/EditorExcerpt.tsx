@@ -1,22 +1,22 @@
 
 import React, { useRef, useEffect } from 'react';
 
-interface EditorExcerptProps {
+interface EditorSubtitleProps {
   initialValue: string;
   onValueChange: (value: string) => void;
 }
 
-const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChange }) => {
-  const excerptRef = useRef<HTMLParagraphElement>(null);
+const EditorSubtitle: React.FC<EditorSubtitleProps> = ({ initialValue, onValueChange }) => {
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    if (excerptRef.current) {
+    if (subtitleRef.current) {
       if (initialValue) {
-        excerptRef.current.textContent = initialValue;
-        excerptRef.current.dataset.empty = 'false';
+        subtitleRef.current.textContent = initialValue;
+        subtitleRef.current.dataset.empty = 'false';
       } else {
-        excerptRef.current.textContent = '';
-        excerptRef.current.dataset.empty = 'true';
+        subtitleRef.current.textContent = '';
+        subtitleRef.current.dataset.empty = 'true';
       }
     }
   }, [initialValue]);
@@ -35,33 +35,33 @@ const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChan
   };
 
   const handleInput = () => {
-    if (excerptRef.current) {
-      const plainText = excerptRef.current.textContent || '';
+    if (subtitleRef.current) {
+      const plainText = subtitleRef.current.textContent || '';
       if (!plainText.trim()) {
-        excerptRef.current.dataset.empty = 'true';
+        subtitleRef.current.dataset.empty = 'true';
       } else {
-        excerptRef.current.dataset.empty = 'false';
+        subtitleRef.current.dataset.empty = 'false';
       }
     }
   };
 
   const handleBlur = () => {
-    if (excerptRef.current) {
-      const plainText = excerptRef.current.textContent || '';
-      excerptRef.current.textContent = plainText;
+    if (subtitleRef.current) {
+      const plainText = subtitleRef.current.textContent || '';
+      subtitleRef.current.textContent = plainText;
       onValueChange(plainText);
 
       if (!plainText.trim()) {
-        excerptRef.current.dataset.empty = 'true';
+        subtitleRef.current.dataset.empty = 'true';
       } else {
-        excerptRef.current.dataset.empty = 'false';
+        subtitleRef.current.dataset.empty = 'false';
       }
     }
   };
 
   return (
     <p
-      ref={excerptRef}
+      ref={subtitleRef}
       className="text-lg text-gray-500 mb-8 outline-none relative"
       contentEditable
       suppressContentEditableWarning
@@ -74,4 +74,4 @@ const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChan
   );
 };
 
-export default EditorExcerpt;
+export default EditorSubtitle;
