@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
@@ -245,10 +244,10 @@ export const FeaturedArticleSection = () => {
           <div className="md:col-span-2 bg-muted"></div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!article) return null
+  if (!article) return null;
 
-  return <FeaturedArticle {...article} />
+  return <FeaturedArticle {...article} />;
 }
