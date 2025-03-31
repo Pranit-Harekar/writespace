@@ -7,14 +7,12 @@ import { extractExcerpt } from '@/lib/textUtils';
 interface ArticlesListProps {
   limit?: number;
   filterByCategory?: string;
-  filterByLanguage?: string;
   searchQuery?: string;
 }
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
   limit = 6,
   filterByCategory,
-  filterByLanguage,
   searchQuery,
 }) => {
   const { toast } = useToast();
@@ -70,11 +68,6 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             // Use the category_id if we found a match
             query = query.eq('category_id', categoryData.id);
           }
-        }
-
-        // Apply language filter if provided
-        if (filterByLanguage) {
-          query = query.eq('language', filterByLanguage);
         }
 
         // Apply limit
@@ -136,7 +129,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             },
             publishedAt: item.published_at || '',
             category: categoryName || 'Uncategorized',
-            language: item.language,
+            language: item.language || 'en',
             readTime: item.read_time || 5,
             featuredImage: item.featured_image || undefined,
           };
@@ -156,7 +149,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
     };
 
     fetchArticles();
-  }, [filterByCategory, filterByLanguage, limit, searchQuery, toast]);
+  }, [filterByCategory, limit, searchQuery, toast]);
 
   if (isLoading) {
     return (

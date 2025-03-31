@@ -1,19 +1,11 @@
 
 import React from 'react';
-import { Clock, Globe, CalendarCheck, Tag, Image as ImageIcon } from 'lucide-react';
+import { Clock, CalendarCheck, Tag, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { CategorySelector } from '@/components/CategorySelector';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { LANGUAGES } from '@/contexts/LanguageContext';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -32,12 +24,10 @@ interface ArticleMetaSidebarProps {
 const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
   categoryId,
   categoryName,
-  language,
   readTime,
   featuredImage,
   isPublished,
   onCategoryChange,
-  onLanguageChange,
   onReadTimeChange,
   onFeaturedImageChange,
   onPublishChange,
@@ -60,25 +50,6 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               categoryId={categoryId}
               onChange={onCategoryChange}
             />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <Globe className="h-4 w-4 mr-2" />
-              <Label className="text-sm font-medium">Language</Label>
-            </div>
-            <Select value={language} onValueChange={onLanguageChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(LANGUAGES).map(([code, lang]) => (
-                  <SelectItem key={code} value={code}>
-                    {lang.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-2">

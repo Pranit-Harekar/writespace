@@ -1,14 +1,10 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type Language = 'en' | 'hi' | 'bn' | 'ta' | 'te';
+export type Language = 'en';
 
 export const LANGUAGES = {
   en: { name: 'English', code: 'en' },
-  hi: { name: 'हिन्दी', code: 'hi' },
-  bn: { name: 'বাংলা', code: 'bn' },
-  ta: { name: 'தமிழ்', code: 'ta' },
-  te: { name: 'తెలుగు', code: 'te' },
 };
 
 type LanguageContextType = {

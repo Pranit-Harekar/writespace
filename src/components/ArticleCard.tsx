@@ -6,7 +6,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { stripHtml } from '@/lib/textUtils';
-import { LANGUAGES } from '@/contexts/LanguageContext';
 
 export interface ArticleProps {
   id: string;
@@ -31,13 +30,9 @@ export const ArticleCard: React.FC<ArticleProps> = ({
   author,
   publishedAt,
   category,
-  language,
   readTime,
   featuredImage,
 }) => {
-  // Get language display name from the language code
-  const languageDisplay = LANGUAGES[language as keyof typeof LANGUAGES]?.name || language;
-
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
       {featuredImage && (
@@ -53,9 +48,6 @@ export const ArticleCard: React.FC<ArticleProps> = ({
         <div className="flex justify-between items-start">
           <Badge variant="outline" className="mb-2">
             {category}
-          </Badge>
-          <Badge variant="secondary" className="mb-2">
-            {languageDisplay}
           </Badge>
         </div>
         <CardTitle className="text-xl hover:text-primary transition-colors">
