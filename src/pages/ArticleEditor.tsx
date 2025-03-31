@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ChevronLeft, Save, Trash2 } from 'lucide-react'
@@ -16,7 +17,6 @@ const ArticleEditor = () => {
   const { user } = useAuth()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true)
 
   // Article content state
   const [title, setTitle] = useState<string>('')
@@ -195,29 +195,6 @@ const ArticleEditor = () => {
     }
   }
 
-  // Listen for sidebar state changes
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'data-state' &&
-          mutation.target instanceof HTMLElement
-        ) {
-          const isOpen = mutation.target.getAttribute('data-state') === 'open'
-          setIsSidebarOpen(isOpen)
-        }
-      })
-    })
-
-    const collapsibleElement = document.querySelector('[data-radix-collection-item]')
-    if (collapsibleElement) {
-      observer.observe(collapsibleElement, { attributes: true })
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
   if (isLoading && isEditing) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -256,14 +233,8 @@ const ArticleEditor = () => {
           </div>
         </div>
 
-        <div
-          className={`grid grid-cols-1 ${
-            isSidebarOpen ? 'lg:grid-cols-3' : 'lg:grid-cols-1'
-          } gap-6`}
-        >
-          <div
-            className={`${isSidebarOpen ? 'lg:col-span-2' : 'lg:max-w-4xl lg:mx-auto lg:w-full'}`}
-          >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
             <ArticleContentEditor
               initialContent={content}
               initialTitle={title}
@@ -274,7 +245,7 @@ const ArticleEditor = () => {
             />
           </div>
 
-          <div className={`${isSidebarOpen ? 'lg:col-span-1' : 'lg:hidden'}`}>
+          <div className="lg:col-span-1">
             <ArticleMetaSidebar
               categoryId={categoryId}
               categoryName={categoryName}

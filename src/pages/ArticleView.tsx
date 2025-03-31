@@ -187,11 +187,10 @@ const ArticleView = () => {
             </div>
           </div>
 
-          <div className="prose prose-lg max-w-none">
-            {article.content.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
+          <div 
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: article.content }}
+          />
         </article>
       </div>
     </div>
