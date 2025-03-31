@@ -61,7 +61,7 @@ const EditorSubtitle: React.FC<EditorSubtitleProps> = ({ initialValue, onValueCh
   return (
     <p
       ref={subtitleRef}
-      className="text-lg text-gray-500 mb-8 outline-none relative"
+      className="text-lg text-gray-500 outline-none relative"
       contentEditable
       suppressContentEditableWarning
       onPaste={handlePaste}

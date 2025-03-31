@@ -231,7 +231,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         canUndo={editorHistory.canUndo}
         canRedo={editorHistory.canRedo}
       />
-      <div className="py-6 px-8 max-w-4xl mx-auto" ref={contentRef}>
+      <div className="py-6 px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
         <EditorTitle initialValue={initialTitle} onValueChange={onTitleChange} />
 
         <EditorSubtitle initialValue={initialSubtitle} onValueChange={onSubtitleChange} />

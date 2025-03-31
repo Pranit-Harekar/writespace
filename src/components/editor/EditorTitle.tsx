@@ -61,7 +61,7 @@ const EditorTitle: React.FC<EditorTitleProps> = ({ initialValue, onValueChange }
   return (
     <h1
       ref={titleRef}
-      className="text-4xl font-bold mb-4 outline-none relative"
+      className="text-4xl font-bold outline-none relative"
       contentEditable
       suppressContentEditableWarning
       onPaste={handlePaste}

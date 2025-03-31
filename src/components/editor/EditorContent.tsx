@@ -43,7 +43,7 @@ const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChan
   return (
     <div
       ref={contentRef}
-      className="prose prose-lg max-w-none outline-none min-h-[50vh] relative"
+      className="prose prose-lg max-w-none outline-none min-h-[50vh] relative text-md"
       contentEditable
       suppressContentEditableWarning
       onInput={handleInput}
