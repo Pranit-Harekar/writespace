@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import RichTextToolbar from "./RichTextToolbar";
@@ -27,7 +26,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const excerptRef = useRef<HTMLParagraphElement>(null);
 
-  // Initialize the editor with content when it changes externally
   useEffect(() => {
     if (contentRef.current && initialContent !== contentRef.current.innerHTML) {
       contentRef.current.innerHTML = initialContent;
@@ -40,16 +38,13 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     }
   }, [initialContent, initialTitle, initialExcerpt]);
 
-  // Listen for content changes to propagate back to parent
   useEffect(() => {
     const saveContent = () => {
       if (contentRef.current) {
         onContentChange(contentRef.current.innerHTML);
         
-        // Save to undo stack if content changed
         const newContent = contentRef.current.innerHTML;
         if (undoStack[currentPosition] !== newContent) {
-          // Trim the stack if we're not at the end
           const newUndoStack = [...undoStack.slice(0, currentPosition + 1), newContent];
           setUndoStack(newUndoStack);
           setRedoStack([]);
@@ -147,7 +142,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         break;
     }
     
-    // Focus back on the content after command execution
     if (contentRef.current) {
       contentRef.current.focus();
     }
@@ -186,8 +180,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           }
         }
         break;
-      // Video and audio would typically involve more complex embedding processes
-      // but for now, we'll just use simple placeholders
       case "video":
         const videoUrl = prompt("Enter video URL (YouTube, Vimeo, etc.):", "https://");
         if (videoUrl) {
@@ -222,7 +214,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         break;
     }
     
-    // Focus back on the content
     if (contentRef.current) {
       contentRef.current.focus();
     }
@@ -246,7 +237,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         break;
     }
     
-    // Focus back on the content
     if (contentRef.current) {
       contentRef.current.focus();
     }
@@ -269,7 +259,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           className="text-4xl font-bold mb-4 outline-none"
           contentEditable
           suppressContentEditableWarning
-          placeholder="Title"
           data-placeholder="Title"
           onBlur={(e) => onTitleChange(e.currentTarget.textContent || "")}
         >
@@ -281,7 +270,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           className="text-lg text-gray-500 mb-8 outline-none"
           contentEditable
           suppressContentEditableWarning
-          placeholder="Add a subtitle..."
           data-placeholder="Add a subtitle..."
           onBlur={(e) => onExcerptChange(e.currentTarget.textContent || "")}
         >
@@ -293,7 +281,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           className="prose prose-lg max-w-none outline-none min-h-[300px]"
           contentEditable
           suppressContentEditableWarning
-          placeholder="Start writing..."
           data-placeholder="Start writing..."
           onBlur={(e) => onContentChange(e.currentTarget.innerHTML)}
         >
