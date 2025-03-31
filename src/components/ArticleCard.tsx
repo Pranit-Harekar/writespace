@@ -18,7 +18,6 @@ export interface ArticleProps {
   };
   publishedAt: string;
   category: string;
-  language: string;
   readTime: number;
   featuredImage?: string;
 }

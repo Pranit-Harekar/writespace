@@ -27,7 +27,6 @@ interface ArticleListItem {
     id: string;
     name: string;
   } | null;
-  language: string;
   created_at: string;
   updated_at: string;
   is_published: boolean;
@@ -57,7 +56,6 @@ const MyArticles = () => {
             category, 
             category_id,
             categories:category_id(id, name),
-            language, 
             created_at, 
             updated_at, 
             is_published
@@ -124,7 +122,6 @@ const MyArticles = () => {
               <TableRow>
                 <TableHead className="w-[300px]">Title</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Language</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Last Updated</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -137,7 +134,6 @@ const MyArticles = () => {
                   <TableCell>
                     {article.categories?.name || article.category || "—"}
                   </TableCell>
-                  <TableCell>{article.language === 'en' ? 'English' : article.language}</TableCell>
                   <TableCell>
                     <Badge variant={article.is_published ? "default" : "outline"}>
                       {article.is_published ? "Published" : "Draft"}

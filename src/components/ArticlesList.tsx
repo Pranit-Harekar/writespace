@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -129,7 +130,6 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             },
             publishedAt: item.published_at || '',
             category: categoryName || 'Uncategorized',
-            language: item.language || 'en',
             readTime: item.read_time || 5,
             featuredImage: item.featured_image || undefined,
           };
@@ -173,7 +173,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
       <div className="text-center py-12">
         <h2 className="text-xl font-medium mb-2">No articles found</h2>
         <p className="text-muted-foreground">
-          {filterByCategory || filterByLanguage
+          {filterByCategory
             ? 'Try changing your filters or check back later.'
             : 'Check back later for new content.'}
         </p>

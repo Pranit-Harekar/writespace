@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -25,7 +26,6 @@ export const FeaturedArticleSection = () => {
             category,
             category_id,
             categories:category_id(id, name),
-            language,
             read_time,
             featured_image,
             published_at,
@@ -51,7 +51,6 @@ export const FeaturedArticleSection = () => {
               category,
               category_id,
               categories:category_id(id, name),
-              language,
               read_time,
               featured_image,
               published_at,
@@ -96,7 +95,6 @@ export const FeaturedArticleSection = () => {
               },
               publishedAt: fallbackData.published_at || '',
               category: categoryName,
-              language: fallbackData.language,
               readTime: fallbackData.read_time || 5,
               featuredImage: fallbackData.featured_image || undefined,
             };
@@ -126,7 +124,6 @@ export const FeaturedArticleSection = () => {
               },
               publishedAt: fallbackData.published_at || '',
               category: categoryName,
-              language: fallbackData.language,
               readTime: fallbackData.read_time || 5,
               featuredImage: fallbackData.featured_image || undefined,
             };
@@ -166,7 +163,6 @@ export const FeaturedArticleSection = () => {
               },
               publishedAt: featuredArticleData.published_at || '',
               category: categoryName,
-              language: featuredArticleData.language,
               readTime: featuredArticleData.read_time || 5,
               featuredImage: featuredArticleData.featured_image || undefined,
             };
@@ -195,7 +191,6 @@ export const FeaturedArticleSection = () => {
               },
               publishedAt: featuredArticleData.published_at || '',
               category: categoryName,
-              language: featuredArticleData.language,
               readTime: featuredArticleData.read_time || 5,
               featuredImage: featuredArticleData.featured_image || undefined,
             };
