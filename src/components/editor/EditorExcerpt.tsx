@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 
 interface EditorExcerptProps {
@@ -8,7 +7,7 @@ interface EditorExcerptProps {
 
 const EditorExcerpt: React.FC<EditorExcerptProps> = ({ initialValue, onValueChange }) => {
   const excerptRef = useRef<HTMLParagraphElement>(null);
-  
+
   useEffect(() => {
     if (excerptRef.current) {
       if (initialValue) {

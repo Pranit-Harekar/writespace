@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 
 interface EditorTitleProps {
@@ -6,9 +5,12 @@ interface EditorTitleProps {
   onValueChange: (value: string) => void;
 }
 
-const EditorTitle: React.FC<EditorTitleProps> = ({ initialValue, onValueChange }) => {
+const EditorTitle: React.FC<EditorTitleProps> = ({
+  initialValue,
+  onValueChange,
+}) => {
   const titleRef = useRef<HTMLHeadingElement>(null);
-  
+
   useEffect(() => {
     if (titleRef.current) {
       if (initialValue) {
@@ -28,7 +30,10 @@ const EditorTitle: React.FC<EditorTitleProps> = ({ initialValue, onValueChange }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Prevent formatting keyboard shortcuts
-    if ((e.ctrlKey || e.metaKey) && ['b', 'i', 'u'].includes(e.key.toLowerCase())) {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      ['b', 'i', 'u'].includes(e.key.toLowerCase())
+    ) {
       e.preventDefault();
     }
   };

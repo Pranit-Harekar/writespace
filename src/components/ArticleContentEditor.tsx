@@ -1,18 +1,17 @@
-
-import React, { useRef, useEffect } from 'react'
-import { useEditorHistory } from './editor/useEditorHistory'
-import EditorTitle from './editor/EditorTitle'
-import EditorExcerpt from './editor/EditorExcerpt'
-import EditorContent from './editor/EditorContent'
-import RichTextToolbar from './RichTextToolbar'
+import React, { useRef, useEffect } from 'react';
+import { useEditorHistory } from './editor/useEditorHistory';
+import EditorTitle from './editor/EditorTitle';
+import EditorExcerpt from './editor/EditorExcerpt';
+import EditorContent from './editor/EditorContent';
+import RichTextToolbar from './RichTextToolbar';
 
 interface ArticleContentEditorProps {
-  initialContent: string
-  initialTitle: string
-  initialExcerpt: string
-  onContentChange: (content: string) => void
-  onTitleChange: (title: string) => void
-  onExcerptChange: (excerpt: string) => void
+  initialContent: string;
+  initialTitle: string;
+  initialExcerpt: string;
+  onContentChange: (content: string) => void;
+  onTitleChange: (title: string) => void;
+  onExcerptChange: (excerpt: string) => void;
 }
 
 const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
@@ -25,18 +24,18 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const editorHistory = useEditorHistory(initialContent);
-  
+
   // Auto-save content to history periodically
   useEffect(() => {
     if (!contentRef.current) return;
-    
+
     const saveContent = () => {
       if (contentRef.current) {
         const content = contentRef.current.innerHTML;
         editorHistory.saveToHistory(content);
       }
     };
-    
+
     const timerId = setInterval(saveContent, 3000);
     return () => clearInterval(timerId);
   }, []);
@@ -232,20 +231,11 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         canRedo={editorHistory.canRedo}
       />
       <div className="py-6 px-8 max-w-4xl mx-auto" ref={contentRef}>
-        <EditorTitle 
-          initialValue={initialTitle} 
-          onValueChange={onTitleChange} 
-        />
-        
-        <EditorExcerpt 
-          initialValue={initialExcerpt} 
-          onValueChange={onExcerptChange} 
-        />
-        
-        <EditorContent 
-          initialValue={initialContent} 
-          onValueChange={onContentChange} 
-        />
+        <EditorTitle initialValue={initialTitle} onValueChange={onTitleChange} />
+
+        <EditorExcerpt initialValue={initialExcerpt} onValueChange={onExcerptChange} />
+
+        <EditorContent initialValue={initialContent} onValueChange={onContentChange} />
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-
-import React from 'react'
+import React from 'react';
 import {
   Bold,
   Italic,
@@ -19,25 +18,25 @@ import {
   Redo,
   ChevronDown,
   RemoveFormatting,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
   Menubar,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
   MenubarTrigger,
-} from '@/components/ui/menubar'
+} from '@/components/ui/menubar';
 
 interface RichTextToolbarProps {
-  onFormatText: (format: string) => void
-  onInsertMedia: (type: string) => void
-  onAlignText: (alignment: string) => void
-  onUndo: () => void
-  onRedo: () => void
-  canUndo: boolean
-  canRedo: boolean
+  onFormatText: (format: string) => void;
+  onInsertMedia: (type: string) => void;
+  onAlignText: (alignment: string) => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
@@ -248,7 +247,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({
         </MenubarMenu>
       </Menubar>
     </div>
-  )
-}
+  );
+};
 
-export default RichTextToolbar
+export default RichTextToolbar;

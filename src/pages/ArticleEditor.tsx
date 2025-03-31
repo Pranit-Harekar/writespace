@@ -1,52 +1,51 @@
-
-import React, { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Save, Trash2 } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
-import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/integrations/supabase/client'
-import { Header } from '@/components/Header'
-import { Button } from '@/components/ui/button'
-import ArticleContentEditor from '@/components/ArticleContentEditor'
-import ArticleMetaSidebar from '@/components/ArticleMetaSidebar'
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, Save, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import ArticleContentEditor from '@/components/ArticleContentEditor';
+import ArticleMetaSidebar from '@/components/ArticleMetaSidebar';
 
 const ArticleEditor = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const { toast } = useToast()
-  const { user } = useAuth()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   // Article content state
-  const [title, setTitle] = useState<string>('')
-  const [content, setContent] = useState<string>('')
-  const [excerpt, setExcerpt] = useState<string>('')
+  const [title, setTitle] = useState<string>('');
+  const [content, setContent] = useState<string>('');
+  const [excerpt, setExcerpt] = useState<string>('');
 
   // Article metadata state
-  const [categoryId, setCategoryId] = useState<string | null>(null)
-  const [categoryName, setCategoryName] = useState<string>('')
-  const [language, setLanguage] = useState<string>('en')
-  const [readTime, setReadTime] = useState<number>(5)
-  const [featuredImage, setFeaturedImage] = useState<string>('')
-  const [isPublished, setIsPublished] = useState<boolean>(false)
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [categoryName, setCategoryName] = useState<string>('');
+  const [language, setLanguage] = useState<string>('en');
+  const [readTime, setReadTime] = useState<number>(5);
+  const [featuredImage, setFeaturedImage] = useState<string>('');
+  const [isPublished, setIsPublished] = useState<boolean>(false);
 
-  const isEditing = Boolean(id)
+  const isEditing = Boolean(id);
 
   // Fetch article if editing
   useEffect(() => {
     const fetchArticle = async () => {
-      if (!id || !user) return
+      if (!id || !user) return;
 
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from('articles')
           .select('*, categories:category_id(id, name)')
           .eq('id', id)
-          .single()
+          .single();
 
-        if (error) throw error
+        if (error) throw error;
 
         // Check if current user is the author
         if (data.author_id !== user.id) {
@@ -54,42 +53,42 @@ const ArticleEditor = () => {
             title: 'Unauthorized',
             description: "You don't have permission to edit this article",
             variant: 'destructive',
-          })
-          navigate('/')
-          return
+          });
+          navigate('/');
+          return;
         }
 
         // Set the article content
-        setTitle(data.title)
-        setContent(data.content)
-        setExcerpt(data.excerpt || '')
+        setTitle(data.title);
+        setContent(data.content);
+        setExcerpt(data.excerpt || '');
 
         // Set the metadata
-        setCategoryId(data.category_id)
-        setCategoryName(data.category || (data.categories ? data.categories.name : ''))
-        setLanguage(data.language)
-        setReadTime(data.read_time || 5)
-        setFeaturedImage(data.featured_image || '')
-        setIsPublished(data.is_published || false)
+        setCategoryId(data.category_id);
+        setCategoryName(data.category || (data.categories ? data.categories.name : ''));
+        setLanguage(data.language);
+        setReadTime(data.read_time || 5);
+        setFeaturedImage(data.featured_image || '');
+        setIsPublished(data.is_published || false);
       } catch (error: unknown) {
-        console.error('Error fetching article:', error)
+        console.error('Error fetching article:', error);
         toast({
           title: 'Error',
           description: error['message'] || 'Failed to load article',
           variant: 'destructive',
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchArticle()
-  }, [id, user, navigate, toast])
+    fetchArticle();
+  }, [id, user, navigate, toast]);
 
   const handleCategoryChange = (categoryName: string, id: string | null) => {
-    setCategoryName(categoryName)
-    setCategoryId(id)
-  }
+    setCategoryName(categoryName);
+    setCategoryId(id);
+  };
 
   const handleSave = async () => {
     if (!user) {
@@ -97,8 +96,8 @@ const ArticleEditor = () => {
         title: 'Authentication required',
         description: 'You must be logged in to create or edit articles',
         variant: 'destructive',
-      })
-      return
+      });
+      return;
     }
 
     if (!title.trim()) {
@@ -106,11 +105,11 @@ const ArticleEditor = () => {
         title: 'Title required',
         description: 'Please provide a title for your article',
         variant: 'destructive',
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const articleData = {
@@ -124,76 +123,76 @@ const ArticleEditor = () => {
         read_time: readTime,
         is_published: isPublished,
         published_at: isPublished ? new Date().toISOString() : null,
-      }
+      };
 
-      let response
+      let response;
 
       if (isEditing) {
         // Update existing article
-        response = await supabase.from('articles').update(articleData).eq('id', id)
+        response = await supabase.from('articles').update(articleData).eq('id', id);
       } else {
         // Create new article
-        response = await supabase.from('articles').insert(articleData).select()
+        response = await supabase.from('articles').insert(articleData).select();
       }
 
-      if (response.error) throw response.error
+      if (response.error) throw response.error;
 
       toast({
         title: isEditing ? 'Article updated' : 'Article created',
         description: `Your article has been ${isEditing ? 'updated' : 'created'} successfully`,
-      })
+      });
 
       if (!isEditing && response.data) {
         // Navigate to the newly created article
-        navigate(`/article/edit/${response.data[0].id}`)
+        navigate(`/article/edit/${response.data[0].id}`);
       }
     } catch (error: unknown) {
-      console.error('Error saving article:', error)
+      console.error('Error saving article:', error);
       toast({
         title: 'Error',
         description: error['message'] || `Failed to ${isEditing ? 'update' : 'create'} article`,
         variant: 'destructive',
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!id || !user) return
+    if (!id || !user) return;
 
     if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
-      return
+      return;
     }
 
-    setIsDeleting(true)
+    setIsDeleting(true);
 
     try {
       const { error } = await supabase
         .from('articles')
         .delete()
         .eq('id', id)
-        .eq('author_id', user.id)
+        .eq('author_id', user.id);
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: 'Article deleted',
         description: 'Your article has been deleted successfully',
-      })
+      });
 
-      navigate('/my-articles')
+      navigate('/my-articles');
     } catch (error: unknown) {
-      console.error('Error deleting article:', error)
+      console.error('Error deleting article:', error);
       toast({
         title: 'Error',
         description: error['message'] || 'Failed to delete article',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   if (isLoading && isEditing) {
     return (
@@ -205,7 +204,7 @@ const ArticleEditor = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -263,7 +262,7 @@ const ArticleEditor = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ArticleEditor
+export default ArticleEditor;
