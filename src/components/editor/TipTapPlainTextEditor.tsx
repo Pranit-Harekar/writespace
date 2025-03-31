@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
 
 interface PlainTextEditorProps {
   initialValue: string;
@@ -32,11 +33,15 @@ const TipTapPlainTextEditor: React.FC<PlainTextEditorProps> = ({
         codeBlock: false,
         hardBreak: false,
       }),
+      TextAlign.configure({
+        types: ['paragraph'],
+      }),
       Placeholder.configure({
         placeholder,
+        emptyEditorClass: 'is-editor-empty',
       }),
     ],
-    content: initialValue,
+    content: `<${tagName}>${initialValue || ''}</${tagName}>`,
     onUpdate: ({ editor }) => {
       // Get plain text content
       const plainText = editor.getText();
@@ -52,12 +57,12 @@ const TipTapPlainTextEditor: React.FC<PlainTextEditorProps> = ({
   // Update content when initialValue changes
   useEffect(() => {
     if (editor && initialValue !== editor.getText()) {
-      editor.commands.setContent(initialValue);
+      editor.commands.setContent(`<${tagName}>${initialValue || ''}</${tagName}>`);
     }
-  }, [initialValue, editor]);
+  }, [initialValue, editor, tagName]);
 
   return (
-    <EditorContent editor={editor} />
+    <EditorContent editor={editor} className={className} />
   );
 };
 

@@ -7,19 +7,20 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
+import RichTextToolbar from '../RichTextToolbar';
 
-interface EditorProps {
+interface FullEditorProps {
   initialValue: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
-const TipTapEditor: React.FC<EditorProps> = ({ 
-  initialValue, 
-  onValueChange, 
+const FullEditor: React.FC<FullEditorProps> = ({
+  initialValue,
+  onValueChange,
   placeholder = 'Start writing...',
-  className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md' 
+  className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md',
 }) => {
   const editor = useEditor({
     extensions: [
@@ -60,8 +61,13 @@ const TipTapEditor: React.FC<EditorProps> = ({
   }, [initialValue, editor]);
 
   return (
-    <EditorContent editor={editor} className={className} />
+    <div className="bg-white border rounded-md shadow-sm">
+      <RichTextToolbar />
+      <div className="p-4">
+        <EditorContent editor={editor} className={className} />
+      </div>
+    </div>
   );
 };
 
-export default TipTapEditor;
+export default FullEditor;

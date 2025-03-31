@@ -74,12 +74,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  /* Contenteditable placeholder styles */
-  [contenteditable=true]:empty:before {
-    content: attr(data-placeholder);
-    @apply text-gray-400 cursor-text;
-  }
 }
 
 @layer utilities {
@@ -125,5 +119,14 @@
   
   .prose pre {
     @apply bg-gray-100 p-4 rounded my-4 overflow-x-auto;
+  }
+  
+  /* TipTap placeholder styles */
+  .is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
   }
 }
