@@ -1,17 +1,16 @@
-
-import React from "react";
-import { useParams } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { ArticlesList } from "@/components/ArticlesList";
-import { Footer } from "@/components/Footer";
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { Header } from '@/components/Header';
+import { ArticlesList } from '@/components/ArticlesList';
+import { Footer } from '@/components/Footer';
 
 const CategoryView = () => {
   const { category } = useParams<{ category: string }>();
-  
+
   const formatCategoryName = (category: string) => {
     return category
       .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
 

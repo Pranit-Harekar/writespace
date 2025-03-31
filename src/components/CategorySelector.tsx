@@ -1,14 +1,13 @@
-
-import React, { useState, useEffect } from "react";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CategorySelectorProps {
   value: string;
@@ -21,10 +20,10 @@ interface Category {
   name: string;
 }
 
-export const CategorySelector: React.FC<CategorySelectorProps> = ({ 
+export const CategorySelector: React.FC<CategorySelectorProps> = ({
   value,
   categoryId,
-  onChange 
+  onChange,
 }) => {
   const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,15 +37,15 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         .from('categories')
         .select('id, name')
         .order('name', { ascending: true });
-        
+
       if (error) throw error;
       setCategories(data || []);
     } catch (error: any) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to load categories",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to load categories',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -59,7 +58,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   // Handle selection of existing category
   const handleSelectCategory = (categoryId: string) => {
-    const category = categories.find(c => c.id === categoryId);
+    const category = categories.find((c) => c.id === categoryId);
     if (category) {
       onChange(category.name, category.id);
     }
@@ -67,11 +66,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   return (
     <div className="w-full">
-      <Select 
-        value={categoryId || ""} 
-        onValueChange={handleSelectCategory}
-        disabled={loading}
-      >
+      <Select value={categoryId || ''} onValueChange={handleSelectCategory} disabled={loading}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
@@ -83,9 +78,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           ))}
         </SelectContent>
       </Select>
-      <p className="text-xs text-muted-foreground mt-2">
-        Categories can only be managed through the Supabase admin interface.
-      </p>
     </div>
   );
 };
