@@ -7,9 +7,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -32,8 +29,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [creatingCategory, setCreatingCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
 
   // Fetch categories from the database
   const fetchCategories = async () => {
@@ -62,49 +57,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
     fetchCategories();
   }, []);
 
-  const handleCreateCategory = async () => {
-    if (!newCategoryName.trim()) {
-      toast({
-        title: "Error",
-        description: "Category name cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .insert({ name: newCategoryName.trim() })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "New category created successfully",
-      });
-      
-      // Update the form with the new category
-      onChange(data.name, data.id);
-      
-      // Reset the UI state
-      setNewCategoryName("");
-      setCreatingCategory(false);
-      
-      // Refresh categories list
-      fetchCategories();
-    } catch (error: any) {
-      console.error("Error creating category:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create category",
-        variant: "destructive",
-      });
-    }
-  };
-
   // Handle selection of existing category
   const handleSelectCategory = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
@@ -113,36 +65,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
     }
   };
 
-  if (creatingCategory) {
-    return (
-      <div className="flex items-center gap-2">
-        <Input
-          placeholder="Enter new category name"
-          value={newCategoryName}
-          onChange={(e) => setNewCategoryName(e.target.value)}
-          className="flex-1"
-        />
-        <Button 
-          onClick={handleCreateCategory}
-          size="sm"
-          className="shrink-0"
-        >
-          Add
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setCreatingCategory(false)}
-          className="shrink-0 p-0 w-8 h-8"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex items-center gap-2">
+    <div className="w-full">
       <Select 
         value={categoryId || ""} 
         onValueChange={handleSelectCategory}
@@ -159,15 +83,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           ))}
         </SelectContent>
       </Select>
-      
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={() => setCreatingCategory(true)}
-        className="shrink-0"
-      >
-        <Plus className="h-4 w-4 mr-1" /> New
-      </Button>
+      <p className="text-xs text-muted-foreground mt-2">
+        Categories can only be managed through the Supabase admin interface.
+      </p>
     </div>
   );
 };

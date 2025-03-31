@@ -26,9 +26,7 @@ const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChan
 
   const handleInput = () => {
     if (contentRef.current) {
-      const content = contentRef.current.innerHTML;
       const hasText = contentRef.current.textContent?.trim() !== '';
-      
       contentRef.current.dataset.empty = hasText ? 'false' : 'true';
     }
   };
@@ -38,11 +36,8 @@ const EditorContent: React.FC<EditorContentProps> = ({ initialValue, onValueChan
       const content = contentRef.current.innerHTML;
       onValueChange(content);
       
-      if (!contentRef.current.textContent?.trim()) {
-        contentRef.current.dataset.empty = 'true';
-      } else {
-        contentRef.current.dataset.empty = 'false';
-      }
+      const hasText = contentRef.current.textContent?.trim() !== '';
+      contentRef.current.dataset.empty = hasText ? 'false' : 'true';
     }
   };
 

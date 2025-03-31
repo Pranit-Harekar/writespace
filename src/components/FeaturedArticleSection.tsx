@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
@@ -22,6 +23,8 @@ export const FeaturedArticleSection = () => {
             title, 
             excerpt, 
             category, 
+            category_id,
+            categories:category_id(id, name),
             language, 
             read_time, 
             featured_image,
@@ -45,6 +48,8 @@ export const FeaturedArticleSection = () => {
               title, 
               excerpt, 
               category, 
+              category_id,
+              categories:category_id(id, name),
               language, 
               read_time, 
               featured_image,
@@ -69,6 +74,10 @@ export const FeaturedArticleSection = () => {
           if (authorError) {
             console.warn('Author profile not found:', authorError)
             // Create a formatted article without author details
+            
+            // Get category name from the categories relation or fall back to the category field
+            const categoryName = fallbackData.categories ? fallbackData.categories.name : fallbackData.category || 'Uncategorized';
+            
             const formattedArticle = {
               id: fallbackData.id,
               title: fallbackData.title,
@@ -79,7 +88,7 @@ export const FeaturedArticleSection = () => {
                 profileImage: undefined,
               },
               publishedAt: fallbackData.published_at || '',
-              category: fallbackData.category || 'Uncategorized',
+              category: categoryName,
               language: fallbackData.language,
               readTime: fallbackData.read_time || 5,
               featuredImage: fallbackData.featured_image || undefined,
@@ -88,6 +97,10 @@ export const FeaturedArticleSection = () => {
             setArticle(formattedArticle)
           } else {
             // Format the article with author details
+            
+            // Get category name from the categories relation or fall back to the category field
+            const categoryName = fallbackData.categories ? fallbackData.categories.name : fallbackData.category || 'Uncategorized';
+            
             const formattedArticle = {
               id: fallbackData.id,
               title: fallbackData.title,
@@ -99,7 +112,7 @@ export const FeaturedArticleSection = () => {
                 profileImage: authorData.avatar_url || undefined,
               },
               publishedAt: fallbackData.published_at || '',
-              category: fallbackData.category || 'Uncategorized',
+              category: categoryName,
               language: fallbackData.language,
               readTime: fallbackData.read_time || 5,
               featuredImage: fallbackData.featured_image || undefined,
@@ -117,6 +130,10 @@ export const FeaturedArticleSection = () => {
 
           if (authorError) {
             console.warn('Author profile not found:', authorError)
+            
+            // Get category name from the categories relation or fall back to the category field
+            const categoryName = featuredArticleData.categories ? featuredArticleData.categories.name : featuredArticleData.category || 'Uncategorized';
+            
             // Create a formatted article without author details
             const formattedArticle = {
               id: featuredArticleData.id,
@@ -128,7 +145,7 @@ export const FeaturedArticleSection = () => {
                 profileImage: undefined,
               },
               publishedAt: featuredArticleData.published_at || '',
-              category: featuredArticleData.category || 'Uncategorized',
+              category: categoryName,
               language: featuredArticleData.language,
               readTime: featuredArticleData.read_time || 5,
               featuredImage: featuredArticleData.featured_image || undefined,
@@ -136,6 +153,9 @@ export const FeaturedArticleSection = () => {
 
             setArticle(formattedArticle)
           } else {
+            // Get category name from the categories relation or fall back to the category field
+            const categoryName = featuredArticleData.categories ? featuredArticleData.categories.name : featuredArticleData.category || 'Uncategorized';
+            
             // Format the featured article with author details
             const formattedArticle = {
               id: featuredArticleData.id,
@@ -148,7 +168,7 @@ export const FeaturedArticleSection = () => {
                 profileImage: authorData.avatar_url || undefined,
               },
               publishedAt: featuredArticleData.published_at || '',
-              category: featuredArticleData.category || 'Uncategorized',
+              category: categoryName,
               language: featuredArticleData.language,
               readTime: featuredArticleData.read_time || 5,
               featuredImage: featuredArticleData.featured_image || undefined,
