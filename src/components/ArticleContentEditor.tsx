@@ -41,6 +41,9 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       Image,
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-orange-500 underline hover:text-orange-600',
+        },
       }),
       Underline,
       TextAlign.configure({
@@ -56,7 +59,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md focus:outline-none',
+        class: 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md focus:outline-none relative',
       },
     },
   });
@@ -86,7 +89,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           initialValue={initialContent}
           onValueChange={onContentChange}
           placeholder="Start writing..."
-          className="prose prose-lg max-w-none outline-none focus:outline-none min-h-[50vh] text-md"
+          className="prose prose-lg max-w-none outline-none focus:outline-none min-h-[50vh] text-md relative"
           editorInstance={editor}
         />
       </div>

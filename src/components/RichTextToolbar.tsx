@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
 import {
@@ -5,7 +6,6 @@ import {
   Italic,
   Underline as UnderlineIcon,
   Code,
-  Link as LinkIcon,
   Image as ImageIcon,
   Headphones,
   Video,
@@ -30,6 +30,7 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar';
 import LinkMediaDialog from './editor/LinkMediaDialog';
+import LinkEditor from './editor/LinkEditor';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
@@ -37,7 +38,7 @@ interface RichTextToolbarProps {
 
 const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<'link' | 'image' | 'audio' | 'video' | 'button'>('link');
+  const [dialogType, setDialogType] = useState<'image' | 'audio' | 'video' | 'button'>('image');
 
   if (!editor) {
     return null;
@@ -88,7 +89,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
     }
   };
 
-  const openMediaDialog = (type: 'link' | 'image' | 'audio' | 'video' | 'button') => {
+  const openMediaDialog = (type: 'image' | 'audio' | 'video' | 'button') => {
     setDialogType(type);
     setDialogOpen(true);
   };
@@ -97,15 +98,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
     if (!editor || !url) return;
 
     switch (dialogType) {
-      case 'link': {
-        const linkText = text || url;
-        if (editor.view.state.selection.empty) {
-          editor.chain().focus().insertContent(`<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`).run();
-        } else {
-          editor.chain().focus().setLink({ href: url }).run();
-        }
-        break;
-      }
       case 'image': {
         editor.chain().focus().setImage({ src: url, alt: text || 'Image' }).run();
         break;
@@ -263,15 +255,8 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => openMediaDialog('link')}
-        className={`h-8 w-8 ${editor.isActive('link') ? 'bg-secondary' : ''}`}
-        title="Link"
-      >
-        <LinkIcon className="h-4 w-4" />
-      </Button>
+      {/* Replace the Link button with our new LinkEditor component */}
+      <LinkEditor editor={editor} />
 
       <Button
         variant="ghost"

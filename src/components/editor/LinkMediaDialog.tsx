@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type MediaType = 'link' | 'image' | 'audio' | 'video' | 'button';
+type MediaType = 'image' | 'audio' | 'video' | 'button';
 
 interface LinkMediaDialogProps {
   open: boolean;
@@ -41,8 +41,6 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({
 
   const getDialogTitle = () => {
     switch (type) {
-      case 'link':
-        return 'Insert Link';
       case 'image':
         return 'Insert Image';
       case 'audio':
@@ -58,8 +56,6 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({
 
   const getUrlPlaceholder = () => {
     switch (type) {
-      case 'link':
-        return 'https://example.com';
       case 'image':
         return 'https://example.com/image.jpg';
       case 'audio':
@@ -94,7 +90,7 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({
                 autoFocus
               />
             </div>
-            {(type === 'link' || type === 'button') && (
+            {type === 'button' && (
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="text" className="text-right">
                   Text
@@ -103,7 +99,7 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({
                   id="text"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  placeholder={type === 'button' ? 'Click me' : 'Link text'}
+                  placeholder="Click me"
                   className="col-span-3"
                 />
               </div>
