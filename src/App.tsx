@@ -16,6 +16,7 @@ import MyArticles from "./pages/MyArticles";
 import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import CategoryRedirect from "./components/CategoryRedirect";
 
 const queryClient = new QueryClient();
 
