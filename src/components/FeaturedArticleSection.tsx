@@ -5,6 +5,16 @@ import { useToast } from '@/hooks/use-toast'
 import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { ArticleProps } from '@/components/ArticleCard'
 
+// Helper function to extract excerpt from content
+const extractExcerpt = (content: string, maxLength: number = 160): string => {
+  // Remove HTML tags
+  const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // Return a truncated version
+  return plainText.length > maxLength 
+    ? plainText.substring(0, maxLength) + '...' 
+    : plainText;
+};
+
 export const FeaturedArticleSection = () => {
   const { toast } = useToast()
   const [article, setArticle] = useState<ArticleProps | null>(null)
@@ -22,6 +32,7 @@ export const FeaturedArticleSection = () => {
             id, 
             title, 
             excerpt, 
+            content,
             category, 
             category_id,
             categories:category_id(id, name),
@@ -47,6 +58,7 @@ export const FeaturedArticleSection = () => {
               id, 
               title, 
               excerpt, 
+              content,
               category, 
               category_id,
               categories:category_id(id, name),
@@ -78,10 +90,15 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = fallbackData.categories ? fallbackData.categories.name : fallbackData.category || 'Uncategorized';
             
+            // Use explicit excerpt or generate from content
+            const excerptText = fallbackData.excerpt?.trim() 
+              ? fallbackData.excerpt
+              : extractExcerpt(fallbackData.content);
+              
             const formattedArticle = {
               id: fallbackData.id,
               title: fallbackData.title,
-              excerpt: fallbackData.excerpt || '',
+              excerpt: excerptText,
               author: {
                 id: fallbackData.author_id,
                 name: 'Anonymous',
@@ -101,10 +118,15 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = fallbackData.categories ? fallbackData.categories.name : fallbackData.category || 'Uncategorized';
             
+            // Use explicit excerpt or generate from content
+            const excerptText = fallbackData.excerpt?.trim() 
+              ? fallbackData.excerpt
+              : extractExcerpt(fallbackData.content);
+              
             const formattedArticle = {
               id: fallbackData.id,
               title: fallbackData.title,
-              excerpt: fallbackData.excerpt || '',
+              excerpt: excerptText,
               author: {
                 id: authorData.id,
                 name:
@@ -134,11 +156,16 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = featuredArticleData.categories ? featuredArticleData.categories.name : featuredArticleData.category || 'Uncategorized';
             
+            // Use explicit excerpt or generate from content
+            const excerptText = featuredArticleData.excerpt?.trim() 
+              ? featuredArticleData.excerpt
+              : extractExcerpt(featuredArticleData.content);
+              
             // Create a formatted article without author details
             const formattedArticle = {
               id: featuredArticleData.id,
               title: featuredArticleData.title,
-              excerpt: featuredArticleData.excerpt || '',
+              excerpt: excerptText,
               author: {
                 id: featuredArticleData.author_id,
                 name: 'Anonymous',
@@ -156,11 +183,16 @@ export const FeaturedArticleSection = () => {
             // Get category name from the categories relation or fall back to the category field
             const categoryName = featuredArticleData.categories ? featuredArticleData.categories.name : featuredArticleData.category || 'Uncategorized';
             
+            // Use explicit excerpt or generate from content
+            const excerptText = featuredArticleData.excerpt?.trim() 
+              ? featuredArticleData.excerpt
+              : extractExcerpt(featuredArticleData.content);
+              
             // Format the featured article with author details
             const formattedArticle = {
               id: featuredArticleData.id,
               title: featuredArticleData.title,
-              excerpt: featuredArticleData.excerpt || '',
+              excerpt: excerptText,
               author: {
                 id: authorData.id,
                 name:

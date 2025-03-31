@@ -11,6 +11,16 @@ interface ArticlesListProps {
   searchQuery?: string;
 }
 
+// Helper function to extract excerpt from content
+const extractExcerpt = (content: string, maxLength: number = 150): string => {
+  // Remove HTML tags
+  const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // Return a truncated version
+  return plainText.length > maxLength 
+    ? plainText.substring(0, maxLength) + '...' 
+    : plainText;
+};
+
 export const ArticlesList: React.FC<ArticlesListProps> = ({
   limit = 6,
   filterByCategory,
@@ -32,6 +42,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             id, 
             title, 
             excerpt, 
+            content,
             category, 
             category_id,
             categories:category_id(id, name),
@@ -115,10 +126,15 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           // Get category name from the categories relation or fall back to the category field
           const categoryName = item.categories ? item.categories.name : item.category;
 
+          // Use explicit excerpt or generate from content
+          const excerptText = item.excerpt?.trim() 
+            ? item.excerpt
+            : extractExcerpt(item.content);
+
           return {
             id: item.id,
             title: item.title,
-            excerpt: item.excerpt || "",
+            excerpt: excerptText,
             author: {
               id: profile.id,
               name: profile.full_name || profile.username || "Anonymous",
