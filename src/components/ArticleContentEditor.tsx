@@ -2,26 +2,26 @@
 import React, { useRef, useEffect } from 'react';
 import { useEditorHistory } from './editor/useEditorHistory';
 import EditorTitle from './editor/EditorTitle';
-import EditorExcerpt from './editor/EditorExcerpt';
+import EditorSubtitle from './editor/EditorSubtitle';
 import EditorContent from './editor/EditorContent';
 import RichTextToolbar from './RichTextToolbar';
 
 interface ArticleContentEditorProps {
   initialContent: string;
   initialTitle: string;
-  initialExcerpt: string;
+  initialSubtitle: string;
   onContentChange: (content: string) => void;
   onTitleChange: (title: string) => void;
-  onExcerptChange: (excerpt: string) => void;
+  onSubtitleChange: (subtitle: string) => void;
 }
 
 const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   initialContent,
   initialTitle,
-  initialExcerpt,
+  initialSubtitle,
   onContentChange,
   onTitleChange,
-  onExcerptChange,
+  onSubtitleChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const editorHistory = useEditorHistory(initialContent);
@@ -234,7 +234,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       <div className="py-6 px-8 max-w-4xl mx-auto" ref={contentRef}>
         <EditorTitle initialValue={initialTitle} onValueChange={onTitleChange} />
 
-        <EditorExcerpt initialValue={initialExcerpt} onValueChange={onExcerptChange} />
+        <EditorSubtitle initialValue={initialSubtitle} onValueChange={onSubtitleChange} />
 
         <EditorContent initialValue={initialContent} onValueChange={onContentChange} />
       </div>
