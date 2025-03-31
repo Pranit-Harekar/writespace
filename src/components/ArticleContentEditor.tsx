@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import RichTextToolbar from "./RichTextToolbar";
@@ -26,44 +27,59 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const excerptRef = useRef<HTMLParagraphElement>(null);
 
+  // Set initial content only once on mount
   useEffect(() => {
-    if (contentRef.current && initialContent !== contentRef.current.innerHTML) {
+    if (contentRef.current && initialContent) {
       contentRef.current.innerHTML = initialContent;
     }
-    if (titleRef.current && initialTitle !== titleRef.current.textContent) {
+    if (titleRef.current && initialTitle) {
       titleRef.current.textContent = initialTitle;
     }
-    if (excerptRef.current && initialExcerpt !== excerptRef.current.textContent) {
+    if (excerptRef.current && initialExcerpt) {
       excerptRef.current.textContent = initialExcerpt;
     }
-  }, [initialContent, initialTitle, initialExcerpt]);
+  }, []);
 
+  // Handle auto-save without resetting cursor position
   useEffect(() => {
     const saveContent = () => {
       if (contentRef.current) {
-        onContentChange(contentRef.current.innerHTML);
-        
         const newContent = contentRef.current.innerHTML;
+        
+        // Only update if content actually changed
         if (undoStack[currentPosition] !== newContent) {
+          onContentChange(newContent);
+          
           const newUndoStack = [...undoStack.slice(0, currentPosition + 1), newContent];
           setUndoStack(newUndoStack);
           setRedoStack([]);
           setCurrentPosition(newUndoStack.length - 1);
         }
       }
-      
-      if (titleRef.current) {
-        onTitleChange(titleRef.current.textContent || "");
-      }
-      
-      if (excerptRef.current) {
-        onExcerptChange(excerptRef.current.textContent || "");
-      }
     };
 
     const timerId = setInterval(saveContent, 1000);
     return () => clearInterval(timerId);
-  }, [onContentChange, onTitleChange, onExcerptChange, undoStack, currentPosition]);
+  }, [onContentChange, undoStack, currentPosition]);
+
+  // Handle title and excerpt changes without affecting cursor
+  const handleTitleBlur = () => {
+    if (titleRef.current) {
+      onTitleChange(titleRef.current.textContent || "");
+    }
+  };
+  
+  const handleExcerptBlur = () => {
+    if (excerptRef.current) {
+      onExcerptChange(excerptRef.current.textContent || "");
+    }
+  };
+  
+  const handleContentBlur = () => {
+    if (contentRef.current) {
+      onContentChange(contentRef.current.innerHTML);
+    }
+  };
 
   const handleUndo = () => {
     if (currentPosition > 0) {
@@ -243,7 +259,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   };
   
   return (
-    <div className="border rounded-lg shadow bg-white">
+    <div className="bg-white">
       <RichTextToolbar
         onFormatText={handleFormatText}
         onInsertMedia={handleInsertMedia}
@@ -253,14 +269,14 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         canUndo={currentPosition > 0}
         canRedo={redoStack.length > 0}
       />
-      <div className="py-6 px-8">
+      <div className="py-6 px-8 max-w-4xl mx-auto">
         <h1
           ref={titleRef}
           className="text-4xl font-bold mb-4 outline-none"
           contentEditable
           suppressContentEditableWarning
           data-placeholder="Title"
-          onBlur={(e) => onTitleChange(e.currentTarget.textContent || "")}
+          onBlur={handleTitleBlur}
         >
           {initialTitle || "Title"}
         </h1>
@@ -271,18 +287,18 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           contentEditable
           suppressContentEditableWarning
           data-placeholder="Add a subtitle..."
-          onBlur={(e) => onExcerptChange(e.currentTarget.textContent || "")}
+          onBlur={handleExcerptBlur}
         >
           {initialExcerpt || "Add a subtitle..."}
         </p>
         
         <div
           ref={contentRef}
-          className="prose prose-lg max-w-none outline-none min-h-[300px]"
+          className="prose prose-lg max-w-none outline-none min-h-[50vh]"
           contentEditable
           suppressContentEditableWarning
           data-placeholder="Start writing..."
-          onBlur={(e) => onContentChange(e.currentTarget.innerHTML)}
+          onBlur={handleContentBlur}
         >
           {initialContent || "<p>Start writing...</p>"}
         </div>
