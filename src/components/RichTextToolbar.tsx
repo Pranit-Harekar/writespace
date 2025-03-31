@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Editor } from '@tiptap/react';
 import {
@@ -107,21 +106,40 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
         const btnText = prompt('Button text:', 'Click me');
         const btnUrl = prompt('Button URL:', 'https://');
         if (btnText && btnUrl) {
-          editor.chain().focus().setLink({ href: btnUrl }).insertContent(`<a href="${btnUrl}" class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 my-2" target="_blank" rel="noopener noreferrer">${btnText}</a>`).run();
+          editor
+            .chain()
+            .focus()
+            .setLink({ href: btnUrl })
+            .insertContent(
+              `<a href="${btnUrl}" class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 my-2" target="_blank" rel="noopener noreferrer">${btnText}</a>`,
+            )
+            .run();
         }
         break;
       }
       case 'video': {
         const videoUrl = prompt('Enter video URL (YouTube, Vimeo, etc.):', 'https://');
         if (videoUrl) {
-          editor.chain().focus().insertContent(`<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Video: ${videoUrl}</p></div>`).run();
+          editor
+            .chain()
+            .focus()
+            .insertContent(
+              `<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Video: ${videoUrl}</p></div>`,
+            )
+            .run();
         }
         break;
       }
       case 'audio': {
         const audioUrl = prompt('Enter audio URL:', 'https://');
         if (audioUrl) {
-          editor.chain().focus().insertContent(`<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Audio: ${audioUrl}</p></div>`).run();
+          editor
+            .chain()
+            .focus()
+            .insertContent(
+              `<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Audio: ${audioUrl}</p></div>`,
+            )
+            .run();
         }
         break;
       }

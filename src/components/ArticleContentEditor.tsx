@@ -57,10 +57,8 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 
   return (
     <div className="bg-white">
-      <div className="py-6 px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
-        <div className="bg-white border rounded-md shadow-sm mb-4">
-          <RichTextToolbar editor={editor} />
-        </div>
+      <div className="px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
+        <RichTextToolbar editor={editor} />
 
         <TipTapPlainTextEditor
           initialValue={initialTitle}
