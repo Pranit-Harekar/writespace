@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ArticleProps } from './ArticleCard';
 import { stripHtml } from '@/lib/textUtils';
+import { LANGUAGES } from '@/contexts/LanguageContext';
 
 export const FeaturedArticle: React.FC<ArticleProps> = ({
   id,
@@ -19,13 +20,16 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
   readTime,
   featuredImage,
 }) => {
+  // Get language display name from the language code
+  const languageDisplay = LANGUAGES[language as keyof typeof LANGUAGES]?.name || language;
+
   return (
     <div className="grid md:grid-cols-5 gap-6 rounded-lg overflow-hidden border p-0 md:p-0">
       <div className="md:col-span-3 order-2 md:order-1 p-6 flex flex-col justify-between">
         <div>
           <div className="flex gap-2 mb-3">
             <Badge variant="outline">{category}</Badge>
-            <Badge variant="secondary">{language}</Badge>
+            <Badge variant="secondary">{languageDisplay}</Badge>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold mb-4 hover:text-primary transition-colors">
             <Link to={`/article/${id}`}>{title}</Link>

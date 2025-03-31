@@ -6,6 +6,8 @@ import { ArticlesList } from "@/components/ArticlesList";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { CategoryList } from "@/components/CategoryList";
+import { LANGUAGES } from "@/contexts/LanguageContext";
+import { Badge } from "@/components/ui/badge";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -59,18 +61,31 @@ const SearchResults = () => {
               <CategoryList />
             </div>
             
-            {currentLanguage && (
-              <div className="mb-6 flex items-center">
-                <span className="mr-2">Filtered by language: {currentLanguage}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={clearLanguageFilter}
-                >
-                  Clear Filter
-                </Button>
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">Filter by Language</h2>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(LANGUAGES).map(([code, lang]) => (
+                  <Badge 
+                    key={code}
+                    variant={currentLanguage === code ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => applyLanguageFilter(code)}
+                  >
+                    {lang.name}
+                  </Badge>
+                ))}
+                {currentLanguage && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={clearLanguageFilter}
+                    className="ml-2"
+                  >
+                    Clear Filter
+                  </Button>
+                )}
               </div>
-            )}
+            </div>
             
             <ArticlesList 
               searchQuery={query} 

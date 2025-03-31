@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Clock, Globe, CalendarCheck, Tag, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { LANGUAGES } from '@/contexts/LanguageContext';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -70,10 +72,11 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Spanish</SelectItem>
-                <SelectItem value="fr">French</SelectItem>
-                <SelectItem value="de">German</SelectItem>
+                {Object.entries(LANGUAGES).map(([code, lang]) => (
+                  <SelectItem key={code} value={code}>
+                    {lang.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
