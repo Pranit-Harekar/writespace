@@ -1,9 +1,15 @@
-import React, { useRef, useEffect } from 'react';
-import { useEditorHistory } from './editor/useEditorHistory';
-import EditorTitle from './editor/EditorTitle';
-import EditorSubtitle from './editor/EditorSubtitle';
-import EditorContent from './editor/EditorContent';
+
+import React, { useRef } from 'react';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import Placeholder from '@tiptap/extension-placeholder';
 import RichTextToolbar from './RichTextToolbar';
+import TipTapEditor from './editor/TipTapEditor';
+import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
 
 interface ArticleContentEditorProps {
   initialContent: string;
@@ -23,220 +29,54 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   onSubtitleChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const editorHistory = useEditorHistory(initialContent);
-
-  // Auto-save content to history periodically
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    const saveContent = () => {
-      if (contentRef.current) {
-        const content = contentRef.current.innerHTML;
-        editorHistory.saveToHistory(content);
-      }
-    };
-
-    const timerId = setInterval(saveContent, 3000);
-    return () => clearInterval(timerId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleUndo = () => {
-    const previousContent = editorHistory.undo();
-    if (previousContent !== null && contentRef.current) {
-      contentRef.current.innerHTML = previousContent;
-    }
-  };
-
-  const handleRedo = () => {
-    const nextContent = editorHistory.redo();
-    if (nextContent !== null && contentRef.current) {
-      contentRef.current.innerHTML = nextContent;
-    }
-  };
-
-  const handleFormatText = (format: string) => {
-    // Focus content area first
-    if (contentRef.current) {
-      contentRef.current.focus();
-    }
-
-    document.execCommand('styleWithCSS', false, 'true');
-
-    switch (format) {
-      case 'bold':
-        document.execCommand('bold', false);
-        break;
-      case 'italic':
-        document.execCommand('italic', false);
-        break;
-      case 'strikethrough':
-        document.execCommand('strikeThrough', false);
-        break;
-      case 'code': {
-        const selection = window.getSelection();
-        if (selection && selection.toString().length > 0) {
-          const range = selection.getRangeAt(0);
-          const codeElement = document.createElement('code');
-          codeElement.className = 'bg-gray-100 px-1 py-0.5 rounded text-gray-800 font-mono text-sm';
-          codeElement.textContent = selection.toString();
-          range.deleteContents();
-          range.insertNode(codeElement);
-        }
-        break;
-      }
-      case 'clearFormatting':
-        document.execCommand('removeFormat', false);
-        break;
-      case 'heading1':
-        document.execCommand('formatBlock', false, '<h1>');
-        break;
-      case 'heading2':
-        document.execCommand('formatBlock', false, '<h2>');
-        break;
-      case 'heading3':
-        document.execCommand('formatBlock', false, '<h3>');
-        break;
-      case 'paragraph':
-        document.execCommand('formatBlock', false, '<p>');
-        break;
-      case 'blockquote':
-        document.execCommand('formatBlock', false, '<blockquote>');
-        document.execCommand('indent', false);
-        break;
-      case 'bulletList':
-        document.execCommand('insertUnorderedList', false);
-        break;
-      case 'orderedList':
-        document.execCommand('insertOrderedList', false);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleInsertMedia = (type: string) => {
-    // Focus content area first
-    if (contentRef.current) {
-      contentRef.current.focus();
-    }
-
-    switch (type) {
-      case 'link': {
-        const url = prompt('Enter URL:', 'https://');
-        if (url) {
-          document.execCommand('createLink', false, url);
-        }
-        break;
-      }
-      case 'image': {
-        const imageUrl = prompt('Enter image URL:', 'https://');
-        if (imageUrl) {
-          document.execCommand('insertImage', false, imageUrl);
-        }
-        break;
-      }
-      case 'button': {
-        const btnText = prompt('Button text:', 'Click me');
-        const btnUrl = prompt('Button URL:', 'https://');
-        if (btnText && btnUrl) {
-          const btn = document.createElement('a');
-          btn.href = btnUrl;
-          btn.className =
-            'inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 my-2';
-          btn.textContent = btnText;
-          btn.setAttribute('target', '_blank');
-          btn.setAttribute('rel', 'noopener noreferrer');
-
-          const selection = window.getSelection();
-          if (selection) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(btn);
-          }
-        }
-        break;
-      }
-      case 'video': {
-        const videoUrl = prompt('Enter video URL (YouTube, Vimeo, etc.):', 'https://');
-        if (videoUrl) {
-          const placeholder = document.createElement('div');
-          placeholder.className =
-            'border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4';
-          placeholder.innerHTML = `<p>Video: ${videoUrl}</p>`;
-
-          const selection = window.getSelection();
-          if (selection) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(placeholder);
-          }
-        }
-        break;
-      }
-      case 'audio': {
-        const audioUrl = prompt('Enter audio URL:', 'https://');
-        if (audioUrl) {
-          const placeholder = document.createElement('div');
-          placeholder.className =
-            'border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4';
-          placeholder.innerHTML = `<p>Audio: ${audioUrl}</p>`;
-
-          const selection = window.getSelection();
-          if (selection) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(placeholder);
-          }
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  };
-
-  const handleAlignText = (alignment: string) => {
-    // Focus content area first
-    if (contentRef.current) {
-      contentRef.current.focus();
-    }
-
-    switch (alignment) {
-      case 'left':
-        document.execCommand('justifyLeft', false);
-        break;
-      case 'center':
-        document.execCommand('justifyCenter', false);
-        break;
-      case 'right':
-        document.execCommand('justifyRight', false);
-        break;
-      case 'justify':
-        document.execCommand('justifyFull', false);
-        break;
-      default:
-        break;
-    }
-  };
+  
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Image,
+      Link.configure({
+        openOnClick: false,
+      }),
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Placeholder.configure({
+        placeholder: 'Start writing...',
+      }),
+    ],
+    content: initialContent,
+    onUpdate: ({ editor }) => {
+      onContentChange(editor.getHTML());
+    },
+  });
 
   return (
     <div className="bg-white">
-      <RichTextToolbar
-        onFormatText={handleFormatText}
-        onInsertMedia={handleInsertMedia}
-        onAlignText={handleAlignText}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        canUndo={editorHistory.canUndo}
-        canRedo={editorHistory.canRedo}
-      />
+      <RichTextToolbar editor={editor} />
       <div className="py-6 px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
-        <EditorTitle initialValue={initialTitle} onValueChange={onTitleChange} />
+        <TipTapPlainTextEditor
+          initialValue={initialTitle}
+          onValueChange={onTitleChange}
+          placeholder="Title"
+          className="text-4xl font-bold outline-none relative"
+          tagName="h1"
+        />
 
-        <EditorSubtitle initialValue={initialSubtitle} onValueChange={onSubtitleChange} />
+        <TipTapPlainTextEditor
+          initialValue={initialSubtitle}
+          onValueChange={onSubtitleChange}
+          placeholder="Add a subtitle..."
+          className="text-lg text-gray-500 outline-none relative"
+          tagName="p"
+        />
 
-        <EditorContent initialValue={initialContent} onValueChange={onContentChange} />
+        <TipTapEditor
+          initialValue={initialContent}
+          onValueChange={onContentChange}
+          placeholder="Start writing..."
+          className="prose prose-lg max-w-none outline-none min-h-[50vh] text-md"
+        />
       </div>
     </div>
   );
@@ -247,18 +87,15 @@ export default ArticleContentEditor;
 // Add improved CSS for placeholders
 const style = document.createElement('style');
 style.innerHTML = `
-  [contenteditable][data-placeholder][data-empty="true"]:before {
-    content: attr(data-placeholder);
+  .ProseMirror p.is-editor-empty:first-child::before,
+  .ProseMirror h1.is-editor-empty:first-child::before,
+  .ProseMirror h2.is-editor-empty:first-child::before,
+  .ProseMirror h3.is-editor-empty:first-child::before {
     color: #9ca3af;
-    cursor: text;
-    position: absolute;
-    left: 0;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
     pointer-events: none;
-  }
-
-  /* Make sure placeholders don't show when content exists */
-  [contenteditable][data-placeholder][data-empty="false"]:before {
-    content: none;
   }
 `;
 document.head.appendChild(style);
