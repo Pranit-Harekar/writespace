@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
 import {
   Bold,
@@ -29,12 +29,16 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from '@/components/ui/menubar';
+import LinkMediaDialog from './editor/LinkMediaDialog';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
 }
 
 const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<'link' | 'image' | 'audio' | 'video' | 'button'>('link');
+
   if (!editor) {
     return null;
   }
@@ -84,63 +88,57 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
     }
   };
 
-  const handleInsertMedia = (type: string) => {
-    if (!editor) return;
+  const openMediaDialog = (type: 'link' | 'image' | 'audio' | 'video' | 'button') => {
+    setDialogType(type);
+    setDialogOpen(true);
+  };
 
-    switch (type) {
+  const handleMediaInsert = (url: string, text?: string) => {
+    if (!editor || !url) return;
+
+    switch (dialogType) {
       case 'link': {
-        const url = prompt('Enter URL:', 'https://');
-        if (url) {
+        const linkText = text || url;
+        if (editor.view.state.selection.empty) {
+          editor.chain().focus().insertContent(`<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`).run();
+        } else {
           editor.chain().focus().setLink({ href: url }).run();
         }
         break;
       }
       case 'image': {
-        const imageUrl = prompt('Enter image URL:', 'https://');
-        if (imageUrl) {
-          editor.chain().focus().setImage({ src: imageUrl }).run();
-        }
+        editor.chain().focus().setImage({ src: url, alt: text || 'Image' }).run();
         break;
       }
       case 'button': {
-        const btnText = prompt('Button text:', 'Click me');
-        const btnUrl = prompt('Button URL:', 'https://');
-        if (btnText && btnUrl) {
-          editor
-            .chain()
-            .focus()
-            .setLink({ href: btnUrl })
-            .insertContent(
-              `<a href="${btnUrl}" class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 my-2" target="_blank" rel="noopener noreferrer">${btnText}</a>`,
-            )
-            .run();
-        }
+        const btnText = text || 'Click me';
+        editor
+          .chain()
+          .focus()
+          .insertContent(
+            `<a href="${url}" class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 my-2" target="_blank" rel="noopener noreferrer">${btnText}</a>`,
+          )
+          .run();
         break;
       }
       case 'video': {
-        const videoUrl = prompt('Enter video URL (YouTube, Vimeo, etc.):', 'https://');
-        if (videoUrl) {
-          editor
-            .chain()
-            .focus()
-            .insertContent(
-              `<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Video: ${videoUrl}</p></div>`,
-            )
-            .run();
-        }
+        editor
+          .chain()
+          .focus()
+          .insertContent(
+            `<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Video: ${url}</p></div>`,
+          )
+          .run();
         break;
       }
       case 'audio': {
-        const audioUrl = prompt('Enter audio URL:', 'https://');
-        if (audioUrl) {
-          editor
-            .chain()
-            .focus()
-            .insertContent(
-              `<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Audio: ${audioUrl}</p></div>`,
-            )
-            .run();
-        }
+        editor
+          .chain()
+          .focus()
+          .insertContent(
+            `<div class="border-2 border-dashed border-gray-300 p-4 text-center bg-gray-50 my-4"><p>Audio: ${url}</p></div>`,
+          )
+          .run();
         break;
       }
       default:
@@ -268,7 +266,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => handleInsertMedia('link')}
+        onClick={() => openMediaDialog('link')}
         className={`h-8 w-8 ${editor.isActive('link') ? 'bg-secondary' : ''}`}
         title="Link"
       >
@@ -278,7 +276,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => handleInsertMedia('image')}
+        onClick={() => openMediaDialog('image')}
         className="h-8 w-8"
         title="Image"
       >
@@ -288,7 +286,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => handleInsertMedia('audio')}
+        onClick={() => openMediaDialog('audio')}
         className="h-8 w-8"
         title="Audio"
       >
@@ -298,7 +296,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => handleInsertMedia('video')}
+        onClick={() => openMediaDialog('video')}
         className="h-8 w-8"
         title="Video"
       >
@@ -336,7 +334,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
             <ChevronDown className="h-4 w-4 ml-1" />
           </MenubarTrigger>
           <MenubarContent>
-            <MenubarItem onSelect={() => handleInsertMedia('button')}>Insert Button</MenubarItem>
+            <MenubarItem onSelect={() => openMediaDialog('button')}>Insert Button</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
@@ -367,6 +365,13 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
+
+      <LinkMediaDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onConfirm={handleMediaInsert}
+        type={dialogType}
+      />
     </div>
   );
 };
