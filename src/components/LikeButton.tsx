@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import confetti from 'canvas-confetti';
 
 interface LikeButtonProps {
   articleId: string;
@@ -66,6 +66,20 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     }
   };
 
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ff0000', '#ff4d94', '#ff99c8', '#ff66b3'],
+      angle: 90,
+      startVelocity: 30,
+      gravity: 0.8,
+      shapes: ['circle', 'square'],
+      ticks: 300
+    });
+  };
+
   const toggleLike = async () => {
     if (!user) {
       toast({
@@ -104,6 +118,9 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         
         setIsLiked(true);
         setLikesCount(prev => prev + 1);
+        
+        // Trigger confetti effect when liking
+        triggerConfetti();
       }
     } catch (error: any) {
       console.error('Error toggling like:', error);
