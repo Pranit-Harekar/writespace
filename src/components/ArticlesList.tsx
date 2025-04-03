@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -96,6 +95,41 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
 
         if (profilesError) throw profilesError;
 
+        // Get likes and comments counts for each article
+        const articleIds = articlesData.map(article => article.id);
+        
+        // Fetch like counts
+        const { data: likesData, error: likesError } = await supabase
+          .from('article_likes')
+          .select('article_id, count')
+          .in('article_id', articleIds)
+          .select('article_id', { count: 'exact' })
+          .group('article_id');
+          
+        if (likesError) throw likesError;
+        
+        // Create a map of article IDs to like counts
+        const likesCountMap = new Map();
+        likesData?.forEach(item => {
+          likesCountMap.set(item.article_id, parseInt(item.count));
+        });
+        
+        // Fetch comment counts
+        const { data: commentsData, error: commentsError } = await supabase
+          .from('article_comments')
+          .select('article_id, count')
+          .in('article_id', articleIds)
+          .select('article_id', { count: 'exact' })
+          .group('article_id');
+          
+        if (commentsError) throw commentsError;
+        
+        // Create a map of article IDs to comment counts
+        const commentsCountMap = new Map();
+        commentsData?.forEach(item => {
+          commentsCountMap.set(item.article_id, parseInt(item.count));
+        });
+
         // Create a lookup map for profiles
         const profileMap = new Map();
         profilesData?.forEach((profile) => {
@@ -132,6 +166,8 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
             category: categoryName || 'Uncategorized',
             readTime: item.read_time || 5,
             featuredImage: item.featured_image || undefined,
+            likesCount: likesCountMap.get(item.id) || 0,
+            commentsCount: commentsCountMap.get(item.id) || 0,
           };
         });
 

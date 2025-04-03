@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
+import { Calendar, Heart, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,8 @@ export interface ArticleProps {
   category: string;
   readTime: number;
   featuredImage?: string;
+  likesCount?: number;
+  commentsCount?: number;
 }
 
 export const ArticleCard: React.FC<ArticleProps> = ({
@@ -31,6 +33,8 @@ export const ArticleCard: React.FC<ArticleProps> = ({
   category,
   readTime,
   featuredImage,
+  likesCount = 0,
+  commentsCount = 0,
 }) => {
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
@@ -72,6 +76,16 @@ export const ArticleCard: React.FC<ArticleProps> = ({
             {new Date(publishedAt).toLocaleDateString()}
           </span>
           <span>{readTime} min read</span>
+        </div>
+      </CardFooter>
+      <CardFooter className="pt-0 pb-3 flex justify-start gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <Heart className="h-3.5 w-3.5" />
+          <span>{likesCount}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <MessageSquare className="h-3.5 w-3.5" />
+          <span>{commentsCount}</span>
         </div>
       </CardFooter>
     </Card>
