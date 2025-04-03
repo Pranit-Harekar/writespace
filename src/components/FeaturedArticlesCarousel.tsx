@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { FeaturedArticle } from '@/components/FeaturedArticle';
@@ -18,6 +19,8 @@ export const FeaturedArticlesCarousel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const [animationRef] = useAutoAnimate();
 
   // Fetch featured articles
@@ -166,16 +169,18 @@ export const FeaturedArticlesCarousel = () => {
     if (!carouselApi || articles.length <= 1) return;
 
     const interval = setInterval(() => {
-      if (activeIndex >= articles.length - 1) {
-        // If at the last slide, go back to the first slide
-        carouselApi.scrollTo(0);
-      } else {
-        carouselApi.scrollNext();
+      if (!isPaused) {
+        if (activeIndex >= articles.length - 1) {
+          // If at the last slide, go back to the first slide
+          carouselApi.scrollTo(0);
+        } else {
+          carouselApi.scrollNext();
+        }
       }
     }, 5000); // Auto rotate every 5 seconds
 
     return () => clearInterval(interval);
-  }, [carouselApi, articles.length, activeIndex]);
+  }, [carouselApi, articles.length, activeIndex, isPaused]);
 
   // Update active index when carousel changes
   useEffect(() => {
@@ -192,9 +197,37 @@ export const FeaturedArticlesCarousel = () => {
     };
   }, [carouselApi]);
 
+  // Set up event listeners for pausing on hover
+  useEffect(() => {
+    const handleMouseEnter = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.carousel-pause-trigger')) {
+        setIsPaused(true);
+      }
+    };
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).closest('.carousel-pause-trigger')) {
+        setIsPaused(false);
+      }
+    };
+
+    const carouselElement = carouselRef.current;
+    if (carouselElement) {
+      carouselElement.addEventListener('mouseenter', handleMouseEnter, true);
+      carouselElement.addEventListener('mouseleave', handleMouseLeave, true);
+    }
+
+    return () => {
+      if (carouselElement) {
+        carouselElement.removeEventListener('mouseenter', handleMouseEnter, true);
+        carouselElement.removeEventListener('mouseleave', handleMouseLeave, true);
+      }
+    };
+  }, []);
+
   if (isLoading) {
     return (
-      <div className="border rounded-lg overflow-hidden h-[400px] mb-8 animate-pulse">
+      <div className="border rounded-lg overflow-hidden h-[350px] mb-8 animate-pulse">
         <div className="grid md:grid-cols-5 h-full">
           <div className="md:col-span-3 p-6">
             <div className="bg-muted h-4 mb-2 rounded w-1/4"></div>
@@ -223,10 +256,10 @@ export const FeaturedArticlesCarousel = () => {
 
   return (
     <div className="mb-8" ref={animationRef}>
-      <Carousel className="w-full relative" setApi={setCarouselApi}>
+      <Carousel className="w-full relative" setApi={setCarouselApi} ref={carouselRef}>
         <CarouselContent>
           {articles.map((article) => (
-            <CarouselItem key={article.id} className="min-h-[400px]">
+            <CarouselItem key={article.id} className="min-h-[350px]">
               <FeaturedArticle {...article} />
             </CarouselItem>
           ))}

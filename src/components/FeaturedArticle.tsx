@@ -19,19 +19,19 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
   featuredImage,
 }) => {
   return (
-    <div className="grid md:grid-cols-5 gap-6 rounded-lg overflow-hidden border p-0 md:p-0 h-[380px]">
-      <div className="md:col-span-3 order-2 md:order-1 p-6 flex flex-col justify-between">
+    <div className="grid md:grid-cols-5 gap-4 rounded-lg overflow-hidden border p-0 md:p-0 h-[320px]">
+      <div className="md:col-span-3 order-2 md:order-1 p-4 flex flex-col justify-between">
         <div>
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2 mb-2">
             <Badge variant="outline">{category}</Badge>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-4 line-clamp-2 hover:text-primary transition-colors">
+          <h1 className="text-2xl md:text-3xl font-bold mb-3 line-clamp-2 hover:text-primary transition-colors">
             <Link to={`/article/${id}`}>{title}</Link>
           </h1>
-          <p className="text-muted-foreground mb-6 line-clamp-2">{stripHtml(excerpt)}</p>
+          <p className="text-muted-foreground mb-4 line-clamp-2">{stripHtml(excerpt)}</p>
         </div>
         <div className="flex flex-wrap justify-between items-center">
-          <div className="flex items-center gap-3 mb-3 md:mb-0">
+          <div className="flex items-center gap-3 mb-2 md:mb-0">
             <Avatar>
               <AvatarImage src={author.profileImage} alt={author.name} />
               <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
@@ -49,12 +49,12 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
               </div>
             </div>
           </div>
-          <Button asChild>
+          <Button asChild className="carousel-pause-trigger">
             <Link to={`/article/${id}`}>Read Full Article</Link>
           </Button>
         </div>
       </div>
-      <div className="md:col-span-2 order-1 md:order-2 h-[200px] md:h-auto relative">
+      <div className="md:col-span-2 order-1 md:order-2 h-[180px] md:h-auto relative">
         <div className="absolute inset-0">
           {featuredImage ? (
             <img src={featuredImage} alt={title} className="w-full h-full object-cover" />
