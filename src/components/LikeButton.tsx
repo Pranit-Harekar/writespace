@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -71,7 +72,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#ff0000', '#ff4d94', '#ff99c8', '#ff66b3'],
+      colors: ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9'],
       angle: 90,
       startVelocity: 30,
       gravity: 0.8,
