@@ -49,7 +49,6 @@ const ArticleView = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [author, setAuthor] = useState<Author | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
@@ -233,23 +232,14 @@ const ArticleView = () => {
           <div className="mt-8 flex items-center space-x-4">
             <LikeButton articleId={article.id} />
             
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-1"
-              onClick={() => setShowComments(!showComments)}
-            >
+            <div className="flex items-center gap-1">
               <MessageSquare className="h-5 w-5" />
               <span>{commentCount} {commentCount === 1 ? "Comment" : "Comments"}</span>
-            </Button>
+            </div>
           </div>
           
-          {showComments && (
-            <>
-              <Separator className="my-8" />
-              <Comments articleId={article.id} />
-            </>
-          )}
+          <Separator className="my-8" />
+          <Comments articleId={article.id} />
         </article>
       </div>
     </div>
