@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -162,16 +161,21 @@ export const FeaturedArticlesCarousel = () => {
     fetchFeaturedArticles();
   }, [toast]);
 
-  // Set up auto-rotation for carousel
+  // Set up auto-rotation for carousel with loop
   useEffect(() => {
     if (!carouselApi || articles.length <= 1) return;
 
     const interval = setInterval(() => {
-      carouselApi.scrollNext();
+      if (activeIndex >= articles.length - 1) {
+        // If at the last slide, go back to the first slide
+        carouselApi.scrollTo(0);
+      } else {
+        carouselApi.scrollNext();
+      }
     }, 5000); // Auto rotate every 5 seconds
 
     return () => clearInterval(interval);
-  }, [carouselApi, articles.length]);
+  }, [carouselApi, articles.length, activeIndex]);
 
   // Update active index when carousel changes
   useEffect(() => {
