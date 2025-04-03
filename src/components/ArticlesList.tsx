@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -98,37 +99,29 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         // Get likes and comments counts for each article
         const articleIds = articlesData.map(article => article.id);
         
-        // Fetch like counts
-        const { data: likesData, error: likesError } = await supabase
-          .from('article_likes')
-          .select('article_id, count')
-          .in('article_id', articleIds)
-          .select('article_id', { count: 'exact' })
-          .group('article_id');
-          
-        if (likesError) throw likesError;
-        
-        // Create a map of article IDs to like counts
+        // Count likes for each article
         const likesCountMap = new Map();
-        likesData?.forEach(item => {
-          likesCountMap.set(item.article_id, parseInt(item.count));
-        });
+        for (const articleId of articleIds) {
+          const { count, error } = await supabase
+            .from('article_likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('article_id', articleId);
+            
+          if (error) throw error;
+          likesCountMap.set(articleId, count || 0);
+        }
         
-        // Fetch comment counts
-        const { data: commentsData, error: commentsError } = await supabase
-          .from('article_comments')
-          .select('article_id, count')
-          .in('article_id', articleIds)
-          .select('article_id', { count: 'exact' })
-          .group('article_id');
-          
-        if (commentsError) throw commentsError;
-        
-        // Create a map of article IDs to comment counts
+        // Count comments for each article
         const commentsCountMap = new Map();
-        commentsData?.forEach(item => {
-          commentsCountMap.set(item.article_id, parseInt(item.count));
-        });
+        for (const articleId of articleIds) {
+          const { count, error } = await supabase
+            .from('article_comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('article_id', articleId);
+            
+          if (error) throw error;
+          commentsCountMap.set(articleId, count || 0);
+        }
 
         // Create a lookup map for profiles
         const profileMap = new Map();
