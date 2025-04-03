@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Header } from "@/components/Header";
-import { FeaturedArticleSection } from "@/components/FeaturedArticleSection";
+import { FeaturedArticlesCarousel } from "@/components/FeaturedArticlesCarousel";
 import { ArticlesList } from "@/components/ArticlesList";
 import { CategoryList } from "@/components/CategoryList";
 import { Footer } from "@/components/Footer";
@@ -13,7 +13,8 @@ const Index = () => {
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <section className="mb-12">
-            <FeaturedArticleSection />
+            <h2 className="text-2xl font-bold mb-6">Featured Articles</h2>
+            <FeaturedArticlesCarousel />
           </section>
           
           <section className="mb-12">
