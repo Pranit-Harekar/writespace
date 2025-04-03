@@ -28,7 +28,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
           <h1 className="text-2xl md:text-3xl font-bold mb-4 line-clamp-2 hover:text-primary transition-colors">
             <Link to={`/article/${id}`}>{title}</Link>
           </h1>
-          <p className="text-muted-foreground mb-6 line-clamp-3">{stripHtml(excerpt)}</p>
+          <p className="text-muted-foreground mb-6 line-clamp-2">{stripHtml(excerpt)}</p>
         </div>
         <div className="flex flex-wrap justify-between items-center">
           <div className="flex items-center gap-3 mb-3 md:mb-0">

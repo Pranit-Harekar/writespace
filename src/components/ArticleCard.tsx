@@ -66,7 +66,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-muted-foreground mb-3 line-clamp-3">{stripHtml(excerpt)}</p>
+        <p className="text-muted-foreground mb-3 line-clamp-2">{stripHtml(excerpt)}</p>
       </CardContent>
       <CardFooter className="flex justify-between pt-2 border-t text-sm text-muted-foreground h-14">
         <div className="flex items-center gap-2">
