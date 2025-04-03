@@ -75,17 +75,16 @@ export const ArticleCard: React.FC<ArticleProps> = ({
             <Calendar className="h-3 w-3" />
             {new Date(publishedAt).toLocaleDateString()}
           </span>
-          <span>{readTime} min read</span>
-        </div>
-      </CardFooter>
-      <CardFooter className="pt-0 pb-3 flex justify-start gap-4 text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <Heart className="h-3.5 w-3.5" />
-          <span>{likesCount}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <MessageSquare className="h-3.5 w-3.5" />
-          <span>{commentsCount}</span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <Heart className="h-3.5 w-3.5" />
+              <span>{likesCount}</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>{commentsCount}</span>
+            </span>
+          </div>
         </div>
       </CardFooter>
     </Card>
