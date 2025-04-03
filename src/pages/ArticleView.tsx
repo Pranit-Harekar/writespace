@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Calendar, Clock, Pencil, ChevronLeft } from "lucide-react";
+import { Calendar, Clock, Pencil, ChevronLeft, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,9 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LikeButton } from "@/components/LikeButton";
+import { Comments } from "@/components/Comments";
+import { Separator } from "@/components/ui/separator";
 
 interface Article {
   id: string;
@@ -46,6 +49,8 @@ const ArticleView = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [author, setAuthor] = useState<Author | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showComments, setShowComments] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -97,6 +102,16 @@ const ArticleView = () => {
         if (authorError) throw authorError;
         
         setAuthor(authorData);
+        
+        // Get comment count
+        const { count: commentCount, error: countError } = await supabase
+          .from("article_comments")
+          .select("*", { count: 'exact', head: true })
+          .eq("article_id", id);
+        
+        if (countError) throw countError;
+        
+        setCommentCount(commentCount || 0);
       } catch (error: any) {
         console.error("Error fetching article:", error);
         toast({
@@ -214,6 +229,27 @@ const ArticleView = () => {
             className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
+          
+          <div className="mt-8 flex items-center space-x-4">
+            <LikeButton articleId={article.id} />
+            
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-1"
+              onClick={() => setShowComments(!showComments)}
+            >
+              <MessageSquare className="h-5 w-5" />
+              <span>{commentCount} {commentCount === 1 ? "Comment" : "Comments"}</span>
+            </Button>
+          </div>
+          
+          {showComments && (
+            <>
+              <Separator className="my-8" />
+              <Comments articleId={article.id} />
+            </>
+          )}
         </article>
       </div>
     </div>
