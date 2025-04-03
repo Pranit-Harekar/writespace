@@ -104,14 +104,14 @@ const ArticleView = () => {
         setAuthor(authorData);
         
         // Get comment count
-        const { count: commentCount, error: countError } = await supabase
+        const { count, error: countError } = await supabase
           .from("article_comments")
           .select("*", { count: 'exact', head: true })
           .eq("article_id", id);
         
         if (countError) throw countError;
         
-        setCommentCount(commentCount || 0);
+        setCommentCount(count || 0);
       } catch (error: any) {
         console.error("Error fetching article:", error);
         toast({
