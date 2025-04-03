@@ -19,16 +19,16 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
   featuredImage,
 }) => {
   return (
-    <div className="grid md:grid-cols-5 gap-6 rounded-lg overflow-hidden border p-0 md:p-0">
+    <div className="grid md:grid-cols-5 gap-6 rounded-lg overflow-hidden border p-0 md:p-0 h-[380px]">
       <div className="md:col-span-3 order-2 md:order-1 p-6 flex flex-col justify-between">
         <div>
           <div className="flex gap-2 mb-3">
             <Badge variant="outline">{category}</Badge>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-4 hover:text-primary transition-colors">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 line-clamp-2 hover:text-primary transition-colors">
             <Link to={`/article/${id}`}>{title}</Link>
           </h1>
-          <p className="text-muted-foreground mb-6">{stripHtml(excerpt)}</p>
+          <p className="text-muted-foreground mb-6 line-clamp-3">{stripHtml(excerpt)}</p>
         </div>
         <div className="flex flex-wrap justify-between items-center">
           <div className="flex items-center gap-3 mb-3 md:mb-0">
@@ -54,14 +54,16 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
           </Button>
         </div>
       </div>
-      <div className="md:col-span-2 order-1 md:order-2 h-48 md:h-auto">
-        {featuredImage ? (
-          <img src={featuredImage} alt={title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <span className="text-muted-foreground">No image available</span>
-          </div>
-        )}
+      <div className="md:col-span-2 order-1 md:order-2 h-[200px] md:h-auto relative">
+        <div className="absolute inset-0">
+          {featuredImage ? (
+            <img src={featuredImage} alt={title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground">No image available</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

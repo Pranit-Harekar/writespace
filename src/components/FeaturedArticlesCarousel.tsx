@@ -9,15 +9,19 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
+import { cn } from '@/lib/utils';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 
 export const FeaturedArticlesCarousel = () => {
   const { toast } = useToast();
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [animationRef] = useAutoAnimate();
 
+  // Fetch featured articles
   useEffect(() => {
     const fetchFeaturedArticles = async () => {
       try {
@@ -158,9 +162,35 @@ export const FeaturedArticlesCarousel = () => {
     fetchFeaturedArticles();
   }, [toast]);
 
+  // Set up auto-rotation for carousel
+  useEffect(() => {
+    if (!carouselApi || articles.length <= 1) return;
+
+    const interval = setInterval(() => {
+      carouselApi.scrollNext();
+    }, 5000); // Auto rotate every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [carouselApi, articles.length]);
+
+  // Update active index when carousel changes
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      setActiveIndex(carouselApi.selectedScrollSnap());
+    };
+
+    carouselApi.on("select", onSelect);
+
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
+
   if (isLoading) {
     return (
-      <div className="border rounded-lg overflow-hidden h-64 mb-8 animate-pulse">
+      <div className="border rounded-lg overflow-hidden h-[400px] mb-8 animate-pulse">
         <div className="grid md:grid-cols-5 h-full">
           <div className="md:col-span-3 p-6">
             <div className="bg-muted h-4 mb-2 rounded w-1/4"></div>
@@ -181,19 +211,38 @@ export const FeaturedArticlesCarousel = () => {
     );
   }
 
+  const handleDotClick = (index: number) => {
+    if (carouselApi) {
+      carouselApi.scrollTo(index);
+    }
+  };
+
   return (
-    <Carousel className="w-full relative mb-8">
-      <CarouselContent>
-        {articles.map((article) => (
-          <CarouselItem key={article.id}>
-            <FeaturedArticle {...article} />
-          </CarouselItem>
-        ))}
-      </CarouselContent>
+    <div className="mb-8" ref={animationRef}>
+      <Carousel className="w-full relative" setApi={setCarouselApi}>
+        <CarouselContent>
+          {articles.map((article) => (
+            <CarouselItem key={article.id} className="min-h-[400px]">
+              <FeaturedArticle {...article} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+      
+      {/* Dots navigation */}
       <div className="flex justify-center gap-2 mt-4">
-        <CarouselPrevious className="static transform-none mr-2" />
-        <CarouselNext className="static transform-none ml-2" />
+        {articles.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => handleDotClick(index)}
+            className={cn(
+              "w-3 h-3 rounded-full transition-colors",
+              index === activeIndex ? "bg-primary" : "bg-muted"
+            )}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
-    </Carousel>
+    </div>
   );
 };
