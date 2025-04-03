@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Heart, MessageSquare } from 'lucide-react';
+import { Calendar, Heart, MessageSquare, Clock } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -39,12 +39,20 @@ export const ArticleCard: React.FC<ArticleProps> = ({
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
       {featuredImage && (
-        <div className="w-full h-48 overflow-hidden">
-          <img
-            src={featuredImage}
-            alt={title}
-            className="w-full h-full object-cover transition-transform hover:scale-105"
-          />
+        <div className="w-full h-48 overflow-hidden relative group">
+          <Link to={`/article/${id}`}>
+            <img
+              src={featuredImage}
+              alt={title}
+              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="bg-white/90 px-3 py-1 rounded-full flex items-center text-sm font-medium">
+                <Clock className="h-3.5 w-3.5 mr-1" />
+                {readTime} min read
+              </div>
+            </div>
+          </Link>
         </div>
       )}
       <CardHeader className="pb-2 flex-grow-0">
