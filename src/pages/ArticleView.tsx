@@ -103,7 +103,7 @@ const ArticleView = () => {
         
         setAuthor(authorData);
         
-        // Get comment count
+        // Get comment count - use a simple count query without any joins
         const { count, error: countError } = await supabase
           .from("article_comments")
           .select("*", { count: 'exact', head: true })

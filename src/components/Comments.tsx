@@ -23,7 +23,7 @@ interface Comment {
   updated_at: string;
   user_id: string;
   article_id: string;
-  author?: Author;
+  author_profile?: Author;
 }
 
 interface CommentsProps {
@@ -47,22 +47,30 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
     try {
       setIsLoading(true);
       
-      const { data, error } = await supabase
+      // First, get the comments
+      const { data: commentsData, error: commentsError } = await supabase
         .from('article_comments')
-        .select(`
-          *,
-          author:user_id(
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('article_id', articleId)
         .order('created_at', { ascending: false });
         
-      if (error) throw error;
+      if (commentsError) throw commentsError;
       
-      setComments(data as Comment[] || []);
+      // Then, for each comment, get the author's profile
+      const commentsWithProfiles = await Promise.all((commentsData || []).map(async (comment) => {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('username, full_name, avatar_url')
+          .eq('id', comment.user_id)
+          .single();
+          
+        return {
+          ...comment,
+          author_profile: profileData || null
+        };
+      }));
+      
+      setComments(commentsWithProfiles);
     } catch (error: any) {
       console.error('Error fetching comments:', error);
       toast({
@@ -90,28 +98,32 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
     if (!newComment.trim()) return;
     
     try {
-      const newCommentData = {
-        article_id: articleId,
-        user_id: user.id,
-        content: newComment.trim()
-      } as any; // Using 'as any' to bypass TypeScript type checking for now
-      
-      const { data, error } = await supabase
+      // Insert the comment
+      const { data: commentData, error: commentError } = await supabase
         .from('article_comments')
-        .insert(newCommentData)
-        .select(`
-          *,
-          author:user_id(
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
+        .insert({
+          article_id: articleId,
+          user_id: user.id,
+          content: newComment.trim()
+        })
+        .select('*')
         .single();
         
-      if (error) throw error;
+      if (commentError) throw commentError;
       
-      setComments([data as Comment, ...comments]);
+      // Get the author profile
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('username, full_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+      
+      const newCommentWithProfile = {
+        ...commentData,
+        author_profile: profileData || null
+      };
+      
+      setComments([newCommentWithProfile, ...comments]);
       setNewComment('');
       toast({
         title: 'Comment added',
@@ -141,23 +153,25 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
     if (!editingContent.trim()) return;
     
     try {
-      const { data, error } = await supabase
+      // Update the comment
+      const { data: updatedComment, error: updateError } = await supabase
         .from('article_comments')
         .update({ content: editingContent.trim() })
         .eq('id', commentId)
-        .select(`
-          *,
-          author:user_id(
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .single();
         
-      if (error) throw error;
+      if (updateError) throw updateError;
       
-      setComments(comments.map(c => c.id === commentId ? (data as Comment) : c));
+      // Find the comment's existing profile data
+      const existingComment = comments.find(c => c.id === commentId);
+      
+      const updatedCommentWithProfile = {
+        ...updatedComment,
+        author_profile: existingComment?.author_profile || null
+      };
+      
+      setComments(comments.map(c => c.id === commentId ? updatedCommentWithProfile : c));
       setEditingCommentId(null);
       setEditingContent('');
       toast({
@@ -246,11 +260,11 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
               <div className="flex items-start gap-4">
                 <Avatar>
                   <AvatarImage 
-                    src={comment.author?.avatar_url || undefined} 
-                    alt={comment.author?.full_name || comment.author?.username || ""}
+                    src={comment.author_profile?.avatar_url || undefined} 
+                    alt={comment.author_profile?.full_name || comment.author_profile?.username || ""}
                   />
                   <AvatarFallback>
-                    {(comment.author?.full_name || comment.author?.username || "U").charAt(0)}
+                    {(comment.author_profile?.full_name || comment.author_profile?.username || "U").charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 
@@ -258,7 +272,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium">
-                        {comment.author?.full_name || comment.author?.username || "Anonymous"}
+                        {comment.author_profile?.full_name || comment.author_profile?.username || "Anonymous"}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(comment.created_at), 'MMM d, yyyy')}
