@@ -33,7 +33,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
   featuredImage,
 }) => {
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
       {featuredImage && (
         <div className="w-full h-48 overflow-hidden">
           <img
@@ -43,7 +43,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
           />
         </div>
       )}
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 flex-grow-0">
         <div className="flex justify-between items-start">
           <Badge variant="outline" className="mb-2">
             {category}
@@ -53,10 +53,10 @@ export const ArticleCard: React.FC<ArticleProps> = ({
           <Link to={`/article/${id}`}>{title}</Link>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground mb-3">{stripHtml(excerpt)}</p>
+      <CardContent className="flex-grow">
+        <p className="text-muted-foreground mb-3 line-clamp-3">{stripHtml(excerpt)}</p>
       </CardContent>
-      <CardFooter className="flex justify-between pt-2 border-t text-sm text-muted-foreground">
+      <CardFooter className="flex justify-between pt-2 border-t text-sm text-muted-foreground h-14">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
             <AvatarImage src={author.profileImage} alt={author.name} />

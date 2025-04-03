@@ -21,7 +21,7 @@ const Index = () => {
             <CategoryList />
           </section>
           
-          <section>
+          <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
             <ArticlesList limit={6} />
           </section>
