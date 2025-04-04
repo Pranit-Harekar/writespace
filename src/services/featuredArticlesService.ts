@@ -3,11 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArticleProps } from '@/components/ArticleCard';
 import { extractExcerpt } from '@/lib/textUtils';
+import { useCallback } from 'react';
 
 export const useFeaturedArticlesService = () => {
   const { toast } = useToast();
 
-  const fetchFeaturedArticles = async (): Promise<ArticleProps[]> => {
+  const fetchFeaturedArticles = useCallback(async (): Promise<ArticleProps[]> => {
     try {
       // Get articles with highest combined likes and comments count (top 5)
       const { data: articlesData, error: articlesError } = await supabase
@@ -36,10 +37,10 @@ export const useFeaturedArticlesService = () => {
         return [];
       }
 
-      // Extract author_ids to fetch profiles
+      // Extract author_ids to fetch profiles in a single request
       const authorIds = [...new Set(articlesData.map((article) => article.author_id))];
 
-      // Fetch author profiles
+      // Fetch author profiles in a single request
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, username, full_name, avatar_url')
@@ -47,32 +48,38 @@ export const useFeaturedArticlesService = () => {
 
       if (profilesError) throw profilesError;
 
-      // Get likes and comments counts for each article
+      // Get likes and comments counts for each article in batch requests
       const articleIds = articlesData.map(article => article.id);
       
-      // Count likes for each article
-      const likesCountMap = new Map();
-      for (const articleId of articleIds) {
-        const { count, error } = await supabase
-          .from('article_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('article_id', articleId);
-          
-        if (error) throw error;
-        likesCountMap.set(articleId, count || 0);
-      }
+      // Fetch likes count for all articles in a single count query
+      const { data: likesData, error: likesError } = await supabase
+        .from('article_likes')
+        .select('article_id, count', { count: 'exact', head: false })
+        .in('article_id', articleIds)
+        .group('article_id');
+        
+      if (likesError) throw likesError;
       
-      // Count comments for each article
+      // Create a map for quick lookup of likes counts
+      const likesCountMap = new Map();
+      likesData?.forEach(item => {
+        likesCountMap.set(item.article_id, parseInt(item.count));
+      });
+      
+      // Fetch comments count for all articles in a single count query
+      const { data: commentsData, error: commentsError } = await supabase
+        .from('article_comments')
+        .select('article_id, count', { count: 'exact', head: false })
+        .in('article_id', articleIds)
+        .group('article_id');
+        
+      if (commentsError) throw commentsError;
+      
+      // Create a map for quick lookup of comments counts
       const commentsCountMap = new Map();
-      for (const articleId of articleIds) {
-        const { count, error } = await supabase
-          .from('article_comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('article_id', articleId);
-          
-        if (error) throw error;
-        commentsCountMap.set(articleId, count || 0);
-      }
+      commentsData?.forEach(item => {
+        commentsCountMap.set(item.article_id, parseInt(item.count));
+      });
 
       // Create a lookup map for profiles
       const profileMap = new Map();
@@ -138,7 +145,7 @@ export const useFeaturedArticlesService = () => {
       });
       return [];
     }
-  };
+  }, [toast]);
 
   return { fetchFeaturedArticles };
 };

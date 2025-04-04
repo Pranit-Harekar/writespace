@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
 import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
@@ -22,6 +22,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const initialLoadComplete = useRef(false);
 
   const loadArticles = async (pageNumber: number, isLoadMore = false) => {
     const loadingState = isLoadMore ? setIsLoadingMore : setIsLoading;
@@ -46,11 +47,17 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
     loadingState(false);
   };
 
-  // Initial load
+  // Initial load - only load once when props change
   useEffect(() => {
+    // Reset pagination and loading state when filters change
     setPage(1);
+    setIsLoading(true);
+    initialLoadComplete.current = false;
+    
+    // Load the first page of articles
     loadArticles(1);
-  }, [filterByCategory, limit, searchQuery]);
+    initialLoadComplete.current = true;
+  }, [filterByCategory, searchQuery, limit]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;

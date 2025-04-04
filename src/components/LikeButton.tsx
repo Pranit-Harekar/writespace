@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,15 +23,20 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isLoading, setIsLoading] = useState(true);
+  const dataFetchedRef = useRef(false);
 
   useEffect(() => {
-    getLikesCount();
-    if (user) {
+    // Initialize with the initialLikesCount
+    setLikesCount(initialLikesCount);
+    
+    // Only check like status if user is logged in and we haven't fetched yet
+    if (user && !dataFetchedRef.current) {
+      dataFetchedRef.current = true;
       checkIfLiked();
-    } else {
+    } else if (!user) {
       setIsLoading(false);
     }
-  }, [user, articleId]);
+  }, [user, articleId, initialLikesCount]);
 
   const checkIfLiked = async () => {
     try {
@@ -49,21 +54,6 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       console.error('Error checking like status:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const getLikesCount = async () => {
-    try {
-      const { count, error } = await supabase
-        .from('article_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('article_id', articleId);
-
-      if (error) throw error;
-      
-      setLikesCount(count || 0);
-    } catch (error) {
-      console.error('Error getting likes count:', error);
     }
   };
 

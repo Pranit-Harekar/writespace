@@ -81,10 +81,10 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
       return { articles: [], hasMore: false };
     }
 
-    // Extract author_ids to fetch profiles
+    // Extract author_ids to fetch profiles in a single batch
     const authorIds = [...new Set(articlesData.map((article) => article.author_id))];
 
-    // Fetch author profiles
+    // Fetch author profiles in a single batch
     const { data: profilesData, error: profilesError } = await supabase
       .from('profiles')
       .select('id, username, full_name, avatar_url')
@@ -92,32 +92,38 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
 
     if (profilesError) throw profilesError;
 
-    // Get likes and comments counts for each article
+    // Get article IDs for batch fetching engagement metrics
     const articleIds = articlesData.map(article => article.id);
     
-    // Count likes for each article
-    const likesCountMap = new Map();
-    for (const articleId of articleIds) {
-      const { count, error } = await supabase
-        .from('article_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('article_id', articleId);
-        
-      if (error) throw error;
-      likesCountMap.set(articleId, count || 0);
-    }
+    // Fetch all likes counts in a single batch query with grouping
+    const { data: likesData, error: likesError } = await supabase
+      .from('article_likes')
+      .select('article_id, count(*)', { count: 'exact', head: false })
+      .in('article_id', articleIds)
+      .group('article_id');
+      
+    if (likesError) throw likesError;
     
-    // Count comments for each article
+    // Create a map for quick lookup
+    const likesCountMap = new Map();
+    likesData?.forEach(item => {
+      likesCountMap.set(item.article_id, parseInt(item.count));
+    });
+    
+    // Fetch all comments counts in a single batch query with grouping
+    const { data: commentsData, error: commentsError } = await supabase
+      .from('article_comments')
+      .select('article_id, count(*)', { count: 'exact', head: false })
+      .in('article_id', articleIds)
+      .group('article_id');
+      
+    if (commentsError) throw commentsError;
+    
+    // Create a map for quick lookup
     const commentsCountMap = new Map();
-    for (const articleId of articleIds) {
-      const { count, error } = await supabase
-        .from('article_comments')
-        .select('*', { count: 'exact', head: true })
-        .eq('article_id', articleId);
-        
-      if (error) throw error;
-      commentsCountMap.set(articleId, count || 0);
-    }
+    commentsData?.forEach(item => {
+      commentsCountMap.set(item.article_id, parseInt(item.count));
+    });
 
     // Create a lookup map for profiles
     const profileMap = new Map();

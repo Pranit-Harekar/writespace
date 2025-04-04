@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { FeaturedArticle } from '@/components/FeaturedArticle';
 import { ArticleProps } from '@/components/ArticleCard';
@@ -17,9 +18,13 @@ export const FeaturedArticlesCarousel = () => {
   const [isPaused, setIsPaused] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [animationRef] = useAutoAnimate();
+  const dataFetchedRef = useRef(false);
 
-  // Fetch featured articles
+  // Fetch featured articles only once
   useEffect(() => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
     const loadArticles = async () => {
       const data = await fetchFeaturedArticles();
       setArticles(data);
