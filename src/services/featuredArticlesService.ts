@@ -51,34 +51,34 @@ export const useFeaturedArticlesService = () => {
       // Get likes and comments counts for each article in batch requests
       const articleIds = articlesData.map(article => article.id);
       
-      // Fetch likes count for all articles in a single count query
+      // Fetch likes for all articles
       const { data: likesData, error: likesError } = await supabase
         .from('article_likes')
-        .select('article_id, count', { count: 'exact', head: false })
-        .in('article_id', articleIds)
-        .group('article_id');
+        .select('article_id')
+        .in('article_id', articleIds);
         
       if (likesError) throw likesError;
       
       // Create a map for quick lookup of likes counts
       const likesCountMap = new Map();
-      likesData?.forEach(item => {
-        likesCountMap.set(item.article_id, parseInt(item.count));
+      articleIds.forEach(articleId => {
+        const articleLikes = likesData?.filter(like => like.article_id === articleId) || [];
+        likesCountMap.set(articleId, articleLikes.length);
       });
       
-      // Fetch comments count for all articles in a single count query
+      // Fetch comments for all articles
       const { data: commentsData, error: commentsError } = await supabase
         .from('article_comments')
-        .select('article_id, count', { count: 'exact', head: false })
-        .in('article_id', articleIds)
-        .group('article_id');
+        .select('article_id')
+        .in('article_id', articleIds);
         
       if (commentsError) throw commentsError;
       
       // Create a map for quick lookup of comments counts
       const commentsCountMap = new Map();
-      commentsData?.forEach(item => {
-        commentsCountMap.set(item.article_id, parseInt(item.count));
+      articleIds.forEach(articleId => {
+        const articleComments = commentsData?.filter(comment => comment.article_id === articleId) || [];
+        commentsCountMap.set(articleId, articleComments.length);
       });
 
       // Create a lookup map for profiles

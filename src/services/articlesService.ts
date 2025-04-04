@@ -95,35 +95,43 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
     // Get article IDs for batch fetching engagement metrics
     const articleIds = articlesData.map(article => article.id);
     
-    // Fetch all likes counts in a single batch query with grouping
-    const { data: likesData, error: likesError } = await supabase
+    // Fetch all likes counts using individual COUNT queries
+    const { data: likesCountData, error: likesError } = await supabase
       .from('article_likes')
-      .select('article_id, count(*)', { count: 'exact', head: false })
-      .in('article_id', articleIds)
-      .group('article_id');
+      .select('article_id, count')
+      .in('article_id', articleIds);
       
     if (likesError) throw likesError;
     
     // Create a map for quick lookup
     const likesCountMap = new Map();
-    likesData?.forEach(item => {
-      likesCountMap.set(item.article_id, parseInt(item.count));
-    });
     
-    // Fetch all comments counts in a single batch query with grouping
+    // Process the results to count by article_id
+    if (likesCountData) {
+      articleIds.forEach(articleId => {
+        const articleLikes = likesCountData.filter(like => like.article_id === articleId);
+        likesCountMap.set(articleId, articleLikes.length);
+      });
+    }
+    
+    // Fetch all comments counts using individual COUNT queries
     const { data: commentsData, error: commentsError } = await supabase
       .from('article_comments')
-      .select('article_id, count(*)', { count: 'exact', head: false })
-      .in('article_id', articleIds)
-      .group('article_id');
+      .select('article_id')
+      .in('article_id', articleIds);
       
     if (commentsError) throw commentsError;
     
     // Create a map for quick lookup
     const commentsCountMap = new Map();
-    commentsData?.forEach(item => {
-      commentsCountMap.set(item.article_id, parseInt(item.count));
-    });
+    
+    // Process the results to count by article_id
+    if (commentsData) {
+      articleIds.forEach(articleId => {
+        const articleComments = commentsData.filter(comment => comment.article_id === articleId);
+        commentsCountMap.set(articleId, articleComments.length);
+      });
+    }
 
     // Create a lookup map for profiles
     const profileMap = new Map();
