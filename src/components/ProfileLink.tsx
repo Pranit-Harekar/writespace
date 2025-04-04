@@ -6,12 +6,18 @@ interface ProfileLinkProps {
   username: string;
   children: React.ReactNode;
   className?: string;
+  userId?: string;
+  displayName?: string;
+  onClick?: () => void;
 }
 
 export const ProfileLink: React.FC<ProfileLinkProps> = ({ 
   username, 
   children, 
-  className = '' 
+  className = '',
+  userId,
+  displayName,
+  onClick
 }) => {
   if (!username) return <>{children}</>;
   
@@ -19,8 +25,9 @@ export const ProfileLink: React.FC<ProfileLinkProps> = ({
     <Link 
       to={`/profile/${username}`} 
       className={`hover:underline ${className}`}
+      onClick={onClick}
     >
-      {children}
+      {children || displayName}
     </Link>
   );
 };
