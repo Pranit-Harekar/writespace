@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -137,16 +136,26 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     }
   };
 
+  // For read-only mode, use a different rendering that looks like a normal element
+  if (readOnly) {
+    return (
+      <div className={`flex items-center gap-1 text-muted-foreground ${className}`}>
+        <Heart className="h-5 w-5" />
+        <span>{likesCount}</span>
+      </div>
+    );
+  }
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={readOnly ? undefined : toggleLike}
-      disabled={isLoading || !user || readOnly}
-      className={`gap-1 ${!user || readOnly ? 'cursor-default' : ''} ${className}`}
-      aria-label={readOnly ? 'Article likes' : isLiked ? 'Unlike article' : 'Like article'}
+      onClick={toggleLike}
+      disabled={isLoading || !user}
+      className={`gap-1 ${!user ? 'cursor-default' : ''} ${className}`}
+      aria-label={isLiked ? 'Unlike article' : 'Like article'}
     >
-      <Heart className={`h-5 w-5 ${isLiked && !readOnly ? 'fill-red-500 text-red-500' : ''}`} />
+      <Heart className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
       <span>{likesCount}</span>
     </Button>
   );
