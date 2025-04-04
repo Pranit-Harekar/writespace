@@ -9,6 +9,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import ArticleView from "./pages/ArticleView";
@@ -37,6 +39,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/search/category/:category" element={<SearchResults />} />
               <Route path="/profile" element={
