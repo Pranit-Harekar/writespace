@@ -1,8 +1,53 @@
+@import 'tailwindcss';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
- 
+@config '../tailwind.config.ts';
+
+@utility prose {
+  & blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4;
+  }
+
+  & h1 {
+    @apply text-3xl font-bold my-6;
+  }
+
+  & h2 {
+    @apply text-2xl font-bold my-5;
+  }
+
+  & h3 {
+    @apply text-xl font-bold my-4;
+  }
+
+  & p {
+    @apply my-3;
+  }
+
+  & ul {
+    @apply list-disc pl-5 my-3;
+  }
+
+  & ol {
+    @apply list-decimal pl-5 my-3;
+  }
+
+  & a {
+    @apply text-blue-600 hover:underline;
+  }
+
+  & img {
+    @apply max-w-full h-auto my-4 rounded;
+  }
+
+  & code {
+    @apply bg-gray-100 px-1 py-0.5 rounded text-gray-800 font-mono text-sm;
+  }
+
+  & pre {
+    @apply bg-gray-100 p-4 rounded my-4 overflow-x-auto;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -10,63 +55,63 @@
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
- 
+
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
- 
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
- 
+
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
- 
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
- 
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
- 
+
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
- 
+
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
- 
+
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
- 
+
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
- 
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
- 
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
- 
+
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
- 
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -74,7 +119,7 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* TipTap placeholder styles */
   .is-editor-empty:first-child::before {
     color: #adb5bd;
@@ -83,7 +128,7 @@
     height: 0;
     pointer-events: none;
   }
-  
+
   /* Remove focus outline from editor content */
   .ProseMirror:focus {
     outline: none !important;
@@ -94,66 +139,20 @@
   .ProseMirror {
     outline: none !important;
   }
-  
-  .tiptap:focus, 
-  .tiptap:focus-visible, 
+
+  .tiptap:focus,
+  .tiptap:focus-visible,
   .tiptap *:focus,
   .tiptap *:focus-visible {
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   /* Ensure the title and subtitle editors don't have focus rings */
-  h1.ProseMirror:focus, 
+  h1.ProseMirror:focus,
   p.ProseMirror:focus {
     outline: none !important;
     box-shadow: none !important;
     border-color: transparent !important;
-  }
-}
-
-@layer utilities {
-  .prose blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4;
-  }
-  
-  .prose h1 {
-    @apply text-3xl font-bold my-6;
-  }
-  
-  .prose h2 {
-    @apply text-2xl font-bold my-5;
-  }
-  
-  .prose h3 {
-    @apply text-xl font-bold my-4;
-  }
-  
-  .prose p {
-    @apply my-3;
-  }
-  
-  .prose ul {
-    @apply list-disc pl-5 my-3;
-  }
-  
-  .prose ol {
-    @apply list-decimal pl-5 my-3;
-  }
-  
-  .prose a {
-    @apply text-blue-600 hover:underline;
-  }
-  
-  .prose img {
-    @apply max-w-full h-auto my-4 rounded;
-  }
-  
-  .prose code {
-    @apply bg-gray-100 px-1 py-0.5 rounded text-gray-800 font-mono text-sm;
-  }
-  
-  .prose pre {
-    @apply bg-gray-100 p-4 rounded my-4 overflow-x-auto;
   }
 }

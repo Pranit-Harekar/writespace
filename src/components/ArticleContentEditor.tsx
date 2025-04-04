@@ -60,7 +60,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md focus:outline-none relative',
+        class: 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md focus:outline-hidden relative',
       },
     },
   });
@@ -74,7 +74,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           initialValue={initialTitle}
           onValueChange={onTitleChange}
           placeholder="Title"
-          className="text-4xl font-bold outline-none focus:outline-none relative"
+          className="text-4xl font-bold outline-hidden focus:outline-hidden relative"
           tagName="h1"
         />
 
@@ -82,7 +82,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           initialValue={initialSubtitle}
           onValueChange={onSubtitleChange}
           placeholder="Add a subtitle..."
-          className="text-lg text-gray-500 outline-none focus:outline-none relative"
+          className="text-lg text-gray-500 outline-hidden focus:outline-hidden relative"
           tagName="p"
         />
 
@@ -91,7 +91,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
             initialValue={initialContent}
             onValueChange={onContentChange}
             placeholder="Start writing..."
-            className="prose prose-lg max-w-none outline-none focus:outline-none min-h-[50vh] text-md relative"
+            className="prose prose-lg max-w-none outline-hidden focus:outline-hidden min-h-[50vh] text-md relative"
             editorInstance={editor}
           />
         </div>

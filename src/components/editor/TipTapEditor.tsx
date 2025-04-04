@@ -18,7 +18,7 @@ const TipTapEditor: React.FC<EditorProps> = ({
   initialValue,
   onValueChange,
   placeholder = 'Start writing...',
-  className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md',
+  className = 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md',
 }) => {
   const editor = useEditor({
     extensions: [

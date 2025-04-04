@@ -54,7 +54,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
           </Link>
         </div>
       )}
-      <CardHeader className="pb-2 flex-grow-0">
+      <CardHeader className="pb-2 grow-0">
         <div className="flex justify-between items-start">
           <Badge variant="outline" className="mb-2">
             {category}
@@ -64,7 +64,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
           <Link to={`/article/${id}`}>{title}</Link>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow">
+      <CardContent className="grow">
         <p className="text-muted-foreground mb-3 line-clamp-2">{stripHtml(excerpt)}</p>
       </CardContent>
       <CardFooter className="flex justify-between pt-4 border-t text-sm text-muted-foreground h-14">

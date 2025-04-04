@@ -20,7 +20,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
   initialValue,
   onValueChange,
   placeholder = 'Start writing...',
-  className = 'prose prose-lg max-w-none outline-none min-h-[50vh] text-md',
+  className = 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md',
   editorInstance,
 }) => {
   // Only create a local editor if no external editor is provided
@@ -52,7 +52,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: `${className} focus:outline-none`,
+        class: `${className} focus:outline-hidden`,
       },
     },
   });
@@ -76,7 +76,7 @@ const FullEditor: React.FC<FullEditorProps> = ({
 
   return (
     <div className="relative">
-      <EditorContent editor={editor} className={`${className} focus:outline-none ProseMirror`} />
+      <EditorContent editor={editor} className={`${className} focus:outline-hidden ProseMirror`} />
     </div>
   );
 };

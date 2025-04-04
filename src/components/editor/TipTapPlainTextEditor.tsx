@@ -49,7 +49,7 @@ const TipTapPlainTextEditor: React.FC<PlainTextEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: `${className} focus:outline-none`,
+        class: `${className} focus:outline-hidden`,
       },
     },
   });
@@ -62,7 +62,7 @@ const TipTapPlainTextEditor: React.FC<PlainTextEditorProps> = ({
   }, [initialValue, editor, tagName]);
 
   return (
-    <EditorContent editor={editor} className={`${className} focus:outline-none`} />
+    <EditorContent editor={editor} className={`${className} focus:outline-hidden`} />
   );
 };
 
