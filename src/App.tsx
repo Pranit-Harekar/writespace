@@ -18,6 +18,10 @@ import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import CategoryRedirect from "./components/CategoryRedirect";
+import About from "./pages/About";
+import Help from "./pages/Help";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +61,11 @@ const App = () => (
                   <MyArticles />
                 </ProtectedRoute>
               } />
+              {/* New routes for static pages */}
+              <Route path="/about" element={<About />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               {/* Redirect old category URLs to the new structure */}
               <Route path="/category/:category" element={<CategoryRedirect />} />
               <Route path="*" element={<NotFound />} />

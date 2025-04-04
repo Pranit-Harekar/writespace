@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 interface ProfileLinkProps {
   username: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   userId?: string;
   displayName?: string;
