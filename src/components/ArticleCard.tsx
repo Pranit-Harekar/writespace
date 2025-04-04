@@ -67,7 +67,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
       <CardContent className="flex-grow">
         <p className="text-muted-foreground mb-3 line-clamp-2">{stripHtml(excerpt)}</p>
       </CardContent>
-      <CardFooter className="flex justify-between pt-2 border-t text-sm text-muted-foreground h-14">
+      <CardFooter className="flex justify-between pt-4 border-t text-sm text-muted-foreground h-14">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
             <AvatarImage src={author.profileImage} alt={author.name} />
@@ -77,7 +77,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
             {author.name}
           </Link>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <span className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
             {new Date(publishedAt).toLocaleDateString()}
@@ -86,10 +86,6 @@ export const ArticleCard: React.FC<ArticleProps> = ({
             <span className="flex items-center gap-1">
               <Heart className="h-3.5 w-3.5" />
               <span>{likesCount}</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <MessageSquare className="h-3.5 w-3.5" />
-              <span>{commentsCount}</span>
             </span>
           </div>
         </div>

@@ -57,8 +57,6 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <LanguageSelector />
-
           {user ? (
             <>
               <div className="hidden sm:flex gap-2">

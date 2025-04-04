@@ -1,10 +1,9 @@
-
-import React from "react";
-import { Header } from "@/components/Header";
-import { FeaturedArticlesCarousel } from "@/components/FeaturedArticlesCarousel";
-import { ArticlesList } from "@/components/ArticlesList";
-import { CategoryList } from "@/components/CategoryList";
-import { Footer } from "@/components/Footer";
+import React from 'react';
+import { Header } from '@/components/Header';
+import { FeaturedArticlesCarousel } from '@/components/FeaturedArticlesCarousel';
+import { ArticlesList } from '@/components/ArticlesList';
+import { CategoryList } from '@/components/CategoryList';
+import { Footer } from '@/components/Footer';
 
 const Index = () => {
   return (
@@ -16,12 +15,12 @@ const Index = () => {
             <h2 className="text-2xl font-bold mb-6">Featured Articles</h2>
             <FeaturedArticlesCarousel />
           </section>
-          
+
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
             <CategoryList />
           </section>
-          
+
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
             <ArticlesList limit={6} />
