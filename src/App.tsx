@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile";
 import ArticleView from "./pages/ArticleView";
 import ArticleEditor from "./pages/ArticleEditor";
 import MyArticles from "./pages/MyArticles";
@@ -39,6 +40,7 @@ const App = () => (
                   <Profile />
                 </ProtectedRoute>
               } />
+              <Route path="/profile/:username" element={<PublicProfile />} />
               <Route path="/article/:id" element={<ArticleView />} />
               <Route path="/article/new" element={
                 <ProtectedRoute>

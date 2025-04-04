@@ -87,16 +87,17 @@ export const Header = () => {
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       {profile?.full_name && <p className="font-medium">{profile.full_name}</p>}
-                      {user?.email && <p className="text-sm text-muted-foreground">{user.email}</p>}
+                      {profile?.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer w-full">
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>My Profile</span>
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/my-articles" className="cursor-pointer w-full sm:hidden">
                       <FileText className="mr-2 h-4 w-4" />
