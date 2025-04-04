@@ -59,7 +59,7 @@ export const useFeaturedArticlesService = () => {
         
       if (likesError) throw likesError;
       
-      // Create a map for quick lookup of likes counts
+      // Count likes per article using client-side JavaScript
       const likesCountMap = new Map();
       articleIds.forEach(articleId => {
         const articleLikes = likesData?.filter(like => like.article_id === articleId) || [];
@@ -74,7 +74,7 @@ export const useFeaturedArticlesService = () => {
         
       if (commentsError) throw commentsError;
       
-      // Create a map for quick lookup of comments counts
+      // Count comments per article using client-side JavaScript
       const commentsCountMap = new Map();
       articleIds.forEach(articleId => {
         const articleComments = commentsData?.filter(comment => comment.article_id === articleId) || [];
