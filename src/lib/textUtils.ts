@@ -9,21 +9,21 @@ import { cn } from "./utils";
  */
 export function stripHtml(html: string, maxLength?: number): string {
   if (!html) return '';
-  
+
   // Create a temporary DOM element
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  
+
   // Get the text content (this will remove all HTML tags and convert entities)
   let plainText = doc.body.textContent || '';
-  
+
   // Trim and handle whitespace
   plainText = plainText.replace(/\s+/g, ' ').trim();
-  
+
   // Truncate if needed
   if (maxLength && plainText.length > maxLength) {
     plainText = plainText.substring(0, maxLength) + '...';
   }
-  
+
   return plainText;
 }
 

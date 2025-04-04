@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
@@ -19,7 +18,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
   featuredImage,
 }) => {
   return (
-    <div className="grid md:grid-cols-5 gap-4 rounded-lg overflow-hidden border p-0 md:p-0 h-[320px]">
+    <div className="grid md:grid-cols-5 gap-4 rounded-lg overflow-hidden border p-0 md:p-0 h-[240px]">
       <div className="md:col-span-3 order-2 md:order-1 p-4 flex flex-col justify-between">
         <div>
           <div className="flex gap-2 mb-2">

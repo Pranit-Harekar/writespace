@@ -1,12 +1,7 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { FeaturedArticle } from '@/components/FeaturedArticle';
 import { ArticleProps } from '@/components/ArticleCard';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useFeaturedArticlesService } from '@/services/featuredArticlesService';
 import { FeaturedArticlesCarouselSkeleton } from '@/components/FeaturedArticlesCarouselSkeleton';
@@ -60,10 +55,10 @@ export const FeaturedArticlesCarousel = () => {
       setActiveIndex(carouselApi.selectedScrollSnap());
     };
 
-    carouselApi.on("select", onSelect);
+    carouselApi.on('select', onSelect);
 
     return () => {
-      carouselApi.off("select", onSelect);
+      carouselApi.off('select', onSelect);
     };
   }, [carouselApi]);
 
@@ -114,18 +109,14 @@ export const FeaturedArticlesCarousel = () => {
       <Carousel className="w-full relative" setApi={setCarouselApi} ref={carouselRef}>
         <CarouselContent>
           {articles.map((article) => (
-            <CarouselItem key={article.id} className="min-h-[320px]">
+            <CarouselItem key={article.id} className="min-h-[240px]">
               <FeaturedArticle {...article} />
             </CarouselItem>
           ))}
         </CarouselContent>
       </Carousel>
-      
-      <CarouselDots 
-        total={articles.length} 
-        activeIndex={activeIndex} 
-        onDotClick={handleDotClick} 
-      />
+
+      <CarouselDots total={articles.length} activeIndex={activeIndex} onDotClick={handleDotClick} />
     </div>
   );
 };

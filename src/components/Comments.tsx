@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,38 +37,40 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     fetchComments();
   }, [articleId]);
-  
+
   const fetchComments = async () => {
     try {
       setIsLoading(true);
-      
+
       // First, get the comments
       const { data: commentsData, error: commentsError } = await supabase
         .from('article_comments')
         .select('*')
         .eq('article_id', articleId)
         .order('created_at', { ascending: false });
-        
+
       if (commentsError) throw commentsError;
-      
+
       // Then, for each comment, get the author's profile
-      const commentsWithProfiles = await Promise.all((commentsData || []).map(async (comment) => {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('username, full_name, avatar_url')
-          .eq('id', comment.user_id)
-          .single();
-          
-        return {
-          ...comment,
-          author_profile: profileData || null
-        };
-      }));
-      
+      const commentsWithProfiles = await Promise.all(
+        (commentsData || []).map(async (comment) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('username, full_name, avatar_url')
+            .eq('id', comment.user_id)
+            .single();
+
+          return {
+            ...comment,
+            author_profile: profileData || null,
+          };
+        }),
+      );
+
       setComments(commentsWithProfiles);
     } catch (error: any) {
       console.error('Error fetching comments:', error);
@@ -82,10 +83,10 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
       setIsLoading(false);
     }
   };
-  
+
   const addComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast({
         title: 'Authentication required',
@@ -94,9 +95,9 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
       });
       return;
     }
-    
+
     if (!newComment.trim()) return;
-    
+
     try {
       // Insert the comment
       const { data: commentData, error: commentError } = await supabase
@@ -104,25 +105,25 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
         .insert({
           article_id: articleId,
           user_id: user.id,
-          content: newComment.trim()
+          content: newComment.trim(),
         })
         .select('*')
         .single();
-        
+
       if (commentError) throw commentError;
-      
+
       // Get the author profile
       const { data: profileData } = await supabase
         .from('profiles')
         .select('username, full_name, avatar_url')
         .eq('id', user.id)
         .single();
-      
+
       const newCommentWithProfile = {
         ...commentData,
-        author_profile: profileData || null
+        author_profile: profileData || null,
       };
-      
+
       setComments([newCommentWithProfile, ...comments]);
       setNewComment('');
       toast({
@@ -138,20 +139,20 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
       });
     }
   };
-  
+
   const startEditing = (comment: Comment) => {
     setEditingCommentId(comment.id);
     setEditingContent(comment.content);
   };
-  
+
   const cancelEditing = () => {
     setEditingCommentId(null);
     setEditingContent('');
   };
-  
+
   const updateComment = async (commentId: string) => {
     if (!editingContent.trim()) return;
-    
+
     try {
       // Update the comment
       const { data: updatedComment, error: updateError } = await supabase
@@ -160,18 +161,18 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
         .eq('id', commentId)
         .select('*')
         .single();
-        
+
       if (updateError) throw updateError;
-      
+
       // Find the comment's existing profile data
-      const existingComment = comments.find(c => c.id === commentId);
-      
+      const existingComment = comments.find((c) => c.id === commentId);
+
       const updatedCommentWithProfile = {
         ...updatedComment,
-        author_profile: existingComment?.author_profile || null
+        author_profile: existingComment?.author_profile || null,
       };
-      
-      setComments(comments.map(c => c.id === commentId ? updatedCommentWithProfile : c));
+
+      setComments(comments.map((c) => (c.id === commentId ? updatedCommentWithProfile : c)));
       setEditingCommentId(null);
       setEditingContent('');
       toast({
@@ -187,17 +188,14 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
       });
     }
   };
-  
+
   const deleteComment = async (commentId: string) => {
     try {
-      const { error } = await supabase
-        .from('article_comments')
-        .delete()
-        .eq('id', commentId);
-        
+      const { error } = await supabase.from('article_comments').delete().eq('id', commentId);
+
       if (error) throw error;
-      
-      setComments(comments.filter(c => c.id !== commentId));
+
+      setComments(comments.filter((c) => c.id !== commentId));
       toast({
         title: 'Comment deleted',
         description: 'Your comment has been removed',
@@ -211,11 +209,11 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
       });
     }
   };
-  
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Comments</h2>
-      
+
       {user ? (
         <form onSubmit={addComment} className="flex gap-2">
           <Input
@@ -233,7 +231,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
           You need to be logged in to comment on this article.
         </p>
       )}
-      
+
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((_, i) => (
@@ -259,41 +257,48 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
             <Card key={comment.id} className="p-4">
               <div className="flex items-start gap-4">
                 <Avatar>
-                  <AvatarImage 
-                    src={comment.author_profile?.avatar_url || undefined} 
-                    alt={comment.author_profile?.full_name || comment.author_profile?.username || ""}
+                  <AvatarImage
+                    src={comment.author_profile?.avatar_url || undefined}
+                    alt={
+                      comment.author_profile?.full_name || comment.author_profile?.username || ''
+                    }
                   />
                   <AvatarFallback>
-                    {(comment.author_profile?.full_name || comment.author_profile?.username || "U").charAt(0)}
+                    {(
+                      comment.author_profile?.full_name ||
+                      comment.author_profile?.username ||
+                      'U'
+                    ).charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                
+
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium">
-                        {comment.author_profile?.full_name || comment.author_profile?.username || "Anonymous"}
+                        {comment.author_profile?.full_name ||
+                          comment.author_profile?.username ||
+                          'Anonymous'}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(comment.created_at), 'MMM d, yyyy')}
-                        {comment.updated_at !== comment.created_at && 
-                          " (edited)"}
+                        {comment.updated_at !== comment.created_at && ' (edited)'}
                       </p>
                     </div>
-                    
+
                     {user && user.id === comment.user_id && (
                       <div className="flex gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => startEditing(comment)}
                           className="h-7 w-7"
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => deleteComment(comment.id)}
                           className="h-7 w-7 text-destructive hover:text-destructive"
                         >
@@ -302,7 +307,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
                       </div>
                     )}
                   </div>
-                  
+
                   {editingCommentId === comment.id ? (
                     <div className="mt-2 space-y-2">
                       <Input
@@ -311,17 +316,10 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
                         className="w-full"
                       />
                       <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={cancelEditing}
-                        >
+                        <Button variant="outline" size="sm" onClick={cancelEditing}>
                           Cancel
                         </Button>
-                        <Button 
-                          size="sm" 
-                          onClick={() => updateComment(comment.id)}
-                        >
+                        <Button size="sm" onClick={() => updateComment(comment.id)}>
                           Save
                         </Button>
                       </div>
