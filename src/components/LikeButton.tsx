@@ -12,6 +12,7 @@ interface LikeButtonProps {
   initialLikesCount?: number;
   className?: string;
   onLikeUpdate?: (newCount: number) => void;
+  readOnly?: boolean;
 }
 
 export const LikeButton: React.FC<LikeButtonProps> = ({
@@ -19,6 +20,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   initialLikesCount = 0,
   className = '',
   onLikeUpdate,
+  readOnly = false,
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -32,13 +34,13 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     setLikesCount(initialLikesCount);
 
     // Only check like status if user is logged in and we haven't fetched yet
-    if (user && !dataFetchedRef.current) {
+    if (user && !dataFetchedRef.current && !readOnly) {
       dataFetchedRef.current = true;
       checkIfLiked();
-    } else if (!user) {
+    } else if (!user || readOnly) {
       setIsLoading(false);
     }
-  }, [user, articleId, initialLikesCount]);
+  }, [user, articleId, initialLikesCount, readOnly]);
 
   const checkIfLiked = async () => {
     try {
@@ -74,6 +76,8 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   };
 
   const toggleLike = async () => {
+    if (readOnly) return;
+    
     if (!user) {
       toast({
         title: 'Authentication required',
@@ -137,12 +141,12 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     <Button
       variant="ghost"
       size="sm"
-      onClick={toggleLike}
-      disabled={isLoading || !user}
-      className={`gap-1 ${!user ? 'cursor-default' : ''} ${className}`}
-      aria-label={isLiked ? 'Unlike article' : 'Like article'}
+      onClick={readOnly ? undefined : toggleLike}
+      disabled={isLoading || !user || readOnly}
+      className={`gap-1 ${!user || readOnly ? 'cursor-default' : ''} ${className}`}
+      aria-label={readOnly ? 'Article likes' : isLiked ? 'Unlike article' : 'Like article'}
     >
-      <Heart className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+      <Heart className={`h-5 w-5 ${isLiked && !readOnly ? 'fill-red-500 text-red-500' : ''}`} />
       <span>{likesCount}</span>
     </Button>
   );
