@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -31,16 +30,26 @@ const PublicProfile = () => {
         setIsLoading(true);
         setError(null);
 
-        // Fetch the profile by username
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("username", username)
-          .single();
+        let query = supabase.from("profiles").select("*");
+        
+        const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        
+        if (UUID_REGEX.test(username)) {
+          query = query.eq("id", username);
+        } else {
+          query = query.eq("username", username);
+        }
+        
+        const { data, error } = await query.maybeSingle();
 
         if (error) {
           console.error("Error fetching profile:", error);
           setError("Could not find this user profile");
+          return;
+        }
+
+        if (!data) {
+          setError("Profile not found");
           return;
         }
 
