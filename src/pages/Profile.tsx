@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,9 +14,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LANGUAGES } from "@/contexts/LanguageContext";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Users } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ProfileLink } from "@/components/ProfileLink";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const profileSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
@@ -28,10 +32,25 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+type UserData = {
+  id: string;
+  username: string;
+  full_name: string | null;
+  avatar_url: string | null;
+};
+
 const Profile = () => {
   const { user, profile, updateProfile, signOut } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [showFollowersDialog, setShowFollowersDialog] = useState(false);
+  const [showFollowingDialog, setShowFollowingDialog] = useState(false);
+  const [followersData, setFollowersData] = useState<UserData[]>([]);
+  const [followingData, setFollowingData] = useState<UserData[]>([]);
+  const [isLoadingFollowers, setIsLoadingFollowers] = useState(false);
+  const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
   const navigate = useNavigate();
   const { setLanguage } = useLanguage();
 
@@ -60,6 +79,110 @@ const Profile = () => {
       setValue("preferred_language", profile.preferred_language || "en");
     }
   }, [profile, setValue]);
+
+  useEffect(() => {
+    const fetchFollowCounts = async () => {
+      if (!user) return;
+      
+      try {
+        // Get follower count
+        const { data: followers, error: followerError } = await supabase
+          .rpc('get_follower_count', { user_id: user.id });
+
+        if (followerError) throw followerError;
+        setFollowerCount(followers || 0);
+
+        // Get following count
+        const { data: following, error: followingError } = await supabase
+          .rpc('get_following_count', { user_id: user.id });
+
+        if (followingError) throw followingError;
+        setFollowingCount(following || 0);
+      } catch (err) {
+        console.error("Error fetching follow counts:", err);
+      }
+    };
+
+    fetchFollowCounts();
+  }, [user]);
+
+  const fetchFollowers = async () => {
+    if (!user) return;
+    
+    setIsLoadingFollowers(true);
+    try {
+      // Get followers
+      const { data: userFollowers, error: followerError } = await supabase
+        .from('user_followers')
+        .select('follower_id')
+        .eq('following_id', user.id);
+
+      if (followerError) throw followerError;
+      
+      if (userFollowers && userFollowers.length > 0) {
+        const followerIds = userFollowers.map(f => f.follower_id);
+        
+        // Get follower profiles
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .in('id', followerIds);
+          
+        if (profilesError) throw profilesError;
+        setFollowersData(profiles || []);
+      } else {
+        setFollowersData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching followers:", err);
+    } finally {
+      setIsLoadingFollowers(false);
+    }
+  };
+
+  const fetchFollowing = async () => {
+    if (!user) return;
+    
+    setIsLoadingFollowing(true);
+    try {
+      // Get following users
+      const { data: userFollowing, error: followingError } = await supabase
+        .from('user_followers')
+        .select('following_id')
+        .eq('follower_id', user.id);
+
+      if (followingError) throw followingError;
+      
+      if (userFollowing && userFollowing.length > 0) {
+        const followingIds = userFollowing.map(f => f.following_id);
+        
+        // Get following profiles
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .in('id', followingIds);
+          
+        if (profilesError) throw profilesError;
+        setFollowingData(profiles || []);
+      } else {
+        setFollowingData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching following users:", err);
+    } finally {
+      setIsLoadingFollowing(false);
+    }
+  };
+
+  const openFollowersDialog = () => {
+    setShowFollowersDialog(true);
+    fetchFollowers();
+  };
+  
+  const openFollowingDialog = () => {
+    setShowFollowingDialog(true);
+    fetchFollowing();
+  };
 
   if (!user || !profile) {
     navigate("/login");
@@ -112,7 +235,26 @@ const Profile = () => {
                 <AvatarImage src={profile.avatar_url || ""} alt={profile.full_name || ""} />
                 <AvatarFallback>{profile.full_name ? getInitials(profile.full_name) : "U"}</AvatarFallback>
               </Avatar>
-              <p className="text-sm text-muted-foreground mb-4">{user.email}</p>
+              <p className="text-sm text-muted-foreground mb-2">{user.email}</p>
+              
+              {/* Follow stats */}
+              <div className="flex justify-center gap-4 mb-4">
+                <button 
+                  onClick={openFollowersDialog}
+                  className="flex flex-col items-center hover:text-primary transition-colors"
+                >
+                  <span className="text-lg font-medium">{followerCount}</span>
+                  <span className="text-sm text-muted-foreground">Followers</span>
+                </button>
+                <button 
+                  onClick={openFollowingDialog}
+                  className="flex flex-col items-center hover:text-primary transition-colors"
+                >
+                  <span className="text-lg font-medium">{followingCount}</span>
+                  <span className="text-sm text-muted-foreground">Following</span>
+                </button>
+              </div>
+
               <Button variant="outline" className="w-full" onClick={() => signOut()}>
                 Sign Out
               </Button>
@@ -180,6 +322,102 @@ const Profile = () => {
               </form>
             </div>
           </div>
+
+          {/* Followers Dialog */}
+          <Dialog open={showFollowersDialog} onOpenChange={setShowFollowersDialog}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Followers</DialogTitle>
+              </DialogHeader>
+              {isLoadingFollowers ? (
+                <div className="py-6 text-center">Loading...</div>
+              ) : followersData.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {followersData.map((follower) => (
+                      <TableRow key={follower.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={follower.avatar_url || ""} alt={follower.full_name || follower.username} />
+                              <AvatarFallback>
+                                {follower.full_name 
+                                  ? getInitials(follower.full_name) 
+                                  : getInitials(follower.username)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <ProfileLink 
+                              userId={follower.id} 
+                              username={follower.username} 
+                              displayName={follower.full_name || follower.username}
+                              onClick={() => setShowFollowersDialog(false)}
+                            />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="py-6 text-center text-muted-foreground">
+                  No followers yet
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Following Dialog */}
+          <Dialog open={showFollowingDialog} onOpenChange={setShowFollowingDialog}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Following</DialogTitle>
+              </DialogHeader>
+              {isLoadingFollowing ? (
+                <div className="py-6 text-center">Loading...</div>
+              ) : followingData.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {followingData.map((following) => (
+                      <TableRow key={following.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={following.avatar_url || ""} alt={following.full_name || following.username} />
+                              <AvatarFallback>
+                                {following.full_name 
+                                  ? getInitials(following.full_name) 
+                                  : getInitials(following.username)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <ProfileLink 
+                              userId={following.id} 
+                              username={following.username} 
+                              displayName={following.full_name || following.username}
+                              onClick={() => setShowFollowingDialog(false)}
+                            />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="py-6 text-center text-muted-foreground">
+                  Not following anyone yet
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
       <Footer />
