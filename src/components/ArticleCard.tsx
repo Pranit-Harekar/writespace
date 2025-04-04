@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, MessageSquare, Clock } from 'lucide-react';
@@ -85,16 +84,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
             {new Date(publishedAt).toLocaleDateString()}
           </span>
           <div className="flex items-center gap-3">
-            <LikeButton 
-              articleId={id} 
-              initialLikesCount={likesCount} 
-              className="p-0 h-auto"
-              readOnly={true} 
-            />
-            <span className="flex items-center gap-1">
-              <MessageSquare className="h-3.5 w-3.5" />
-              <span>{commentsCount}</span>
-            </span>
+            <LikeButton articleId={id} initialLikesCount={likesCount} readOnly={true} />
           </div>
         </div>
       </CardFooter>

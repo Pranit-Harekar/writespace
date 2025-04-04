@@ -76,7 +76,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
 
   const toggleLike = async () => {
     if (readOnly) return;
-    
+
     if (!user) {
       toast({
         title: 'Authentication required',
@@ -140,7 +140,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   if (readOnly) {
     return (
       <div className={`flex items-center gap-1 text-muted-foreground ${className}`}>
-        <Heart className="h-5 w-5" />
+        <Heart className="h-4 w-4" />
         <span>{likesCount}</span>
       </div>
     );
@@ -155,7 +155,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       className={`gap-1 ${!user ? 'cursor-default' : ''} ${className}`}
       aria-label={isLiked ? 'Unlike article' : 'Like article'}
     >
-      <Heart className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+      <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
       <span>{likesCount}</span>
     </Button>
   );

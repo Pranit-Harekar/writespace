@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Pencil, ChevronLeft, MessageSquare } from 'lucide-react';
@@ -112,9 +111,9 @@ const ArticleView = () => {
           .eq('article_id', id);
 
         if (countError) throw countError;
-        
+
         setCommentCount(commentsCount || 0);
-        
+
         // Fetch likes count
         const { count: articleLikesCount, error: likesError } = await supabase
           .from('article_likes')
@@ -122,7 +121,7 @@ const ArticleView = () => {
           .eq('article_id', id);
 
         if (likesError) throw likesError;
-        
+
         setLikesCount(articleLikesCount || 0);
       } catch (error: any) {
         console.error('Error fetching article:', error);
@@ -139,7 +138,7 @@ const ArticleView = () => {
 
     fetchArticle();
   }, [id, user, navigate, toast]);
-  
+
   const handleLikeUpdate = (newCount: number) => {
     setLikesCount(newCount);
   };
@@ -259,14 +258,14 @@ const ArticleView = () => {
           />
 
           <div className="mt-8 flex items-center space-x-4">
-            <LikeButton 
-              articleId={article.id} 
+            <LikeButton
+              articleId={article.id}
               initialLikesCount={likesCount}
               onLikeUpdate={handleLikeUpdate}
             />
 
             <div className="flex items-center gap-1">
-              <MessageSquare className="h-5 w-5" />
+              <MessageSquare className="h-4 w-4" />
               <span>
                 {commentCount} {commentCount === 1 ? 'Comment' : 'Comments'}
               </span>

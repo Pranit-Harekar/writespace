@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
@@ -51,12 +50,8 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <LikeButton 
-              articleId={id} 
-              initialLikesCount={likesCount} 
-              readOnly={true} 
-            />
+          <div className="flex items-center gap-8">
+            <LikeButton articleId={id} initialLikesCount={likesCount} readOnly={true} />
             <Button asChild className="carousel-pause-trigger">
               <Link to={`/article/${id}`}>Read Full Article</Link>
             </Button>
