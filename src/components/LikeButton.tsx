@@ -25,9 +25,9 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    getLikesCount();
     if (user) {
       checkIfLiked();
-      getLikesCount();
     } else {
       setIsLoading(false);
     }
@@ -140,8 +140,8 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       variant="ghost"
       size="sm"
       onClick={toggleLike}
-      disabled={isLoading}
-      className={`gap-1 ${className}`}
+      disabled={isLoading || !user}
+      className={`gap-1 ${!user ? 'cursor-default' : ''} ${className}`}
       aria-label={isLiked ? "Unlike article" : "Like article"}
     >
       <Heart 
