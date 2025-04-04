@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,12 +11,14 @@ interface LikeButtonProps {
   articleId: string;
   initialLikesCount?: number;
   className?: string;
+  onLikeUpdate?: (newCount: number) => void;
 }
 
 export const LikeButton: React.FC<LikeButtonProps> = ({
   articleId,
   initialLikesCount = 0,
   className = '',
+  onLikeUpdate,
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -94,7 +97,11 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         if (error) throw error;
 
         setIsLiked(false);
-        setLikesCount((prev) => Math.max(0, prev - 1));
+        const newCount = Math.max(0, likesCount - 1);
+        setLikesCount(newCount);
+        if (onLikeUpdate) {
+          onLikeUpdate(newCount);
+        }
       } else {
         // Add like
         const { error } = await supabase.from('article_likes').insert({
@@ -105,7 +112,11 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         if (error) throw error;
 
         setIsLiked(true);
-        setLikesCount((prev) => prev + 1);
+        const newCount = likesCount + 1;
+        setLikesCount(newCount);
+        if (onLikeUpdate) {
+          onLikeUpdate(newCount);
+        }
 
         // Trigger confetti effect when liking
         triggerConfetti();

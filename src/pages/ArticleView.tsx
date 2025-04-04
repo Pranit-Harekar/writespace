@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Pencil, ChevronLeft, MessageSquare } from 'lucide-react';
@@ -51,6 +52,7 @@ const ArticleView = () => {
   const [author, setAuthor] = useState<Author | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [commentCount, setCommentCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -92,6 +94,7 @@ const ArticleView = () => {
 
         setArticle(articleData);
 
+        // Fetch author data
         const { data: authorData, error: authorError } = await supabase
           .from('profiles')
           .select('id, username, full_name, avatar_url')
@@ -102,14 +105,25 @@ const ArticleView = () => {
 
         setAuthor(authorData);
 
-        const { count, error: countError } = await supabase
+        // Fetch comment count
+        const { count: commentsCount, error: countError } = await supabase
           .from('article_comments')
           .select('*', { count: 'exact', head: true })
           .eq('article_id', id);
 
         if (countError) throw countError;
+        
+        setCommentCount(commentsCount || 0);
+        
+        // Fetch likes count
+        const { count: articleLikesCount, error: likesError } = await supabase
+          .from('article_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('article_id', id);
 
-        setCommentCount(count || 0);
+        if (likesError) throw likesError;
+        
+        setLikesCount(articleLikesCount || 0);
       } catch (error: any) {
         console.error('Error fetching article:', error);
         toast({
@@ -125,6 +139,10 @@ const ArticleView = () => {
 
     fetchArticle();
   }, [id, user, navigate, toast]);
+  
+  const handleLikeUpdate = (newCount: number) => {
+    setLikesCount(newCount);
+  };
 
   if (isLoading) {
     return (
@@ -241,7 +259,11 @@ const ArticleView = () => {
           />
 
           <div className="mt-8 flex items-center space-x-4">
-            <LikeButton articleId={article.id} />
+            <LikeButton 
+              articleId={article.id} 
+              initialLikesCount={likesCount}
+              onLikeUpdate={handleLikeUpdate}
+            />
 
             <div className="flex items-center gap-1">
               <MessageSquare className="h-5 w-5" />

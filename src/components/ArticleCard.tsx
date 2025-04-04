@@ -1,10 +1,12 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Heart, MessageSquare, Clock } from 'lucide-react';
+import { Calendar, MessageSquare, Clock } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { stripHtml } from '@/lib/textUtils';
+import { LikeButton } from './LikeButton';
 
 export interface ArticleProps {
   id: string;
@@ -83,9 +85,10 @@ export const ArticleCard: React.FC<ArticleProps> = ({
             {new Date(publishedAt).toLocaleDateString()}
           </span>
           <div className="flex items-center gap-3">
+            <LikeButton articleId={id} initialLikesCount={likesCount} className="p-0 h-auto" />
             <span className="flex items-center gap-1">
-              <Heart className="h-3.5 w-3.5" />
-              <span>{likesCount}</span>
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>{commentsCount}</span>
             </span>
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
@@ -6,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ArticleProps } from './ArticleCard';
 import { stripHtml } from '@/lib/textUtils';
+import { LikeButton } from './LikeButton';
 
 export const FeaturedArticle: React.FC<ArticleProps> = ({
   id,
@@ -16,6 +18,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
   category,
   readTime,
   featuredImage,
+  likesCount = 0,
 }) => {
   return (
     <div className="grid md:grid-cols-5 gap-4 rounded-lg overflow-hidden border p-0 md:p-0 h-[240px]">
@@ -48,9 +51,12 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
               </div>
             </div>
           </div>
-          <Button asChild className="carousel-pause-trigger">
-            <Link to={`/article/${id}`}>Read Full Article</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <LikeButton articleId={id} initialLikesCount={likesCount} />
+            <Button asChild className="carousel-pause-trigger">
+              <Link to={`/article/${id}`}>Read Full Article</Link>
+            </Button>
+          </div>
         </div>
       </div>
       <div className="md:col-span-2 order-1 md:order-2 h-[180px] md:h-auto relative">
