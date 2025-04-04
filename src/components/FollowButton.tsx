@@ -64,13 +64,26 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
 
     try {
       if (isFollowing) {
-        // Unfollow logic
-        const { error } = await supabase
-          .from('user_followers')
-          .delete()
-          .match({ follower_id: user.id, following_id: profileId });
+        // Unfollow logic - use custom RPC call or direct SQL
+        const { error } = await supabase.rpc('unfollow_user', {
+          follower: user.id,
+          following: profileId
+        });
 
-        if (error) throw error;
+        if (error) {
+          // Fallback to raw SQL if the RPC doesn't exist
+          const { error: deleteError } = await supabase.auth.refreshSession();
+          if (deleteError) throw deleteError;
+
+          // After refreshing session, try direct delete
+          const { error: directError } = await supabase
+            .from('user_followers')
+            .delete()
+            .eq('follower_id', user.id)
+            .eq('following_id', profileId);
+          
+          if (directError) throw directError;
+        }
 
         setIsFollowing(false);
         toast({
@@ -78,12 +91,28 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
           description: "You have unfollowed this user",
         });
       } else {
-        // Follow logic
-        const { error } = await supabase
-          .from('user_followers')
-          .insert({ follower_id: user.id, following_id: profileId });
+        // Follow logic - use custom RPC call or direct SQL
+        const { error } = await supabase.rpc('follow_user', {
+          follower: user.id,
+          following: profileId
+        });
 
-        if (error) throw error;
+        if (error) {
+          // Fallback to raw SQL if the RPC doesn't exist
+          const { error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) throw refreshError;
+
+          // After refreshing session, try direct insert
+          const { error: directError } = await supabase
+            .from('user_followers')
+            .insert({ 
+              follower_id: user.id, 
+              following_id: profileId 
+            })
+            .single();
+          
+          if (directError) throw directError;
+        }
 
         setIsFollowing(true);
         toast({
@@ -93,7 +122,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
       }
       
       if (onFollowChange) {
-        onFollowChange(isFollowing);
+        onFollowChange(!isFollowing);
       }
     } catch (error: any) {
       toast({
