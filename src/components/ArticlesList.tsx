@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
-import { extractExcerpt } from '@/lib/textUtils';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
+import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
+import { LoadMoreButton } from '@/components/LoadMoreButton';
+import { fetchArticles } from '@/services/articlesService';
 
 interface ArticlesListProps {
   limit?: number;
@@ -18,222 +17,53 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   filterByCategory,
   searchQuery,
 }) => {
-  const { toast } = useToast();
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const fetchArticles = async (pageNumber: number, isLoadMore = false) => {
+  const loadArticles = async (pageNumber: number, isLoadMore = false) => {
     const loadingState = isLoadMore ? setIsLoadingMore : setIsLoading;
     loadingState(true);
     
-    try {
-      // Calculate offset based on page number and limit
-      const offset = (pageNumber - 1) * limit;
-      
-      // Start building the query
-      let query = supabase
-        .from('articles')
-        .select(
-          `
-          id,
-          title,
-          subtitle,
-          content,
-          category,
-          category_id,
-          categories:category_id(id, name),
-          language,
-          read_time,
-          featured_image,
-          published_at,
-          author_id
-        `,
-        )
-        .eq('is_published', true)
-        .order('published_at', { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      // Apply search filter if provided
-      if (searchQuery) {
-        query = query.or(
-          `title.ilike.%${searchQuery}%,subtitle.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`,
-        );
-      }
-
-      // If category filter is provided
-      if (filterByCategory) {
-        // First, try to get the category ID from the name
-        const { data: categoryData, error: categoryError } = await supabase
-          .from('categories')
-          .select('id')
-          .ilike('name', filterByCategory)
-          .single();
-
-        if (categoryError) {
-          // Fall back to the category column if no match in categories table
-          query = query.ilike('category', filterByCategory);
-        } else if (categoryData) {
-          // Use the category_id if we found a match
-          query = query.eq('category_id', categoryData.id);
-        }
-      }
-
-      const { data: articlesData, error: articlesError } = await query;
-
-      if (articlesError) throw articlesError;
-
-      // Check if there are more articles to load
-      setHasMore(articlesData.length === limit);
-
-      // If no articles found, return early
-      if (!articlesData || articlesData.length === 0) {
-        if (!isLoadMore) {
-          setArticles([]);
-        }
-        loadingState(false);
-        return;
-      }
-
-      // Extract author_ids to fetch profiles
-      const authorIds = [...new Set(articlesData.map((article) => article.author_id))];
-
-      // Fetch author profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, full_name, avatar_url')
-        .in('id', authorIds);
-
-      if (profilesError) throw profilesError;
-
-      // Get likes and comments counts for each article
-      const articleIds = articlesData.map(article => article.id);
-      
-      // Count likes for each article
-      const likesCountMap = new Map();
-      for (const articleId of articleIds) {
-        const { count, error } = await supabase
-          .from('article_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('article_id', articleId);
-          
-        if (error) throw error;
-        likesCountMap.set(articleId, count || 0);
-      }
-      
-      // Count comments for each article
-      const commentsCountMap = new Map();
-      for (const articleId of articleIds) {
-        const { count, error } = await supabase
-          .from('article_comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('article_id', articleId);
-          
-        if (error) throw error;
-        commentsCountMap.set(articleId, count || 0);
-      }
-
-      // Create a lookup map for profiles
-      const profileMap = new Map();
-      profilesData?.forEach((profile) => {
-        profileMap.set(profile.id, profile);
-      });
-
-      // Transform data to match ArticleProps
-      const formattedArticles = articlesData.map((item) => {
-        const profile = profileMap.get(item.author_id) || {
-          id: item.author_id,
-          username: 'Anonymous',
-          full_name: null,
-          avatar_url: null,
-        };
-
-        // Get category name from the categories relation or fall back to the category field
-        const categoryName = item.categories ? item.categories.name : item.category;
-
-        // Use explicit subtitle or generate from content
-        const excerptText = item.subtitle?.trim() 
-          ? item.subtitle 
-          : extractExcerpt(item.content);
-
-        return {
-          id: item.id,
-          title: item.title,
-          excerpt: excerptText,
-          author: {
-            id: profile.id,
-            name: profile.full_name || profile.username || 'Anonymous',
-            profileImage: profile.avatar_url || undefined,
-          },
-          publishedAt: item.published_at || '',
-          category: categoryName || 'Uncategorized',
-          readTime: item.read_time || 5,
-          featuredImage: item.featured_image || undefined,
-          likesCount: likesCountMap.get(item.id) || 0,
-          commentsCount: commentsCountMap.get(item.id) || 0,
-        };
-      });
-
-      // If loading more, append to existing articles, otherwise replace
-      if (isLoadMore) {
-        setArticles(prev => [...prev, ...formattedArticles]);
-      } else {
-        setArticles(formattedArticles);
-      }
-    } catch (error: unknown) {
-      console.error('Error fetching articles:', error);
-      toast({
-        title: 'Error',
-        description: error['message'] || 'Failed to load articles',
-        variant: 'destructive',
-      });
-    } finally {
-      loadingState(false);
+    const { articles: fetchedArticles, hasMore: moreAvailable } = await fetchArticles({
+      limit,
+      filterByCategory,
+      searchQuery,
+      page: pageNumber
+    });
+    
+    setHasMore(moreAvailable);
+    
+    // If loading more, append to existing articles, otherwise replace
+    if (isLoadMore) {
+      setArticles(prev => [...prev, ...fetchedArticles]);
+    } else {
+      setArticles(fetchedArticles);
     }
+    
+    loadingState(false);
   };
 
   // Initial load
   useEffect(() => {
     setPage(1);
-    fetchArticles(1);
-  }, [filterByCategory, limit, searchQuery, toast]);
+    loadArticles(1);
+  }, [filterByCategory, limit, searchQuery]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchArticles(nextPage, true);
+    loadArticles(nextPage, true);
   };
 
   if (isLoading) {
-    return (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {Array(limit)
-          .fill(null)
-          .map((_, index) => (
-            <div key={index} className="border rounded-lg p-4 h-64 animate-pulse">
-              <div className="bg-muted h-1/3 mb-4 rounded"></div>
-              <div className="bg-muted h-4 mb-2 rounded w-3/4"></div>
-              <div className="bg-muted h-4 mb-4 rounded w-1/2"></div>
-              <div className="bg-muted h-20 rounded"></div>
-            </div>
-          ))}
-      </div>
-    );
+    return <ArticlesListSkeleton count={limit} />;
   }
 
   if (articles.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-medium mb-2">No articles found</h2>
-        <p className="text-muted-foreground">
-          {filterByCategory
-            ? 'Try changing your filters or check back later.'
-            : 'Check back later for new content.'}
-        </p>
-      </div>
-    );
+    return <ArticlesEmptyState filterByCategory={filterByCategory} />;
   }
 
   return (
@@ -245,22 +75,10 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
       </div>
       
       {hasMore && (
-        <div className="flex justify-center mt-8">
-          <Button 
-            onClick={handleLoadMore} 
-            disabled={isLoadingMore}
-            className="min-w-[150px]"
-          >
-            {isLoadingMore ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              'Load More'
-            )}
-          </Button>
-        </div>
+        <LoadMoreButton 
+          isLoading={isLoadingMore} 
+          onClick={handleLoadMore} 
+        />
       )}
     </div>
   );
