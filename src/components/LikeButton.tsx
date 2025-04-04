@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,10 +12,10 @@ interface LikeButtonProps {
   className?: string;
 }
 
-export const LikeButton: React.FC<LikeButtonProps> = ({ 
-  articleId, 
+export const LikeButton: React.FC<LikeButtonProps> = ({
+  articleId,
   initialLikesCount = 0,
-  className = ""
+  className = '',
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -28,7 +27,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   useEffect(() => {
     // Initialize with the initialLikesCount
     setLikesCount(initialLikesCount);
-    
+
     // Only check like status if user is logged in and we haven't fetched yet
     if (user && !dataFetchedRef.current) {
       dataFetchedRef.current = true;
@@ -48,7 +47,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
         .maybeSingle();
 
       if (error) throw error;
-      
+
       setIsLiked(!!data);
     } catch (error) {
       console.error('Error checking like status:', error);
@@ -67,7 +66,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       startVelocity: 30,
       gravity: 0.8,
       shapes: ['circle', 'square'],
-      ticks: 300
+      ticks: 300,
     });
   };
 
@@ -93,23 +92,21 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
           .eq('user_id', user.id);
 
         if (error) throw error;
-        
+
         setIsLiked(false);
-        setLikesCount(prev => Math.max(0, prev - 1));
+        setLikesCount((prev) => Math.max(0, prev - 1));
       } else {
         // Add like
-        const { error } = await supabase
-          .from('article_likes')
-          .insert({
-            article_id: articleId,
-            user_id: user.id,
-          });
+        const { error } = await supabase.from('article_likes').insert({
+          article_id: articleId,
+          user_id: user.id,
+        });
 
         if (error) throw error;
-        
+
         setIsLiked(true);
-        setLikesCount(prev => prev + 1);
-        
+        setLikesCount((prev) => prev + 1);
+
         // Trigger confetti effect when liking
         triggerConfetti();
       }
@@ -132,11 +129,9 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       onClick={toggleLike}
       disabled={isLoading || !user}
       className={`gap-1 ${!user ? 'cursor-default' : ''} ${className}`}
-      aria-label={isLiked ? "Unlike article" : "Like article"}
+      aria-label={isLiked ? 'Unlike article' : 'Like article'}
     >
-      <Heart 
-        className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
-      />
+      <Heart className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
       <span>{likesCount}</span>
     </Button>
   );

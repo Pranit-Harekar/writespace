@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { Calendar, Clock, Pencil, ChevronLeft, MessageSquare } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { Header } from "@/components/Header";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LikeButton } from "@/components/LikeButton";
-import { Comments } from "@/components/Comments";
-import { Separator } from "@/components/ui/separator";
-import { ProfileLink } from "@/components/ProfileLink";
-import { FollowButton } from "@/components/FollowButton";
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Calendar, Clock, Pencil, ChevronLeft, MessageSquare } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { LikeButton } from '@/components/LikeButton';
+import { Comments } from '@/components/Comments';
+import { Separator } from '@/components/ui/separator';
+import { ProfileLink } from '@/components/ProfileLink';
+import { FollowButton } from '@/components/FollowButton';
 
 interface Article {
   id: string;
@@ -55,67 +55,69 @@ const ArticleView = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       if (!id) return;
-      
+
       try {
         const { data: articleData, error: articleError } = await supabase
-          .from("articles")
-          .select(`
+          .from('articles')
+          .select(
+            `
             *,
             categories:category_id(id, name)
-          `)
-          .eq("id", id)
+          `,
+          )
+          .eq('id', id)
           .maybeSingle();
 
         if (articleError) throw articleError;
-        
+
         if (!articleData) {
           toast({
-            title: "Article not found",
+            title: 'Article not found',
             description: "The article you're looking for doesn't exist",
-            variant: "destructive",
+            variant: 'destructive',
           });
-          navigate("/");
+          navigate('/');
           return;
         }
-        
+
         if (!articleData.is_published && (!user || user.id !== articleData.author_id)) {
           toast({
-            title: "Article not available",
-            description: "This article is not published",
-            variant: "destructive",
+            title: 'Article not available',
+            description: 'This article is not published',
+            variant: 'destructive',
           });
-          navigate("/");
+          navigate('/');
           return;
         }
 
         setArticle(articleData);
-        
+
         const { data: authorData, error: authorError } = await supabase
-          .from("profiles")
-          .select("id, username, full_name, avatar_url")
-          .eq("id", articleData.author_id)
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .eq('id', articleData.author_id)
           .single();
 
         if (authorError) throw authorError;
-        
+
         setAuthor(authorData);
-        
+
         const { count, error: countError } = await supabase
-          .from("article_comments")
-          .select("*", { count: 'exact', head: true })
-          .eq("article_id", id);
-        
+          .from('article_comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('article_id', id);
+
         if (countError) throw countError;
-        
+
         setCommentCount(count || 0);
       } catch (error: any) {
-        console.error("Error fetching article:", error);
+        console.error('Error fetching article:', error);
         toast({
-          title: "Error",
-          description: error.message || "Failed to load article",
-          variant: "destructive",
+          title: 'Error',
+          description: error.message || 'Failed to load article',
+          variant: 'destructive',
         });
-        navigate("/");
+        navigate('/');
       } finally {
         setIsLoading(false);
       }
@@ -141,7 +143,9 @@ const ArticleView = () => {
         <Header />
         <div className="container mx-auto px-4 py-8 flex-1 flex flex-col items-center justify-center">
           <h1 className="text-2xl font-bold mb-4">Article not found</h1>
-          <p className="text-muted-foreground mb-6">The article you're looking for doesn't exist or has been removed.</p>
+          <p className="text-muted-foreground mb-6">
+            The article you're looking for doesn't exist or has been removed.
+          </p>
           <Button asChild>
             <Link to="/">Return Home</Link>
           </Button>
@@ -155,14 +159,10 @@ const ArticleView = () => {
       <Header />
       <div className="container mx-auto px-4 py-8 flex-1">
         <div className="mb-6 flex justify-between items-center">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(-1)}
-            className="gap-1"
-          >
+          <Button variant="ghost" onClick={() => navigate(-1)} className="gap-1">
             <ChevronLeft className="h-4 w-4" /> Back
           </Button>
-          
+
           {user && user.id === article.author_id && (
             <Button asChild>
               <Link to={`/article/edit/${article.id}`}>
@@ -173,41 +173,49 @@ const ArticleView = () => {
         </div>
 
         <article className="max-w-4xl mx-auto">
-          {article.featured_image && (
+          {
             <div className="w-full h-80 overflow-hidden rounded-lg mb-8">
               <img
-                src={article.featured_image}
+                src={
+                  article.featured_image && article.featured_image.length > 1
+                    ? article.featured_image
+                    : '/placeholder.svg'
+                }
                 alt={article.title}
                 className="w-full h-full object-cover"
               />
             </div>
-          )}
+          }
 
           <div className="flex gap-2 mb-4">
             {(article.categories?.name || article.category) && (
-              <Badge variant="outline">
-                {article.categories?.name || article.category}
-              </Badge>
+              <Badge variant="outline">{article.categories?.name || article.category}</Badge>
             )}
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold mb-6">{article.title}</h1>
-          
-          {article.subtitle && (
-            <p className="text-xl text-gray-500 mb-6">{article.subtitle}</p>
-          )}
+
+          {article.subtitle && <p className="text-xl text-gray-500 mb-6">{article.subtitle}</p>}
 
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <ProfileLink username={author.username || author.id}>
                 <Avatar>
-                  <AvatarImage src={author.avatar_url || undefined} alt={author.full_name || author.username || ""} />
-                  <AvatarFallback>{author.full_name?.charAt(0) || author.username?.charAt(0) || "U"}</AvatarFallback>
+                  <AvatarImage
+                    src={author.avatar_url || undefined}
+                    alt={author.full_name || author.username || ''}
+                  />
+                  <AvatarFallback>
+                    {author.full_name?.charAt(0) || author.username?.charAt(0) || 'U'}
+                  </AvatarFallback>
                 </Avatar>
               </ProfileLink>
               <div>
-                <ProfileLink username={author.username || author.id} className="font-medium hover:underline">
-                  {author.full_name || author.username || "Anonymous"}
+                <ProfileLink
+                  username={author.username || author.id}
+                  className="font-medium hover:underline"
+                >
+                  {author.full_name || author.username || 'Anonymous'}
                 </ProfileLink>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
@@ -223,24 +231,26 @@ const ArticleView = () => {
                 </div>
               </div>
             </div>
-            
+
             <FollowButton profileId={author.id} size="sm" />
           </div>
 
-          <div 
-            className="prose prose-lg max-w-none"
+          <div
+            className="prose prose-lg max-w-none font-serif text-lg font-normal"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
-          
+
           <div className="mt-8 flex items-center space-x-4">
             <LikeButton articleId={article.id} />
-            
+
             <div className="flex items-center gap-1">
               <MessageSquare className="h-5 w-5" />
-              <span>{commentCount} {commentCount === 1 ? "Comment" : "Comments"}</span>
+              <span>
+                {commentCount} {commentCount === 1 ? 'Comment' : 'Comments'}
+              </span>
             </div>
           </div>
-          
+
           <Separator className="my-8" />
           <Comments articleId={article.id} />
         </article>

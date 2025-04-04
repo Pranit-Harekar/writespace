@@ -55,13 +55,11 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
       </div>
       <div className="md:col-span-2 order-1 md:order-2 h-[180px] md:h-auto relative">
         <div className="absolute inset-0">
-          {featuredImage ? (
-            <img src={featuredImage} alt={title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground">No image available</span>
-            </div>
-          )}
+          <img
+            src={featuredImage && featuredImage.length > 0 ? featuredImage : '/placeholder.svg'}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
         </div>
       </div>
     </div>

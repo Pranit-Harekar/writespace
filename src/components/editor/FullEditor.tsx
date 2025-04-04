@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -76,7 +75,10 @@ const FullEditor: React.FC<FullEditorProps> = ({
 
   return (
     <div className="relative">
-      <EditorContent editor={editor} className={`${className} focus:outline-hidden ProseMirror`} />
+      <EditorContent
+        editor={editor}
+        className={`${className} focus:outline-hidden ProseMirror font-serif text-lg`}
+      />
     </div>
   );
 };

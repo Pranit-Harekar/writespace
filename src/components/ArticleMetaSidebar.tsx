@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Clock, CalendarCheck, Tag, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,10 +75,12 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               value={featuredImage}
               onChange={(e) => onFeaturedImageChange(e.target.value)}
             />
-            {featuredImage && (
+            {
               <div className="mt-2 rounded-md overflow-hidden border">
                 <img
-                  src={featuredImage}
+                  src={
+                    featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'
+                  }
                   alt="Featured"
                   className="w-full h-32 object-cover"
                   onError={(e) => {
@@ -87,7 +88,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                   }}
                 />
               </div>
-            )}
+            }
           </div>
 
           <div className="pt-2">

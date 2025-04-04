@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
 import FullEditor from './editor/FullEditor';
@@ -44,7 +43,8 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
-        validate: url => /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
+        validate: (url) =>
+          /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
       }),
       Underline,
       TextAlign.configure({
@@ -60,7 +60,8 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md focus:outline-hidden relative',
+        class:
+          'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md focus:outline-hidden relative',
       },
     },
   });

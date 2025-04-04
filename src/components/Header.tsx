@@ -65,11 +65,6 @@ export const Header = () => {
                     <FileText className="h-4 w-4 mr-1" /> My Articles
                   </Link>
                 </Button>
-                <Button size="sm" asChild>
-                  <Link to="/article/new">
-                    <Plus className="h-4 w-4 mr-1" /> New Article
-                  </Link>
-                </Button>
               </div>
 
               <DropdownMenu>
@@ -87,7 +82,9 @@ export const Header = () => {
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       {profile?.full_name && <p className="font-medium">{profile.full_name}</p>}
-                      {profile?.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
+                      {profile?.username && (
+                        <p className="text-sm text-muted-foreground">@{profile.username}</p>
+                      )}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
@@ -102,12 +99,6 @@ export const Header = () => {
                     <Link to="/my-articles" className="cursor-pointer w-full sm:hidden">
                       <FileText className="mr-2 h-4 w-4" />
                       <span>My Articles</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/article/new" className="cursor-pointer w-full sm:hidden">
-                      <Plus className="mr-2 h-4 w-4" />
-                      <span>New Article</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => signOut()}>
