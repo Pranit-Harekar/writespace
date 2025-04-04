@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ProfileData = {
   id: string;
@@ -23,6 +25,8 @@ const PublicProfile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, profile: currentUserProfile } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -53,6 +57,12 @@ const PublicProfile = () => {
           return;
         }
 
+        // If the profile belongs to the current user, redirect to the profile page
+        if (user && user.id === data.id) {
+          navigate("/profile");
+          return;
+        }
+
         setProfile(data as ProfileData);
       } catch (err) {
         console.error("Error:", err);
@@ -65,7 +75,7 @@ const PublicProfile = () => {
     if (username) {
       fetchProfile();
     }
-  }, [username]);
+  }, [username, user, navigate]);
 
   const getInitials = (name: string) => {
     return name
@@ -74,6 +84,11 @@ const PublicProfile = () => {
       .join("")
       .toUpperCase();
   };
+
+  // If we're redirecting to the user's own profile page, show a loading state
+  if (user && profile && user.id === profile.id) {
+    return <ProfileSkeleton />;
+  }
 
   return (
     <>
