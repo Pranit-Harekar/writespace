@@ -186,12 +186,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_followers: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_follower_count: {
+        Args: {
+          user_id: string
+        }
+        Returns: number
+      }
+      get_following_count: {
+        Args: {
+          user_id: string
+        }
+        Returns: number
+      }
+      is_following: {
+        Args: {
+          follower: string
+          following: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Calendar, Clock, Pencil, ChevronLeft, MessageSquare } from "lucide-react";
@@ -12,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LikeButton } from "@/components/LikeButton";
 import { Comments } from "@/components/Comments";
 import { Separator } from "@/components/ui/separator";
+import { ProfileLink } from "@/components/ProfileLink";
+import { FollowButton } from "@/components/FollowButton";
 
 interface Article {
   id: string;
@@ -56,7 +57,6 @@ const ArticleView = () => {
       if (!id) return;
       
       try {
-        // Fetch article
         const { data: articleData, error: articleError } = await supabase
           .from("articles")
           .select(`
@@ -78,7 +78,6 @@ const ArticleView = () => {
           return;
         }
         
-        // Check if article is published or if user is the author
         if (!articleData.is_published && (!user || user.id !== articleData.author_id)) {
           toast({
             title: "Article not available",
@@ -91,7 +90,6 @@ const ArticleView = () => {
 
         setArticle(articleData);
         
-        // Fetch author profile
         const { data: authorData, error: authorError } = await supabase
           .from("profiles")
           .select("id, username, full_name, avatar_url")
@@ -102,7 +100,6 @@ const ArticleView = () => {
         
         setAuthor(authorData);
         
-        // Get comment count - use a simple count query without any joins
         const { count, error: countError } = await supabase
           .from("article_comments")
           .select("*", { count: 'exact', head: true })
@@ -200,28 +197,34 @@ const ArticleView = () => {
             <p className="text-xl text-gray-500 mb-6">{article.subtitle}</p>
           )}
 
-          <div className="flex items-center gap-4 mb-8">
-            <Avatar>
-              <AvatarImage src={author.avatar_url || undefined} alt={author.full_name || author.username || ""} />
-              <AvatarFallback>{author.full_name?.charAt(0) || author.username?.charAt(0) || "U"}</AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="font-medium">
-                {author.full_name || author.username || "Anonymous"}
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(article.published_at || article.created_at).toLocaleDateString()}
-                </span>
-                {article.read_time && (
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <ProfileLink username={author.username || author.id}>
+                <Avatar>
+                  <AvatarImage src={author.avatar_url || undefined} alt={author.full_name || author.username || ""} />
+                  <AvatarFallback>{author.full_name?.charAt(0) || author.username?.charAt(0) || "U"}</AvatarFallback>
+                </Avatar>
+              </ProfileLink>
+              <div>
+                <ProfileLink username={author.username || author.id} className="font-medium hover:underline">
+                  {author.full_name || author.username || "Anonymous"}
+                </ProfileLink>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {article.read_time} min read
+                    <Calendar className="h-3 w-3" />
+                    {new Date(article.published_at || article.created_at).toLocaleDateString()}
                   </span>
-                )}
+                  {article.read_time && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {article.read_time} min read
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
+            
+            <FollowButton profileId={author.id} size="sm" />
           </div>
 
           <div 
