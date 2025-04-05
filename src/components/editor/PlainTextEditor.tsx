@@ -37,7 +37,6 @@ const PlainTextEditor: React.FC<PlainTextEditorProps> = ({
       }),
       Placeholder.configure({
         placeholder,
-        emptyEditorClass: 'is-editor-empty',
       }),
     ],
     content: `<${tagName}>${initialValue || ''}</${tagName}>`,

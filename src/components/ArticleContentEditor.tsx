@@ -52,9 +52,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Placeholder.configure({
-        placeholder: 'Start writing...',
-      }),
+      Placeholder,
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
@@ -93,7 +91,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           <RichTextEditor
             initialValue={initialContent}
             onValueChange={onContentChange}
-            placeholder="Start writing..."
             className="prose prose-lg max-w-none outline-hidden focus:outline-hidden min-h-[50vh] text-md relative"
             editorInstance={editor}
           />

@@ -19,7 +19,6 @@ interface FullEditorProps {
 const RichTextEditor: React.FC<FullEditorProps> = ({
   initialValue,
   onValueChange,
-  placeholder = 'Start writing...',
   className = 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md',
   editorInstance,
 }) => {
@@ -45,9 +44,7 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Placeholder.configure({
-        placeholder,
-      }),
+      Placeholder,
     ],
     content: initialValue,
     onUpdate: ({ editor }) => {
