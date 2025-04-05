@@ -28,9 +28,10 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from '@/components/ui/menubar';
-import LinkMediaDialog from './LinkMediaDialog';
+import LinkMediaDialog from './media/LinkMediaDialog';
 import LinkEditor from './link/LinkEditor';
-import StyleMenu from './formatting/StyleMenu';
+import StyleMenu from './format/StyleMenu';
+import ListMenu from './format/ListMenu';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
@@ -54,29 +55,14 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
       case 'italic':
         editor.chain().focus().toggleItalic().run();
         break;
-      case 'strikethrough':
-        editor.chain().focus().toggleStrike().run();
+      case 'underline':
+        editor.chain().focus().toggleUnderline().run();
         break;
       case 'code':
         editor.chain().focus().toggleCode().run();
         break;
       case 'clearFormatting':
         editor.chain().focus().clearNodes().unsetAllMarks().run();
-        break;
-      case 'heading1':
-        editor.chain().focus().toggleHeading({ level: 1 }).run();
-        break;
-      case 'heading2':
-        editor.chain().focus().toggleHeading({ level: 2 }).run();
-        break;
-      case 'heading3':
-        editor.chain().focus().toggleHeading({ level: 3 }).run();
-        break;
-      case 'paragraph':
-        editor.chain().focus().setParagraph().run();
-        break;
-      case 'blockquote':
-        editor.chain().focus().toggleBlockquote().run();
         break;
       case 'bulletList':
         editor.chain().focus().toggleBulletList().run();
@@ -245,7 +231,10 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      {/* Replace the Link button with our new LinkEditor component */}
+      <ListMenu editor={editor} />
+
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
       <LinkEditor editor={editor} />
 
       <Button
@@ -276,28 +265,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
         title="Video"
       >
         <Video className="h-4 w-4" />
-      </Button>
-
-      <Separator orientation="vertical" className="mx-1 h-6" />
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('bulletList')}
-        className={`h-8 w-8 ${editor.isActive('bulletList') ? 'bg-secondary' : ''}`}
-        title="Bullet List"
-      >
-        <List className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('orderedList')}
-        className={`h-8 w-8 ${editor.isActive('orderedList') ? 'bg-secondary' : ''}`}
-        title="Numbered List"
-      >
-        <ListOrdered className="h-4 w-4" />
       </Button>
 
       <Separator orientation="vertical" className="mx-1 h-6" />

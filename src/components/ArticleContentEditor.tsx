@@ -1,14 +1,18 @@
 import React, { useRef } from 'react';
-import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
-import FullEditor from './editor/FullEditor';
-import RichTextToolbar from './editor/RichTextToolbar';
-import { useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+
+import RichTextEditor from './editor/RichTextEditor';
+import RichTextToolbar from './editor/RichTextToolbar';
+import PlainTextEditor from './editor/PlainTextEditor';
 
 interface ArticleContentEditorProps {
   initialContent: string;
@@ -53,6 +57,10 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       Placeholder.configure({
         placeholder: 'Start writing...',
       }),
+      TaskList.configure({}),
+      TaskItem.configure({
+        nested: true,
+      }),
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
@@ -71,7 +79,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       <div className="px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
         <RichTextToolbar editor={editor} />
 
-        <TipTapPlainTextEditor
+        <PlainTextEditor
           initialValue={initialTitle}
           onValueChange={onTitleChange}
           placeholder="Title"
@@ -79,7 +87,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           tagName="h1"
         />
 
-        <TipTapPlainTextEditor
+        <PlainTextEditor
           initialValue={initialSubtitle}
           onValueChange={onSubtitleChange}
           placeholder="Add a subtitle..."
@@ -88,7 +96,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         />
 
         <div className="relative">
-          <FullEditor
+          <RichTextEditor
             initialValue={initialContent}
             onValueChange={onContentChange}
             placeholder="Start writing..."

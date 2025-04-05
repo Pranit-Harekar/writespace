@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -20,12 +19,7 @@ interface LinkMediaDialogProps {
   type: MediaType;
 }
 
-const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({
-  open,
-  onClose,
-  onConfirm,
-  type,
-}) => {
+const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({ open, onClose, onConfirm, type }) => {
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
 

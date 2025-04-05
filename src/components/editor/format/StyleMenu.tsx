@@ -1,4 +1,3 @@
-
 import {
   Menubar,
   MenubarContent,
@@ -77,11 +76,13 @@ export default function StyleMenu({ editor }) {
           <ChevronDown className="h-4 w-4 ml-1" />
         </MenubarTrigger>
         <MenubarContent>
-          {(['Heading 1', 'Heading 2', 'Heading 3', 'Paragraph', 'Blockquote'] as StyleOptions[]).map((option) => (
-            <MenubarItem 
-              key={option} 
+          {(
+            ['Heading 1', 'Heading 2', 'Heading 3', 'Paragraph', 'Blockquote'] as StyleOptions[]
+          ).map((option) => (
+            <MenubarItem
+              key={option}
               onSelect={() => handleStyle(option)}
-              className={activeStyle === option ? "bg-secondary" : ""}
+              className={activeStyle === option ? 'bg-secondary' : ''}
             >
               {option}
             </MenubarItem>

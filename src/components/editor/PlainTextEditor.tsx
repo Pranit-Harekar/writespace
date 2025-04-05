@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -13,7 +12,7 @@ interface PlainTextEditorProps {
   tagName?: string;
 }
 
-const TipTapPlainTextEditor: React.FC<PlainTextEditorProps> = ({
+const PlainTextEditor: React.FC<PlainTextEditorProps> = ({
   initialValue,
   onValueChange,
   placeholder = '',
@@ -61,9 +60,7 @@ const TipTapPlainTextEditor: React.FC<PlainTextEditorProps> = ({
     }
   }, [initialValue, editor, tagName]);
 
-  return (
-    <EditorContent editor={editor} className={`${className} focus:outline-hidden`} />
-  );
+  return <EditorContent editor={editor} className={`${className} focus:outline-hidden`} />;
 };
 
-export default TipTapPlainTextEditor;
+export default PlainTextEditor;
