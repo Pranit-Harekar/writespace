@@ -34,12 +34,6 @@ export default function ListMenu({ editor }: { editor: Editor }) {
         icon: <ListOrdered className="h-4 w-4" />,
         action: () => editor.chain().focus().toggleOrderedList().run(),
       },
-      {
-        id: 'taskList',
-        label: 'Task List',
-        icon: <ListChecks className="h-4 w-4" />,
-        action: () => editor.chain().focus().toggleTaskList().run(),
-      },
     ],
     [editor],
   );

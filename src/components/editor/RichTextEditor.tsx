@@ -3,8 +3,6 @@ import React, { useEffect } from 'react';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-import TaskItem from '@tiptap/extension-task-item';
-import TaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
@@ -49,10 +47,6 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
       }),
       Placeholder.configure({
         placeholder,
-      }),
-      TaskList.configure({}),
-      TaskItem.configure({
-        nested: true,
       }),
     ],
     content: initialValue,
