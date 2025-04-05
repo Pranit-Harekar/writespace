@@ -39,7 +39,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
         <Button
           variant="ghost"
           size="icon"
-          className={`h-8 w-8 ${editor.isActive('link') ? 'bg-secondary' : ''}`}
+          className={`h-8 w-8 ${editor.isActive('link') ? 'bg-secondary is-active' : ''}`}
           title="Link"
           onClick={() => {
             setInitialUrl(editor.getAttributes('link').href);

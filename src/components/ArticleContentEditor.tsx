@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import TipTapPlainTextEditor from './editor/TipTapPlainTextEditor';
 import FullEditor from './editor/FullEditor';
-import RichTextToolbar from './RichTextToolbar';
+import RichTextToolbar from './editor/RichTextToolbar';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';

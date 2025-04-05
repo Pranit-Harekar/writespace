@@ -28,8 +28,9 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from '@/components/ui/menubar';
-import LinkMediaDialog from './editor/LinkMediaDialog';
-import LinkEditor from './editor/link/LinkEditor';
+import LinkMediaDialog from './LinkMediaDialog';
+import LinkEditor from './link/LinkEditor';
+import StyleMenu from './formatting/StyleMenu';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
@@ -188,21 +189,7 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      <Menubar className="border-none p-0">
-        <MenubarMenu>
-          <MenubarTrigger className="font-normal px-3 flex items-center">
-            Style
-            <ChevronDown className="h-4 w-4 ml-1" />
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem onSelect={() => handleFormatText('heading1')}>Heading 1</MenubarItem>
-            <MenubarItem onSelect={() => handleFormatText('heading2')}>Heading 2</MenubarItem>
-            <MenubarItem onSelect={() => handleFormatText('heading3')}>Heading 3</MenubarItem>
-            <MenubarItem onSelect={() => handleFormatText('paragraph')}>Paragraph</MenubarItem>
-            <MenubarItem onSelect={() => handleFormatText('blockquote')}>Blockquote</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-      </Menubar>
+      <StyleMenu editor={editor} />
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
