@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
 import {
@@ -30,7 +29,7 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar';
 import LinkMediaDialog from './editor/LinkMediaDialog';
-import LinkEditor from './editor/LinkEditor';
+import LinkEditor from './editor/link/LinkEditor';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
@@ -99,7 +98,11 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
 
     switch (dialogType) {
       case 'image': {
-        editor.chain().focus().setImage({ src: url, alt: text || 'Image' }).run();
+        editor
+          .chain()
+          .focus()
+          .setImage({ src: url, alt: text || 'Image' })
+          .run();
         break;
       }
       case 'button': {

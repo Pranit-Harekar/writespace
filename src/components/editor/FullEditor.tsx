@@ -33,6 +33,9 @@ const FullEditor: React.FC<FullEditorProps> = ({
       Image,
       Link.configure({
         openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        protocols: ['http', 'https'],
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
