@@ -1,3 +1,4 @@
+
 import {
   Menubar,
   MenubarContent,
@@ -6,10 +7,46 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar';
 import { ChevronDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 type StyleOptions = 'Heading 1' | 'Heading 2' | 'Heading 3' | 'Paragraph' | 'Blockquote';
 
 export default function StyleMenu({ editor }) {
+  const [activeStyle, setActiveStyle] = useState<StyleOptions>('Paragraph');
+
+  // Update the active style based on editor state
+  useEffect(() => {
+    if (!editor) return;
+
+    // Function to determine current active style
+    const updateActiveStyle = () => {
+      if (editor.isActive('heading', { level: 1 })) {
+        setActiveStyle('Heading 1');
+      } else if (editor.isActive('heading', { level: 2 })) {
+        setActiveStyle('Heading 2');
+      } else if (editor.isActive('heading', { level: 3 })) {
+        setActiveStyle('Heading 3');
+      } else if (editor.isActive('blockquote')) {
+        setActiveStyle('Blockquote');
+      } else {
+        setActiveStyle('Paragraph');
+      }
+    };
+
+    // Initial update
+    updateActiveStyle();
+
+    // Subscribe to selection changes
+    editor.on('selectionUpdate', updateActiveStyle);
+    editor.on('transaction', updateActiveStyle);
+
+    return () => {
+      // Cleanup event listeners
+      editor.off('selectionUpdate', updateActiveStyle);
+      editor.off('transaction', updateActiveStyle);
+    };
+  }, [editor]);
+
   const handleStyle = (option: StyleOptions) => {
     if (!editor) return;
 
@@ -36,12 +73,16 @@ export default function StyleMenu({ editor }) {
     <Menubar className="border-none p-0">
       <MenubarMenu>
         <MenubarTrigger className="font-normal px-3 flex items-center">
-          Style
+          {activeStyle}
           <ChevronDown className="h-4 w-4 ml-1" />
         </MenubarTrigger>
         <MenubarContent>
-          {['Heading 1', 'Heading 2', 'Heading 3', 'Paragraph', 'Blockquote'].map((option) => (
-            <MenubarItem key={option} onSelect={() => handleStyle(option as StyleOptions)}>
+          {(['Heading 1', 'Heading 2', 'Heading 3', 'Paragraph', 'Blockquote'] as StyleOptions[]).map((option) => (
+            <MenubarItem 
+              key={option} 
+              onSelect={() => handleStyle(option)}
+              className={activeStyle === option ? "bg-secondary" : ""}
+            >
               {option}
             </MenubarItem>
           ))}
