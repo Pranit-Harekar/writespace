@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+
+import React, { useRef, useState, useEffect } from 'react';
 
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
@@ -30,6 +31,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   onSubtitleChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const [currentContent, setCurrentContent] = useState(initialContent);
 
   // Create a shared editor for the toolbar that will control the content editor
   const editor = useEditor({
@@ -67,7 +69,9 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
-      onContentChange(editor.getHTML());
+      const html = editor.getHTML();
+      setCurrentContent(html);
+      onContentChange(html);
     },
     editorProps: {
       attributes: {
@@ -76,6 +80,23 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       },
     },
   });
+  
+  // Handle visibility changes to ensure content persistence
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && editor) {
+        // Ensure editor has latest content when coming back
+        if (editor.getHTML() !== currentContent) {
+          editor.commands.setContent(currentContent);
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [editor, currentContent]);
 
   return (
     <div className="bg-white">
@@ -102,7 +123,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
 
         <div className="relative">
           <RichTextEditor
-            initialValue={initialContent}
+            initialValue={currentContent}
             onValueChange={onContentChange}
             className="prose prose-lg max-w-none outline-hidden focus:outline-hidden min-h-[50vh] text-md relative"
             editorInstance={editor}

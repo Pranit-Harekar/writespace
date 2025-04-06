@@ -1,3 +1,5 @@
+
+import React, { memo } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Editor } from '@tiptap/react';
 
@@ -11,28 +13,34 @@ import LinkEditor from './menu-items/link/LinkEditor';
 import MediaMenu from './menu-items/media/MediaMenu';
 import MoreMenu from './menu-items/MoreMenu';
 
-const RichTextToolbar = ({ editor }: { editor: Editor | null }) => {
+interface RichTextToolbarProps {
+  editor: Editor | null;
+}
+
+const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
   if (!editor) {
     return null;
   }
+  
   return (
     <div className="flex flex-wrap items-center p-1 border-b gap-1">
-      <HistoryMenu key="history" editor={editor} />
+      <HistoryMenu editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <TextStyleMenu key="text-style" editor={editor} />
+      <TextStyleMenu editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <MarksMenu key="marks" editor={editor} />
+      <MarksMenu editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <AlignMenu key="align" editor={editor} />
-      <ListMenu key="list" editor={editor} />
+      <AlignMenu editor={editor} />
+      <ListMenu editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <LinkEditor key="link-editor" editor={editor} />
-      <BlockMenu key="block-menu" editor={editor} />
-      <MediaMenu key="media-menu" editor={editor} />
+      <LinkEditor editor={editor} />
+      <BlockMenu editor={editor} />
+      <MediaMenu editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <MoreMenu key="more-menu" editor={editor} />
+      <MoreMenu editor={editor} />
     </div>
   );
 };
 
-export default RichTextToolbar;
+// Memoize the toolbar to prevent unnecessary re-renders
+export default memo(RichTextToolbar);

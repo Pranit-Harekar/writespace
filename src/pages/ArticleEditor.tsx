@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Save, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +17,7 @@ const ArticleEditor = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
   // Article content state
   const [title, setTitle] = useState<string>('');
@@ -40,10 +40,36 @@ const ArticleEditor = () => {
 
   const isEditing = Boolean(id);
 
-  // Fetch article if editing
+  // Cache article data to prevent refetching when switching tabs
+  const articleDataRef = useRef({
+    title: '',
+    content: '',
+    subtitle: '',
+    categoryId: null as string | null,
+    categoryName: '',
+    language: 'en',
+    featuredImage: '',
+    isPublished: false
+  });
+
+  // Save current state to the ref to preserve it when component unmounts
+  useEffect(() => {
+    articleDataRef.current = {
+      title,
+      content,
+      subtitle,
+      categoryId,
+      categoryName,
+      language,
+      featuredImage,
+      isPublished
+    };
+  }, [title, content, subtitle, categoryId, categoryName, language, featuredImage, isPublished]);
+
+  // Fetch article if editing and not already loaded
   useEffect(() => {
     const fetchArticle = async () => {
-      if (!id || !user) return;
+      if (!id || !user || hasLoaded) return;
 
       setIsLoading(true);
       try {
@@ -77,6 +103,9 @@ const ArticleEditor = () => {
         setLanguage(data.language);
         setFeaturedImage(data.featured_image || '');
         setIsPublished(data.is_published || false);
+        
+        // Mark as loaded to avoid refetching
+        setHasLoaded(true);
       } catch (error: unknown) {
         console.error('Error fetching article:', error);
         toast({
@@ -90,7 +119,22 @@ const ArticleEditor = () => {
     };
 
     fetchArticle();
-  }, [id, user, navigate, toast]);
+  }, [id, user, navigate, toast, hasLoaded]);
+
+  // Restore state from ref when coming back to component
+  useEffect(() => {
+    // Only restore if we've already loaded the article before
+    if (hasLoaded && isEditing) {
+      setTitle(articleDataRef.current.title);
+      setContent(articleDataRef.current.content);
+      setSubtitle(articleDataRef.current.subtitle);
+      setCategoryId(articleDataRef.current.categoryId);
+      setCategoryName(articleDataRef.current.categoryName);
+      setLanguage(articleDataRef.current.language);
+      setFeaturedImage(articleDataRef.current.featuredImage);
+      setIsPublished(articleDataRef.current.isPublished);
+    }
+  }, [hasLoaded, isEditing]);
 
   const handleCategoryChange = (categoryName: string, id: string | null) => {
     setCategoryName(categoryName);
@@ -201,7 +245,7 @@ const ArticleEditor = () => {
     }
   };
 
-  if (isLoading && isEditing) {
+  if (isLoading && isEditing && !hasLoaded) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
