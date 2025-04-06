@@ -38,12 +38,19 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     const start = view.coordsAtPos(from);
     const end = view.coordsAtPos(to);
     
+    // Calculate the viewport-relative position
+    const viewportTop = window.scrollY;
+    const viewportLeft = window.scrollX;
+    
     // Use the center point for the popover position
     const x = isLinkActive ? start.left : (start.left + end.left) / 2;
     const y = Math.max(start.bottom, end.bottom) + 5; // Add a small offset
     
     // Set position state
-    setPopoverPosition({ x, y });
+    setPopoverPosition({ 
+      x: x + viewportLeft, 
+      y: y + viewportTop 
+    });
   }, [editor, isLinkActive]);
 
   const getLinkAttributes = useCallback(() => {
@@ -120,18 +127,20 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     }
   };
 
-  // Update position when scrolling
+  // Update position when scrolling or on window resize
   useEffect(() => {
     if (!isLinkMenuOpen) return;
 
-    const handleScroll = () => {
+    const handleUpdate = () => {
       calculatePopoverPosition();
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleUpdate, { passive: true });
+    window.addEventListener('resize', handleUpdate, { passive: true });
     
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleUpdate);
+      window.removeEventListener('resize', handleUpdate);
     };
   }, [isLinkMenuOpen, calculatePopoverPosition]);
   
@@ -174,37 +183,35 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
         <Link className="h-4 w-4" />
       </Button>
       
-      {/* Invisible trigger positioned at cursor location */}
-      <div
-        ref={triggerRef}
-        style={{
-          position: 'fixed',
-          top: `${popoverPosition.y}px`,
-          left: `${popoverPosition.x}px`,
-          width: '0',
-          height: '0',
-          pointerEvents: 'none',
-        }}
-      />
-      
       <Popover open={isLinkMenuOpen} onOpenChange={setIsLinkMenuOpen}>
         <PopoverTrigger asChild>
-          <div ref={triggerRef} />
+          <div 
+            ref={triggerRef} 
+            style={{
+              position: 'fixed',
+              left: '0px',
+              top: '0px',
+              width: '0px',
+              height: '0px',
+              pointerEvents: 'none',
+              opacity: 0
+            }} 
+          />
         </PopoverTrigger>
         <PopoverContent 
           className="w-auto p-0 shadow-md" 
-          align="center" 
-          side="bottom" 
-          avoidCollisions
+          align="start" 
+          sideOffset={5}
           containerStyle={{
             position: 'fixed',
             top: `${popoverPosition.y}px`,
             left: `${popoverPosition.x}px`,
             transform: 'translateX(-50%)',
-            zIndex: 100,
+            margin: 0,
+            width: 'auto',
           }}
         >
-          <div className="flex flex-col p-3 space-y-2 min-w-[260px]">
+          <div className="flex flex-col p-3 space-y-2 min-w-[300px]">
             <div className="flex space-x-2">
               <div className="relative flex-1">
                 <Link className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
