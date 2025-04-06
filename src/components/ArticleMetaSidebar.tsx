@@ -1,21 +1,22 @@
+
 import React from 'react';
-import { Clock, CalendarCheck, Tag, Image as ImageIcon } from 'lucide-react';
+import { Tag, Image as ImageIcon, CalendarCheck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { CategorySelector } from '@/components/CategorySelector';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import ArticleStats from '@/components/ArticleStats';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
   categoryName: string;
   language: string;
-  readTime: number;
+  content: string;
   featuredImage: string;
   isPublished: boolean;
   onCategoryChange: (name: string, id: string | null) => void;
   onLanguageChange: (lang: string) => void;
-  onReadTimeChange: (time: number) => void;
   onFeaturedImageChange: (url: string) => void;
   onPublishChange: (isPublished: boolean) => void;
 }
@@ -23,16 +24,17 @@ interface ArticleMetaSidebarProps {
 const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
   categoryId,
   categoryName,
-  readTime,
+  content,
   featuredImage,
   isPublished,
   onCategoryChange,
-  onReadTimeChange,
   onFeaturedImageChange,
   onPublishChange,
 }) => {
   return (
     <div className="space-y-4">
+      <ArticleStats content={content} />
+
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Article Settings</CardTitle>
@@ -48,19 +50,6 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               value={categoryName}
               categoryId={categoryId}
               onChange={onCategoryChange}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-2" />
-              <Label className="text-sm font-medium">Read Time (minutes)</Label>
-            </div>
-            <Input
-              type="number"
-              min="1"
-              value={readTime}
-              onChange={e => onReadTimeChange(parseInt(e.target.value) || 1)}
             />
           </div>
 

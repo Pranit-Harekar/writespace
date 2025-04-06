@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Save, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +9,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import ArticleContentEditor from '@/components/ArticleContentEditor';
 import ArticleMetaSidebar from '@/components/ArticleMetaSidebar';
+import { stripHtml } from '@/lib/textUtils';
 
 const ArticleEditor = () => {
   const { id } = useParams();
@@ -26,9 +28,15 @@ const ArticleEditor = () => {
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [categoryName, setCategoryName] = useState<string>('');
   const [language, setLanguage] = useState<string>('en');
-  const [readTime, setReadTime] = useState<number>(5);
   const [featuredImage, setFeaturedImage] = useState<string>('');
   const [isPublished, setIsPublished] = useState<boolean>(false);
+
+  // Calculate read time automatically
+  const readTime = useMemo(() => {
+    const plainText = stripHtml(content);
+    const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
+  }, [content]);
 
   const isEditing = Boolean(id);
 
@@ -67,7 +75,6 @@ const ArticleEditor = () => {
         setCategoryId(data.category_id);
         setCategoryName(data.category || (data.categories ? data.categories.name : ''));
         setLanguage(data.language);
-        setReadTime(data.read_time || 5);
         setFeaturedImage(data.featured_image || '');
         setIsPublished(data.is_published || false);
       } catch (error: unknown) {
@@ -120,7 +127,7 @@ const ArticleEditor = () => {
         category_id: categoryId,
         language,
         featured_image: featuredImage,
-        read_time: readTime,
+        read_time: readTime, // Use automatically calculated read time
         is_published: isPublished,
         published_at: isPublished ? new Date().toISOString() : null,
       };
@@ -249,12 +256,11 @@ const ArticleEditor = () => {
               categoryId={categoryId}
               categoryName={categoryName}
               language={language}
-              readTime={readTime}
+              content={content}
               featuredImage={featuredImage}
               isPublished={isPublished}
               onCategoryChange={handleCategoryChange}
               onLanguageChange={setLanguage}
-              onReadTimeChange={setReadTime}
               onFeaturedImageChange={setFeaturedImage}
               onPublishChange={setIsPublished}
             />
