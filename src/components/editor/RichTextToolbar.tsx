@@ -8,12 +8,6 @@ import {
   Image as ImageIcon,
   Headphones,
   Video,
-  List,
-  ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Undo,
   Redo,
   ChevronDown,
@@ -32,6 +26,7 @@ import LinkMediaDialog from './media/LinkMediaDialog';
 import LinkEditor from './link/LinkEditor';
 import StyleMenu from './format/StyleMenu';
 import ListMenu from './format/ListMenu';
+import AlignMenu from './format/AlignMenu';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
@@ -63,12 +58,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
         break;
       case 'clearFormatting':
         editor.chain().focus().clearNodes().unsetAllMarks().run();
-        break;
-      case 'bulletList':
-        editor.chain().focus().toggleBulletList().run();
-        break;
-      case 'orderedList':
-        editor.chain().focus().toggleOrderedList().run();
         break;
       default:
         break;
@@ -123,27 +112,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
           .run();
         break;
       }
-      default:
-        break;
-    }
-  };
-
-  const handleAlignText = (alignment: string) => {
-    if (!editor) return;
-
-    switch (alignment) {
-      case 'left':
-        editor.chain().focus().setTextAlign('left').run();
-        break;
-      case 'center':
-        editor.chain().focus().setTextAlign('center').run();
-        break;
-      case 'right':
-        editor.chain().focus().setTextAlign('right').run();
-        break;
-      case 'justify':
-        editor.chain().focus().setTextAlign('justify').run();
-        break;
       default:
         break;
     }
@@ -219,6 +187,12 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
         <Code className="h-4 w-4" />
       </Button>
 
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      <AlignMenu editor={editor} />
+
+      <ListMenu editor={editor} />
+
       <Button
         variant="ghost"
         size="icon"
@@ -228,10 +202,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
       >
         <RemoveFormatting className="h-4 w-4" />
       </Button>
-
-      <Separator orientation="vertical" className="mx-1 h-6" />
-
-      <ListMenu editor={editor} />
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
@@ -277,33 +247,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
           </MenubarTrigger>
           <MenubarContent>
             <MenubarItem onSelect={() => openMediaDialog('button')}>Insert Button</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-      </Menubar>
-
-      <Menubar className="border-none p-0">
-        <MenubarMenu>
-          <MenubarTrigger className="font-normal px-3 flex items-center">
-            More
-            <ChevronDown className="h-4 w-4 ml-1" />
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem onSelect={() => handleAlignText('left')}>
-              <AlignLeft className="h-4 w-4 mr-2" />
-              Align Left
-            </MenubarItem>
-            <MenubarItem onSelect={() => handleAlignText('center')}>
-              <AlignCenter className="h-4 w-4 mr-2" />
-              Align Center
-            </MenubarItem>
-            <MenubarItem onSelect={() => handleAlignText('right')}>
-              <AlignRight className="h-4 w-4 mr-2" />
-              Align Right
-            </MenubarItem>
-            <MenubarItem onSelect={() => handleAlignText('justify')}>
-              <AlignJustify className="h-4 w-4 mr-2" />
-              Justify
-            </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>

@@ -82,7 +82,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         <PlainTextEditor
           initialValue={initialSubtitle}
           onValueChange={onSubtitleChange}
-          placeholder="Add a subtitle..."
+          placeholder="Subtitle"
           className="text-lg text-gray-500 outline-hidden focus:outline-hidden relative"
           tagName="p"
         />

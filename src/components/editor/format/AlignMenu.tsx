@@ -1,4 +1,4 @@
-import { ChevronDown, List, ListChecks, ListOrdered } from 'lucide-react';
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, ChevronDown } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
@@ -10,29 +10,41 @@ import {
 } from '@/components/ui/menubar';
 import { Editor } from '@tiptap/react';
 
-interface ListOption {
+interface AlignOption {
   id: string;
-  label: string;
   icon: JSX.Element;
+  label: string;
   action: () => void;
 }
 
-export default function ListMenu({ editor }: { editor: Editor }) {
-  const [selectedOption, setSelectedOption] = useState('bulletList');
+export default function AlignMenu({ editor }: { editor: Editor }) {
+  const [selectedOption, setSelectedOption] = useState('left');
 
-  const options: ListOption[] = useMemo(
+  const options: AlignOption[] = useMemo(
     () => [
       {
-        id: 'bulletList',
-        label: 'Bullet List',
-        icon: <List className="h-4 w-4" />,
-        action: () => editor.chain().focus().toggleBulletList().run(),
+        id: 'left',
+        icon: <AlignLeft className="h-4 w-4" />,
+        label: 'Align Left',
+        action: () => editor.chain().focus().setTextAlign('left').run(),
       },
       {
-        id: 'orderedList',
-        label: 'Ordered List',
-        icon: <ListOrdered className="h-4 w-4" />,
-        action: () => editor.chain().focus().toggleOrderedList().run(),
+        id: 'center',
+        icon: <AlignCenter className="h-4 w-4" />,
+        label: 'Align Center',
+        action: () => editor.chain().focus().setTextAlign('center').run(),
+      },
+      {
+        id: 'right',
+        icon: <AlignRight className="h-4 w-4" />,
+        label: 'Align Right',
+        action: () => editor.chain().focus().setTextAlign('right').run(),
+      },
+      {
+        id: 'justify',
+        icon: <AlignJustify className="h-4 w-4" />,
+        label: 'Justify',
+        action: () => editor.chain().focus().setTextAlign('justify').run(),
       },
     ],
     [editor],
@@ -44,8 +56,10 @@ export default function ListMenu({ editor }: { editor: Editor }) {
 
     // Function to determine selected option
     const updateSelectedOption = () => {
-      const activeOption = options.find((option) => editor.isActive(option.id));
-      setSelectedOption(activeOption ? activeOption.id : 'bulletList');
+      const activeOption = options.find((option) => {
+        return editor.isActive({ textAlign: option.id });
+      });
+      setSelectedOption(activeOption ? activeOption.id : 'left');
     };
 
     // Initial update
@@ -74,7 +88,7 @@ export default function ListMenu({ editor }: { editor: Editor }) {
             <MenubarItem
               key={option.id}
               onSelect={option.action}
-              className={selectedOption === option.id ? 'bg-secondary is-active' : ''}
+              className={selectedOption === option.id ? 'bg-secondary' : ''}
             >
               <span className="flex items-center gap-2">
                 {option.icon}
