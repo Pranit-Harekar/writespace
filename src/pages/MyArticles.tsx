@@ -1,13 +1,12 @@
-
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Plus, Pencil, Eye } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { Header } from "@/components/Header";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Pencil, Eye } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -16,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 interface ArticleListItem {
   id: string;
@@ -42,15 +41,16 @@ const MyArticles = () => {
   useEffect(() => {
     // Redirect if not logged in
     if (!user) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
 
     const fetchArticles = async () => {
       try {
         const { data, error } = await supabase
-          .from("articles")
-          .select(`
+          .from('articles')
+          .select(
+            `
             id, 
             title, 
             category, 
@@ -59,19 +59,20 @@ const MyArticles = () => {
             created_at, 
             updated_at, 
             is_published
-          `)
-          .eq("author_id", user.id)
-          .order("updated_at", { ascending: false });
+          `
+          )
+          .eq('author_id', user.id)
+          .order('updated_at', { ascending: false });
 
         if (error) throw error;
-        
+
         setArticles(data || []);
       } catch (error: any) {
-        console.error("Error fetching articles:", error);
+        console.error('Error fetching articles:', error);
         toast({
-          title: "Error",
-          description: error.message || "Failed to load your articles",
-          variant: "destructive",
+          title: 'Error',
+          description: error.message || 'Failed to load your articles',
+          variant: 'destructive',
         });
       } finally {
         setIsLoading(false);
@@ -128,15 +129,13 @@ const MyArticles = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {articles.map((article) => (
+              {articles.map(article => (
                 <TableRow key={article.id}>
                   <TableCell className="font-medium">{article.title}</TableCell>
+                  <TableCell>{article.categories?.name || article.category || '—'}</TableCell>
                   <TableCell>
-                    {article.categories?.name || article.category || "—"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={article.is_published ? "default" : "outline"}>
-                      {article.is_published ? "Published" : "Draft"}
+                    <Badge variant={article.is_published ? 'default' : 'outline'}>
+                      {article.is_published ? 'Published' : 'Draft'}
                     </Badge>
                   </TableCell>
                   <TableCell>{new Date(article.updated_at).toLocaleDateString()}</TableCell>

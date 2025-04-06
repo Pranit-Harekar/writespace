@@ -55,7 +55,7 @@ export const CategoryList = () => {
           </Button>
 
           {!isLoading &&
-            categories.map((cat) => (
+            categories.map(cat => (
               <Button
                 key={cat.id}
                 variant={category === cat.name.toLowerCase() ? 'default' : 'outline'}

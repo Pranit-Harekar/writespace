@@ -27,7 +27,7 @@ export default function MoreMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().setHorizontalRule().run(),
       },
     ],
-    [editor],
+    [editor]
   );
 
   return (
@@ -38,7 +38,7 @@ export default function MoreMenu({ editor }: { editor: Editor }) {
           <ChevronDown className="h-4 w-4" />
         </MenubarTrigger>
         <MenubarContent>
-          {options.map((option) => (
+          {options.map(option => (
             <MenubarItem key={option.id} onSelect={option.action}>
               <span className="flex items-center gap-2">
                 {option.icon}

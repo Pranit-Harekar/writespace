@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,7 +57,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
 
       // Then, for each comment, get the author's profile
       const commentsWithProfiles = await Promise.all(
-        (commentsData || []).map(async (comment) => {
+        (commentsData || []).map(async comment => {
           const { data: profileData } = await supabase
             .from('profiles')
             .select('username, full_name, avatar_url')
@@ -69,7 +68,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
             ...comment,
             author_profile: profileData || null,
           };
-        }),
+        })
       );
 
       setComments(commentsWithProfiles);
@@ -166,14 +165,14 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
       if (updateError) throw updateError;
 
       // Find the comment's existing profile data
-      const existingComment = comments.find((c) => c.id === commentId);
+      const existingComment = comments.find(c => c.id === commentId);
 
       const updatedCommentWithProfile = {
         ...updatedComment,
         author_profile: existingComment?.author_profile || null,
       };
 
-      setComments(comments.map((c) => (c.id === commentId ? updatedCommentWithProfile : c)));
+      setComments(comments.map(c => (c.id === commentId ? updatedCommentWithProfile : c)));
       setEditingCommentId(null);
       setEditingContent('');
       toast({
@@ -196,7 +195,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
 
       if (error) throw error;
 
-      setComments(comments.filter((c) => c.id !== commentId));
+      setComments(comments.filter(c => c.id !== commentId));
       toast({
         title: 'Comment deleted',
         description: 'Your comment has been removed',
@@ -219,7 +218,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
         <form onSubmit={addComment} className="flex gap-2">
           <Input
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={e => setNewComment(e.target.value)}
             placeholder="Add a comment..."
             className="flex-1"
           />
@@ -254,7 +253,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
         </p>
       ) : (
         <div className="space-y-4">
-          {comments.map((comment) => (
+          {comments.map(comment => (
             <Card key={comment.id} className="p-4">
               <div className="flex items-start gap-4">
                 <Avatar>
@@ -313,7 +312,7 @@ export const Comments: React.FC<CommentsProps> = ({ articleId }) => {
                     <div className="mt-2 space-y-2">
                       <Input
                         value={editingContent}
-                        onChange={(e) => setEditingContent(e.target.value)}
+                        onChange={e => setEditingContent(e.target.value)}
                         className="w-full"
                       />
                       <div className="flex justify-end gap-2">

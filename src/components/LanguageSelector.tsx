@@ -1,4 +1,3 @@
-
 // This component is now a simplified placeholder as we're removing language selection
 import { Button } from '@/components/ui/button';
 

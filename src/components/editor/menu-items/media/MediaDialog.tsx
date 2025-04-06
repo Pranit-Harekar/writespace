@@ -62,7 +62,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ open, onClose, onConfirm, typ
               <Input
                 id="url"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={e => setUrl(e.target.value)}
                 placeholder={getUrlPlaceholder()}
                 className="col-span-3"
                 autoFocus
@@ -76,7 +76,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ open, onClose, onConfirm, typ
                 <Input
                   id="text"
                   value={text}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={e => setText(e.target.value)}
                   placeholder="Click me"
                   className="col-span-3"
                 />

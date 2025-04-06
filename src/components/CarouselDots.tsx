@@ -18,7 +18,7 @@ export const CarouselDots: React.FC<CarouselDotsProps> = ({ total, activeIndex, 
           onClick={() => onDotClick(index)}
           className={cn(
             'w-2 h-2 rounded-full transition-colors',
-            index === activeIndex ? 'bg-primary' : 'bg-muted',
+            index === activeIndex ? 'bg-primary' : 'bg-muted'
           )}
           aria-label={`Go to slide ${index + 1}`}
         />

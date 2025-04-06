@@ -1,5 +1,4 @@
-
-import { cn } from "./utils";
+import { cn } from './utils';
 
 /**
  * Strips HTML tags and converts HTML entities to their corresponding characters

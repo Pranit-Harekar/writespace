@@ -1,15 +1,14 @@
-
-import React from "react";
-import { useSearchParams, useParams } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { ArticlesList } from "@/components/ArticlesList";
-import { Footer } from "@/components/Footer";
-import { CategoryList } from "@/components/CategoryList";
+import React from 'react';
+import { useSearchParams, useParams } from 'react-router-dom';
+import { Header } from '@/components/Header';
+import { ArticlesList } from '@/components/ArticlesList';
+import { Footer } from '@/components/Footer';
+import { CategoryList } from '@/components/CategoryList';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const { category } = useParams<{ category: string }>();
-  const query = searchParams.get("q") || "";
+  const query = searchParams.get('q') || '';
 
   // Format the category name for display
   const formatCategoryName = (categoryParam: string) => {
@@ -31,27 +30,21 @@ const SearchResults = () => {
                 {query && ` matching "${query}"`}
               </h1>
             ) : (
-              <h1 className="text-3xl font-bold mb-2">
-                Search Results: "{query}"
-              </h1>
+              <h1 className="text-3xl font-bold mb-2">Search Results: "{query}"</h1>
             )}
-            
+
             <p className="text-muted-foreground mb-6">
-              {category 
-                ? "Browse articles in this category" 
-                : "Showing articles matching your search"}
+              {category
+                ? 'Browse articles in this category'
+                : 'Showing articles matching your search'}
             </p>
-            
+
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">Filter by Category</h2>
               <CategoryList />
             </div>
-            
-            <ArticlesList 
-              searchQuery={query} 
-              filterByCategory={category}
-              limit={12} 
-            />
+
+            <ArticlesList searchQuery={query} filterByCategory={category} limit={12} />
           </section>
         </div>
       </main>

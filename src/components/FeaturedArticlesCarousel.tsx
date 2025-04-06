@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { FeaturedArticle } from '@/components/FeaturedArticle';
 import { ArticleProps } from '@/components/ArticleCard';
@@ -113,7 +112,7 @@ export const FeaturedArticlesCarousel = () => {
     <div className="mb-8" ref={animationRef}>
       <Carousel className="w-full relative" setApi={setCarouselApi} ref={carouselRef}>
         <CarouselContent>
-          {articles.map((article) => (
+          {articles.map(article => (
             <CarouselItem key={article.id} className="min-h-[240px]">
               <FeaturedArticle {...article} />
             </CarouselItem>

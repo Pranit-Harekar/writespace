@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -11,22 +10,18 @@ interface ProfileLinkProps {
   onClick?: () => void;
 }
 
-export const ProfileLink: React.FC<ProfileLinkProps> = ({ 
-  username, 
-  children, 
+export const ProfileLink: React.FC<ProfileLinkProps> = ({
+  username,
+  children,
   className = '',
   userId,
   displayName,
-  onClick
+  onClick,
 }) => {
   if (!username) return <>{children}</>;
-  
+
   return (
-    <Link 
-      to={`/profile/${username}`} 
-      className={`hover:underline ${className}`}
-      onClick={onClick}
-    >
+    <Link to={`/profile/${username}`} className={`hover:underline ${className}`} onClick={onClick}>
       {children || displayName}
     </Link>
   );

@@ -22,7 +22,7 @@ export const Header = () => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map((n) => n[0])
+      .map(n => n[0])
       .join('')
       .toUpperCase();
   };
@@ -51,7 +51,7 @@ export const Header = () => {
               placeholder="Search WriteSpace"
               className="pl-10 bg-background"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
             />
           </form>
         </div>

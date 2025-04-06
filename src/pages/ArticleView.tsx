@@ -64,7 +64,7 @@ const ArticleView = () => {
             `
             *,
             categories:category_id(id, name)
-          `,
+          `
           )
           .eq('id', id)
           .maybeSingle();

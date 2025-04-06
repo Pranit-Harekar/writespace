@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
@@ -52,7 +51,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
-        validate: (url) =>
+        validate: url =>
           /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
         protocols: ['http', 'https'],
       }),

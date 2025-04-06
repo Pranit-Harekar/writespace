@@ -1,24 +1,27 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { BookOpen, Lock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from '@/components/ui/use-toast';
 
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { BookOpen, Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "@/components/ui/use-toast";
-
-const resetPasswordSchema = z.object({
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  confirmPassword: z.string().min(6, { message: "Confirm password must be at least 6 characters" }),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: 'Confirm password must be at least 6 characters' }),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
@@ -28,7 +31,7 @@ const ResetPassword = () => {
   const [error, setError] = useState<string | null>(null);
   const [isValidResetLink, setIsValidResetLink] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  
+
   const {
     register,
     handleSubmit,
@@ -40,56 +43,56 @@ const ResetPassword = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession();
-      
+
       if (error) {
-        setError("Invalid or expired reset link. Please try again.");
+        setError('Invalid or expired reset link. Please try again.');
         setIsValidResetLink(false);
       } else if (data.session?.user) {
         setIsValidResetLink(true);
       } else {
-        setError("No active session found. Please request a new password reset link.");
+        setError('No active session found. Please request a new password reset link.');
         setIsValidResetLink(false);
       }
-      
+
       setIsCheckingSession(false);
     };
-    
+
     checkSession();
   }, []);
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const { error } = await supabase.auth.updateUser({
-        password: data.password
+        password: data.password,
       });
-      
+
       if (error) {
         setError(error.message);
         toast({
-          variant: "destructive",
-          title: "Error",
+          variant: 'destructive',
+          title: 'Error',
           description: error.message,
         });
       } else {
         toast({
-          title: "Password updated",
-          description: "Your password has been reset successfully",
+          title: 'Password updated',
+          description: 'Your password has been reset successfully',
         });
-        
+
         // Redirect to login after a short delay
         setTimeout(() => {
-          navigate("/login");
+          navigate('/login');
         }, 2000);
       }
     } catch (err: any) {
       setError(err.message);
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
       });
     } finally {
       setIsLoading(false);
@@ -112,9 +115,7 @@ const ResetPassword = () => {
             <BookOpen className="h-10 w-10 text-primary" />
           </div>
           <h1 className="text-2xl font-bold">Set new password</h1>
-          <p className="text-muted-foreground">
-            Create a new password for your account
-          </p>
+          <p className="text-muted-foreground">Create a new password for your account</p>
         </div>
 
         {error && (
@@ -134,7 +135,7 @@ const ResetPassword = () => {
                   type="password"
                   placeholder="••••••••"
                   className="pl-10"
-                  {...register("password")}
+                  {...register('password')}
                 />
               </div>
               {errors.password && (
@@ -151,7 +152,7 @@ const ResetPassword = () => {
                   type="password"
                   placeholder="••••••••"
                   className="pl-10"
-                  {...register("confirmPassword")}
+                  {...register('confirmPassword')}
                 />
               </div>
               {errors.confirmPassword && (
@@ -160,16 +161,12 @@ const ResetPassword = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Setting new password..." : "Set new password"}
+              {isLoading ? 'Setting new password...' : 'Set new password'}
             </Button>
           </form>
         ) : (
           <div className="text-center">
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => navigate("/forgot-password")}
-            >
+            <Button variant="outline" className="mt-4" onClick={() => navigate('/forgot-password')}>
               Request new reset link
             </Button>
           </div>

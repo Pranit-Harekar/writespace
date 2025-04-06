@@ -60,7 +60,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               type="number"
               min="1"
               value={readTime}
-              onChange={(e) => onReadTimeChange(parseInt(e.target.value) || 1)}
+              onChange={e => onReadTimeChange(parseInt(e.target.value) || 1)}
             />
           </div>
 
@@ -73,7 +73,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               type="text"
               placeholder="https://example.com/image.jpg"
               value={featuredImage}
-              onChange={(e) => onFeaturedImageChange(e.target.value)}
+              onChange={e => onFeaturedImageChange(e.target.value)}
             />
             {
               <div className="mt-2 rounded-md overflow-hidden border">
@@ -83,7 +83,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                   }
                   alt="Featured"
                   className="w-full h-32 object-cover"
-                  onError={(e) => {
+                  onError={e => {
                     (e.target as HTMLImageElement).src = '/placeholder.svg';
                   }}
                 />

@@ -59,7 +59,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   // Handle selection of existing category
   const handleSelectCategory = (categoryId: string) => {
-    const category = categories.find((c) => c.id === categoryId);
+    const category = categories.find(c => c.id === categoryId);
     if (category) {
       onChange(category.name, category.id);
     }
@@ -72,7 +72,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent>
-          {categories.map((category) => (
+          {categories.map(category => (
             <SelectItem key={category.id} value={category.id}>
               {category.name}
             </SelectItem>

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 
 import Image from '@tiptap/extension-image';
@@ -40,7 +39,7 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
-        validate: (url) =>
+        validate: url =>
           /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
       }),
       Underline,

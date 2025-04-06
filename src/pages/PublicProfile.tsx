@@ -108,7 +108,7 @@ const PublicProfile = () => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map((n) => n[0])
+      .map(n => n[0])
       .join('')
       .toUpperCase();
   };

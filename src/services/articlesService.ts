@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { extractExcerpt } from '@/lib/textUtils';
@@ -11,16 +10,18 @@ export interface ArticlesQueryParams {
   page?: number;
 }
 
-export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
+export const fetchArticles = async (
+  params: ArticlesQueryParams
+): Promise<{
   articles: ArticleProps[];
   hasMore: boolean;
 }> => {
   const { limit = 6, filterByCategory, searchQuery, page = 1 } = params;
-  
+
   try {
     // Calculate offset based on page number and limit
     const offset = (page - 1) * limit;
-    
+
     // Start building the query
     let query = supabase
       .from('articles')
@@ -38,7 +39,7 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
         featured_image,
         published_at,
         author_id
-      `,
+      `
       )
       .eq('is_published', true)
       .order('published_at', { ascending: false })
@@ -47,7 +48,7 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
     // Apply search filter if provided
     if (searchQuery) {
       query = query.or(
-        `title.ilike.%${searchQuery}%,subtitle.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`,
+        `title.ilike.%${searchQuery}%,subtitle.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`
       );
     }
 
@@ -83,9 +84,9 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
 
     // Extract article_ids for batch fetching engagement metrics
     const articleIds = articlesData.map(article => article.id);
-    
+
     // Fetch author_ids to get profiles in a single batch
-    const authorIds = [...new Set(articlesData.map((article) => article.author_id))];
+    const authorIds = [...new Set(articlesData.map(article => article.author_id))];
 
     // Batch fetch author profiles
     const { data: profilesData, error: profilesError } = await supabase
@@ -100,39 +101,40 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
       .from('article_likes')
       .select('article_id')
       .in('article_id', articleIds);
-      
+
     if (likesError) throw likesError;
-    
+
     // Count likes per article using client-side JavaScript
     const likesCountMap = new Map();
     articleIds.forEach(articleId => {
       const articleLikes = likesData?.filter(like => like.article_id === articleId) || [];
       likesCountMap.set(articleId, articleLikes.length);
     });
-    
+
     // Fetch comments for all articles
     const { data: commentsData, error: commentsError } = await supabase
       .from('article_comments')
       .select('article_id')
       .in('article_id', articleIds);
-      
+
     if (commentsError) throw commentsError;
-    
+
     // Count comments per article using client-side JavaScript
     const commentsCountMap = new Map();
     articleIds.forEach(articleId => {
-      const articleComments = commentsData?.filter(comment => comment.article_id === articleId) || [];
+      const articleComments =
+        commentsData?.filter(comment => comment.article_id === articleId) || [];
       commentsCountMap.set(articleId, articleComments.length);
     });
 
     // Create profiles lookup map
     const profileMap = new Map();
-    profilesData?.forEach((profile) => {
+    profilesData?.forEach(profile => {
       profileMap.set(profile.id, profile);
     });
 
     // Transform data to match ArticleProps
-    const formattedArticles = articlesData.map((item) => {
+    const formattedArticles = articlesData.map(item => {
       const profile = profileMap.get(item.author_id) || {
         id: item.author_id,
         username: 'Anonymous',
@@ -144,9 +146,7 @@ export const fetchArticles = async (params: ArticlesQueryParams): Promise<{
       const categoryName = item.categories ? item.categories.name : item.category;
 
       // Use explicit subtitle or generate from content
-      const excerptText = item.subtitle?.trim() 
-        ? item.subtitle 
-        : extractExcerpt(item.content);
+      const excerptText = item.subtitle?.trim() ? item.subtitle : extractExcerpt(item.content);
 
       return {
         id: item.id,

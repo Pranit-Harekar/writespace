@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -11,7 +10,7 @@ const CategoryView = () => {
   const formatCategoryName = (category: string) => {
     return category
       .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
 

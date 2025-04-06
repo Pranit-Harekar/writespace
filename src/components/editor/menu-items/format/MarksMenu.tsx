@@ -52,12 +52,12 @@ export default function MarksMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().clearNodes().unsetAllMarks().run(),
       },
     ],
-    [editor],
+    [editor]
   );
 
   return (
     <>
-      {options.map((option) => (
+      {options.map(option => (
         <Button
           key={option.id}
           variant="ghost"

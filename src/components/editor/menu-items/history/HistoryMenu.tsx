@@ -28,12 +28,12 @@ export default function HistoryMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().redo().run(),
       },
     ],
-    [editor],
+    [editor]
   );
 
   return (
     <>
-      {options.map((option) => (
+      {options.map(option => (
         <Button
           key={option.id}
           variant="ghost"

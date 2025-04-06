@@ -1,4 +1,3 @@
-
 import { Quote, SquareCode } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -28,12 +27,12 @@ export default function BlockMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().toggleCodeBlock().run(),
       },
     ],
-    [editor],
+    [editor]
   );
 
   return (
     <>
-      {options.map((option) => (
+      {options.map(option => (
         <Button
           key={option.id}
           variant="ghost"

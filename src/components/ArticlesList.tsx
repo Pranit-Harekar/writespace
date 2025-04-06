@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
@@ -25,46 +24,50 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   const initialLoadComplete = useRef(false);
   const prevFiltersRef = useRef({ limit, filterByCategory, searchQuery });
 
-  const loadArticles = useCallback(async (pageNumber: number, isLoadMore = false) => {
-    const loadingState = isLoadMore ? setIsLoadingMore : setIsLoading;
-    loadingState(true);
-    
-    try {
-      const { articles: fetchedArticles, hasMore: moreAvailable } = await fetchArticles({
-        limit,
-        filterByCategory,
-        searchQuery,
-        page: pageNumber
-      });
-      
-      setHasMore(moreAvailable);
-      
-      // If loading more, append to existing articles, otherwise replace
-      if (isLoadMore) {
-        setArticles(prev => [...prev, ...fetchedArticles]);
-      } else {
-        setArticles(fetchedArticles);
+  const loadArticles = useCallback(
+    async (pageNumber: number, isLoadMore = false) => {
+      const loadingState = isLoadMore ? setIsLoadingMore : setIsLoading;
+      loadingState(true);
+
+      try {
+        const { articles: fetchedArticles, hasMore: moreAvailable } = await fetchArticles({
+          limit,
+          filterByCategory,
+          searchQuery,
+          page: pageNumber,
+        });
+
+        setHasMore(moreAvailable);
+
+        // If loading more, append to existing articles, otherwise replace
+        if (isLoadMore) {
+          setArticles(prev => [...prev, ...fetchedArticles]);
+        } else {
+          setArticles(fetchedArticles);
+        }
+      } catch (error) {
+        console.error('Error loading articles:', error);
+      } finally {
+        loadingState(false);
       }
-    } catch (error) {
-      console.error("Error loading articles:", error);
-    } finally {
-      loadingState(false);
-    }
-  }, [limit, filterByCategory, searchQuery]);
+    },
+    [limit, filterByCategory, searchQuery]
+  );
 
   // Initial load - only load once when props change
   useEffect(() => {
     // Check if filters have changed
     const currentFilters = { limit, filterByCategory, searchQuery };
-    const filtersChanged = JSON.stringify(currentFilters) !== JSON.stringify(prevFiltersRef.current);
-    
+    const filtersChanged =
+      JSON.stringify(currentFilters) !== JSON.stringify(prevFiltersRef.current);
+
     if (filtersChanged || !initialLoadComplete.current) {
       // Reset pagination and loading state when filters change
       setPage(1);
       setIsLoading(true);
       initialLoadComplete.current = false;
       prevFiltersRef.current = currentFilters;
-      
+
       // Load the first page of articles
       loadArticles(1);
       initialLoadComplete.current = true;
@@ -88,17 +91,12 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   return (
     <div className="space-y-8">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
+        {articles.map(article => (
           <ArticleCard key={article.id} {...article} />
         ))}
       </div>
-      
-      {hasMore && (
-        <LoadMoreButton 
-          isLoading={isLoadingMore} 
-          onClick={handleLoadMore} 
-        />
-      )}
+
+      {hasMore && <LoadMoreButton isLoading={isLoadingMore} onClick={handleLoadMore} />}
     </div>
   );
 };

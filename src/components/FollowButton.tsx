@@ -1,23 +1,22 @@
-
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { UserPlus, UserMinus } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { UserPlus, UserMinus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FollowButtonProps {
   profileId: string;
   className?: string;
-  size?: "default" | "sm" | "lg" | "icon";
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   onFollowChange?: (isFollowing: boolean) => void;
 }
 
-export const FollowButton: React.FC<FollowButtonProps> = ({ 
-  profileId, 
-  className = "", 
-  size = "default",
-  onFollowChange 
+export const FollowButton: React.FC<FollowButtonProps> = ({
+  profileId,
+  className = '',
+  size = 'default',
+  onFollowChange,
 }) => {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -32,16 +31,15 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
       }
 
       try {
-        const { data, error } = await supabase
-          .rpc('is_following', {
-            follower: user.id,
-            following: profileId
-          });
+        const { data, error } = await supabase.rpc('is_following', {
+          follower: user.id,
+          following: profileId,
+        });
 
         if (error) throw error;
         setIsFollowing(!!data);
       } catch (error) {
-        console.error("Error checking follow status:", error);
+        console.error('Error checking follow status:', error);
       } finally {
         setIsLoading(false);
       }
@@ -53,9 +51,9 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
   const handleFollow = async () => {
     if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to follow users",
-        variant: "destructive",
+        title: 'Authentication required',
+        description: 'Please sign in to follow users',
+        variant: 'destructive',
       });
       return;
     }
@@ -70,40 +68,38 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
           .delete()
           .eq('follower_id', user.id)
           .eq('following_id', profileId);
-          
+
         if (deleteError) throw deleteError;
 
         setIsFollowing(false);
         toast({
-          title: "Unfollowed",
-          description: "You have unfollowed this user",
+          title: 'Unfollowed',
+          description: 'You have unfollowed this user',
         });
       } else {
         // Follow logic - use direct SQL operations
-        const { error: directError } = await supabase
-          .from('user_followers')
-          .insert({ 
-            follower_id: user.id, 
-            following_id: profileId 
-          });
-          
+        const { error: directError } = await supabase.from('user_followers').insert({
+          follower_id: user.id,
+          following_id: profileId,
+        });
+
         if (directError) throw directError;
 
         setIsFollowing(true);
         toast({
-          title: "Followed",
-          description: "You are now following this user",
+          title: 'Followed',
+          description: 'You are now following this user',
         });
       }
-      
+
       if (onFollowChange) {
         onFollowChange(!isFollowing);
       }
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update follow status",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to update follow status',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -116,7 +112,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
 
   return (
     <Button
-      variant={isFollowing ? "outline" : "default"}
+      variant={isFollowing ? 'outline' : 'default'}
       size={size}
       onClick={handleFollow}
       disabled={isLoading}

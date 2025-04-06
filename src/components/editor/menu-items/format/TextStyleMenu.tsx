@@ -1,4 +1,3 @@
-
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -58,7 +57,7 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().setParagraph().run(),
       },
     ],
-    [editor],
+    [editor]
   );
 
   // Update the selected option based on editor state
@@ -102,11 +101,11 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
     <Menubar className="border-none p-0">
       <MenubarMenu>
         <MenubarTrigger className="font-normal px-3 flex items-center hover:bg-secondary">
-          {options.find((option) => option.id === selectedOption)?.label || 'Normal'}
+          {options.find(option => option.id === selectedOption)?.label || 'Normal'}
           <ChevronDown className="h-4 w-4 ml-1" />
         </MenubarTrigger>
         <MenubarContent>
-          {options.map((option) => (
+          {options.map(option => (
             <MenubarItem
               key={option.id}
               onSelect={option.action}

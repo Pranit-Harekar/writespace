@@ -47,7 +47,7 @@ export default function AlignMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().setTextAlign('justify').run(),
       },
     ],
-    [editor],
+    [editor]
   );
 
   // Update the selected option based on editor state
@@ -56,7 +56,7 @@ export default function AlignMenu({ editor }: { editor: Editor }) {
 
     // Function to determine selected option
     const updateSelectedOption = () => {
-      const activeOption = options.find((option) => {
+      const activeOption = options.find(option => {
         return editor.isActive({ textAlign: option.id });
       });
       setSelectedOption(activeOption ? activeOption.id : 'left');
@@ -80,11 +80,11 @@ export default function AlignMenu({ editor }: { editor: Editor }) {
     <Menubar className="border-none p-0">
       <MenubarMenu>
         <MenubarTrigger className="px-1 flex items-center hover:bg-secondary">
-          {options.find((option) => option.id === selectedOption).icon}
+          {options.find(option => option.id === selectedOption).icon}
           <ChevronDown className="h-4 w-4" />
         </MenubarTrigger>
         <MenubarContent>
-          {options.map((option) => (
+          {options.map(option => (
             <MenubarItem
               key={option.id}
               onSelect={option.action}

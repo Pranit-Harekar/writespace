@@ -1,9 +1,8 @@
-
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 type Profile = {
   id: string;
@@ -38,14 +37,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch profile data of the logged in user
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
       if (error) {
-        console.error("Error fetching profile:", error);
+        console.error('Error fetching profile:', error);
         return;
       }
 
@@ -53,21 +48,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(data as Profile);
       }
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error('Error fetching profile:', error);
     }
   };
 
   // Update the user's profile
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) {
-      return { error: "No user logged in" };
+      return { error: 'No user logged in' };
     }
 
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("id", user.id);
+      const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
 
       if (error) {
         return { error };
@@ -76,8 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Refetch the profile to update state
       await fetchProfile(user.id);
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
+        title: 'Profile updated',
+        description: 'Your profile has been updated successfully',
       });
       return { error: null };
     } catch (error: any) {
@@ -100,16 +92,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         toast({
-          title: "Sign up failed",
+          title: 'Sign up failed',
           description: error.message,
-          variant: "destructive",
+          variant: 'destructive',
         });
         return { error };
       }
 
       toast({
-        title: "Sign up successful",
-        description: "Please check your email for verification link",
+        title: 'Sign up successful',
+        description: 'Please check your email for verification link',
       });
       return { error: null };
     } catch (error: any) {
@@ -127,18 +119,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         toast({
-          title: "Sign in failed",
+          title: 'Sign in failed',
           description: error.message,
-          variant: "destructive",
+          variant: 'destructive',
         });
         return { error };
       }
 
       toast({
-        title: "Welcome back!",
-        description: "You have been signed in successfully",
+        title: 'Welcome back!',
+        description: 'You have been signed in successfully',
       });
-      navigate("/");
+      navigate('/');
       return { error: null };
     } catch (error: any) {
       return { error };
@@ -150,45 +142,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await supabase.auth.signOut();
       setProfile(null);
-      navigate("/");
+      navigate('/');
       toast({
-        title: "Signed out",
-        description: "You have been signed out successfully",
+        title: 'Signed out',
+        description: 'You have been signed out successfully',
       });
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error('Error signing out:', error);
     }
   };
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Defer Supabase calls with setTimeout
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-        
-        setIsLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        // Defer Supabase calls with setTimeout
+        setTimeout(() => {
+          fetchProfile(session.user.id);
+        }, 0);
+      } else {
+        setProfile(null);
       }
-    );
+
+      setIsLoading(false);
+    });
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         fetchProfile(session.user.id);
       }
-      
+
       setIsLoading(false);
     });
 
@@ -214,7 +206,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
