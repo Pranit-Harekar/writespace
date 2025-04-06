@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
-import {
-  Bold,
-  Italic,
-  Underline as UnderlineIcon,
-  Code,
-  Image as ImageIcon,
-  Headphones,
-  Video,
-  Undo,
-  Redo,
-  ChevronDown,
-  RemoveFormatting,
-} from 'lucide-react';
+import { Image as ImageIcon, Headphones, Video, Undo, Redo, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -24,9 +12,11 @@ import {
 } from '@/components/ui/menubar';
 import LinkMediaDialog from './media/LinkMediaDialog';
 import LinkEditor from './link/LinkEditor';
-import StyleMenu from './format/StyleMenu';
+import TextStyleMenu from './format/TextStyleMenu';
 import ListMenu from './format/ListMenu';
 import AlignMenu from './format/AlignMenu';
+import MarksMenu from './format/MarksMenu';
+import HistoryMenu from './history/HistoryMenu';
 
 interface RichTextToolbarProps {
   editor: Editor | null;
@@ -39,30 +29,6 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
   if (!editor) {
     return null;
   }
-
-  const handleFormatText = (format: string) => {
-    if (!editor) return;
-
-    switch (format) {
-      case 'bold':
-        editor.chain().focus().toggleBold().run();
-        break;
-      case 'italic':
-        editor.chain().focus().toggleItalic().run();
-        break;
-      case 'underline':
-        editor.chain().focus().toggleUnderline().run();
-        break;
-      case 'code':
-        editor.chain().focus().toggleCode().run();
-        break;
-      case 'clearFormatting':
-        editor.chain().focus().clearNodes().unsetAllMarks().run();
-        break;
-      default:
-        break;
-    }
-  };
 
   const openMediaDialog = (type: 'image' | 'audio' | 'video' | 'button') => {
     setDialogType(type);
@@ -119,89 +85,21 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
 
   return (
     <div className="flex items-center p-1 border-b gap-1 overflow-x-auto">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().undo()}
-        className="h-8 w-8"
-        title="Undo"
-      >
-        <Undo className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().redo()}
-        className="h-8 w-8"
-        title="Redo"
-      >
-        <Redo className="h-4 w-4" />
-      </Button>
+      <HistoryMenu editor={editor} />
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      <StyleMenu editor={editor} />
+      <TextStyleMenu editor={editor} />
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('bold')}
-        className={`h-8 w-8 ${editor.isActive('bold') ? 'bg-secondary' : ''}`}
-        title="Bold"
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('italic')}
-        className={`h-8 w-8 ${editor.isActive('italic') ? 'bg-secondary' : ''}`}
-        title="Italic"
-      >
-        <Italic className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('strikethrough')}
-        className={`h-8 w-8 ${editor.isActive('strike') ? 'bg-secondary' : ''}`}
-        title="Strikethrough"
-      >
-        <UnderlineIcon className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('code')}
-        className={`h-8 w-8 ${editor.isActive('code') ? 'bg-secondary' : ''}`}
-        title="Code"
-      >
-        <Code className="h-4 w-4" />
-      </Button>
+      <MarksMenu editor={editor} />
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
       <AlignMenu editor={editor} />
 
       <ListMenu editor={editor} />
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleFormatText('clearFormatting')}
-        className="h-8 w-8"
-        title="Clear Formatting"
-      >
-        <RemoveFormatting className="h-4 w-4" />
-      </Button>
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 

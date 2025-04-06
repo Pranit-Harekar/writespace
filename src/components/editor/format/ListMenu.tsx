@@ -1,4 +1,4 @@
-import { ChevronDown, List, ListChecks, ListOrdered } from 'lucide-react';
+import { ChevronDown, List, ListOrdered } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
@@ -65,7 +65,7 @@ export default function ListMenu({ editor }: { editor: Editor }) {
   return (
     <Menubar className="border-none p-0">
       <MenubarMenu>
-        <MenubarTrigger className="px-1 flex items-center">
+        <MenubarTrigger className="px-1 flex items-center hover:bg-secondary">
           {options.find((option) => option.id === selectedOption).icon}
           <ChevronDown className="h-4 w-4" />
         </MenubarTrigger>
