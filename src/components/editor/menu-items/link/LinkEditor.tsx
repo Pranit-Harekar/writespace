@@ -1,173 +1,255 @@
-import React, { useState, useCallback } from 'react';
+
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 import { Link } from 'lucide-react';
-import LinkForm, { LinkData } from './LinkForm';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface LinkEditorProps {
   editor: Editor;
 }
 
 const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
-  const [initialText, setInitialText] = useState<string>('');
-  const [initialUrl, setInitialUrl] = useState<string>('');
   const [isLinkMenuOpen, setIsLinkMenuOpen] = useState<boolean>(false);
+  const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
+  const [url, setUrl] = useState<string>('');
+  const [openInNewTab, setOpenInNewTab] = useState<boolean>(false);
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = useCallback(
-    ({ text, link }: LinkData) => {
-      if (!editor) return;
-
-      // If there's already a link, update it
-      if (editor.isActive('link')) {
-        // First update the URL
-        editor
-          .chain()
-          .focus()
-          .extendMarkRange('link')
-          .setLink({ href: link })
-          .run();
-
-        // If the text should also change and it's different from the current text
-        if (text && text !== editor.state.doc.textBetween(
-          editor.state.selection.from,
-          editor.state.selection.to,
-          ' '
-        )) {
-          // Replace the selected text (which should be the link text now)
-          editor
-            .chain()
-            .focus()
-            .deleteSelection()
-            .insertContent(text)
-            .setLink({ href: link })
-            .run();
-        }
-        return;
-      }
-
-      // Case: We have selected text, just need to make it a link
-      if (editor.state.selection.content().size > 0) {
-        editor
-          .chain()
-          .focus()
-          .setLink({ href: link })
-          .run();
-        return;
-      }
-
-      // Case: No selection, insert new link with text
-      if (text) {
-        editor
-          .chain()
-          .focus()
-          .insertContent({
-            type: 'text',
-            text: text,
-            marks: [
-              {
-                type: 'link',
-                attrs: { href: link },
-              },
-            ],
-          })
-          .run();
-      }
-    },
-    [editor],
-  );
-
-  const removeLink = useCallback(() => {
-    if (!editor) return;
-    editor.chain().focus().extendMarkRange('link').unsetLink().run();
-  }, [editor]);
-
+  // Track if text is selected or if we're on an existing link
   const isLinkActive = editor?.isActive('link');
+  const hasTextSelection = editor?.state.selection.content().size > 0;
+  const isLinkEditorEnabled = isLinkActive || hasTextSelection;
+  
+  const calculatePopoverPosition = useCallback(() => {
+    if (!editor) return;
 
-  const getSelectedText = useCallback(() => {
-    if (!editor) return '';
-    return editor.state.doc.textBetween(
-      editor.state.selection.from,
-      editor.state.selection.to,
-      ' '
-    );
-  }, [editor]);
+    const { view } = editor;
+    const { state } = view;
+    const { from, to } = state.selection;
 
-  // Get link text even when just clicked (not selected)
-  const getLinkText = useCallback(() => {
-    if (!editor || !editor.isActive('link')) return '';
+    if (from === to && !isLinkActive) return;
+
+    // Get the coordinates of the cursor position
+    const start = view.coordsAtPos(from);
+    const end = view.coordsAtPos(to);
     
-    // First extend the selection to encompass the entire link
-    const { from, to } = editor.state.selection;
+    // Use the center point for the popover position
+    const x = isLinkActive ? start.left : (start.left + end.left) / 2;
+    const y = Math.max(start.bottom, end.bottom) + 5; // Add a small offset
     
-    // Store current selection
-    const currentSelection = { from, to };
+    // Set position state
+    setPopoverPosition({ x, y });
+  }, [editor, isLinkActive]);
+
+  const getLinkAttributes = useCallback(() => {
+    if (!editor || !isLinkActive) return { href: '', target: '' };
     
-    // Temporarily extend selection to get link text
-    editor.chain().extendMarkRange('link').run();
+    const attrs = editor.getAttributes('link');
+    return {
+      href: attrs.href || '',
+      target: attrs.target || ''
+    };
+  }, [editor, isLinkActive]);
+
+  const handleOpenPopover = useCallback(() => {
+    if (!isLinkEditorEnabled) return;
     
-    // Get the text of the now-selected link
-    const linkText = editor.state.doc.textBetween(
-      editor.state.selection.from,
-      editor.state.selection.to,
-      ' '
-    );
+    calculatePopoverPosition();
     
-    // Restore original selection
-    editor.chain().setTextSelection(currentSelection).run();
+    const attrs = getLinkAttributes();
+    setUrl(attrs.href);
+    setOpenInNewTab(attrs.target === '_blank');
+    setIsLinkMenuOpen(true);
     
-    return linkText;
-  }, [editor]);
+    // Focus the URL input after a short delay
+    setTimeout(() => {
+      if (urlInputRef.current) {
+        urlInputRef.current.focus();
+        urlInputRef.current.select();
+      }
+    }, 10);
+  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes]);
+
+  const handleSetLink = () => {
+    if (!editor) return;
+    
+    if (url === '') {
+      // If URL is empty, unset the link
+      if (isLinkActive) {
+        editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      }
+      setIsLinkMenuOpen(false);
+      return;
+    }
+    
+    // Format URL if it doesn't have a protocol
+    const formattedUrl = url.match(/^https?:\/\//) ? url : `https://${url}`;
+    
+    const linkAttrs = {
+      href: formattedUrl,
+      target: openInNewTab ? '_blank' : null,
+    };
+    
+    editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink(linkAttrs)
+      .run();
+    
+    setIsLinkMenuOpen(false);
+  };
+  
+  const handleDelete = () => {
+    if (editor && isLinkActive) {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      setIsLinkMenuOpen(false);
+    }
+  };
+  
+  // Add keyboard event handler for Enter key
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSetLink();
+      e.preventDefault();
+    }
+  };
+
+  // Update position when scrolling
+  useEffect(() => {
+    if (!isLinkMenuOpen) return;
+
+    const handleScroll = () => {
+      calculatePopoverPosition();
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isLinkMenuOpen, calculatePopoverPosition]);
+  
+  // Watch for selection changes to enable/disable the link button
+  useEffect(() => {
+    if (!editor) return;
+    
+    const handleSelectionUpdate = () => {
+      // If popover is open and we click elsewhere, close it
+      if (isLinkMenuOpen && !editor.isActive('link') && editor.state.selection.empty) {
+        setIsLinkMenuOpen(false);
+      }
+    };
+    
+    editor.on('selectionUpdate', handleSelectionUpdate);
+    
+    return () => {
+      editor.off('selectionUpdate', handleSelectionUpdate);
+    };
+  }, [editor, isLinkMenuOpen]);
 
   if (!editor) {
     return null;
   }
 
   return (
-    <Popover open={isLinkMenuOpen} onOpenChange={setIsLinkMenuOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`h-8 w-8 ${isLinkActive ? 'bg-secondary is-active' : ''}`}
-          title="Link"
-          onClick={() => {
-            if (isLinkActive) {
-              setInitialUrl(editor.getAttributes('link').href || '');
-              // Use getLinkText to get the text of the link even when just clicked
-              setInitialText(getLinkText() || '');
-            } else {
-              const selectedText = getSelectedText();
-              setInitialText(selectedText);
-              setInitialUrl('');
-            }
-            setIsLinkMenuOpen(true);
+    <>
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn(
+          'h-8 w-8',
+          isLinkActive ? 'bg-secondary is-active' : '',
+          !isLinkEditorEnabled ? 'opacity-50 cursor-not-allowed' : ''
+        )}
+        title="Link"
+        onClick={handleOpenPopover}
+        disabled={!isLinkEditorEnabled}
+      >
+        <Link className="h-4 w-4" />
+      </Button>
+      
+      {/* Invisible trigger positioned at cursor location */}
+      <div
+        ref={triggerRef}
+        style={{
+          position: 'fixed',
+          top: `${popoverPosition.y}px`,
+          left: `${popoverPosition.x}px`,
+          width: '0',
+          height: '0',
+          pointerEvents: 'none',
+        }}
+      />
+      
+      <Popover open={isLinkMenuOpen} onOpenChange={setIsLinkMenuOpen}>
+        <PopoverTrigger asChild>
+          <div ref={triggerRef} />
+        </PopoverTrigger>
+        <PopoverContent 
+          className="w-auto p-0 shadow-md" 
+          align="center" 
+          side="bottom" 
+          avoidCollisions
+          containerStyle={{
+            position: 'fixed',
+            top: `${popoverPosition.y}px`,
+            left: `${popoverPosition.x}px`,
+            transform: 'translateX(-50%)',
+            zIndex: 100,
           }}
         >
-          <Link className="h-4 w-4" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="start">
-        <div className="p-4">
-          <LinkForm
-            initialValue={{
-              text: initialText,
-              link: initialUrl,
-            }}
-            onCancel={() => setIsLinkMenuOpen(false)}
-            onSubmit={(values) => {
-              handleSubmit(values);
-              setIsLinkMenuOpen(false);
-            }}
-            onRemoveLink={isLinkActive ? () => {
-              removeLink();
-              setIsLinkMenuOpen(false);
-            } : undefined}
-            isEditMode={isLinkActive}
-          />
-        </div>
-      </PopoverContent>
-    </Popover>
+          <div className="flex flex-col p-3 space-y-2 min-w-[260px]">
+            <div className="flex space-x-2">
+              <div className="relative flex-1">
+                <Link className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  ref={urlInputRef}
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Enter URL"
+                  className="pl-8"
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+              <Button 
+                onClick={handleSetLink}
+                size="sm"
+                className="whitespace-nowrap"
+              >
+                Set Link
+              </Button>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="text-sm">Open in new tab</div>
+              <Switch
+                checked={openInNewTab}
+                onCheckedChange={setOpenInNewTab}
+              />
+            </div>
+            
+            {isLinkActive && (
+              <div className="flex justify-end pt-1">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleDelete}
+                  className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                >
+                  Remove
+                </Button>
+              </div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </>
   );
 };
 

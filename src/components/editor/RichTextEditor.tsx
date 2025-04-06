@@ -34,12 +34,14 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
       Image,
       Link.configure({
         openOnClick: false,
-        autolink: true,
+        autolink: false,
         linkOnPaste: true,
         protocols: ['http', 'https'],
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
         },
+        validate: (url) =>
+          /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
       }),
       Underline,
       TextAlign.configure({

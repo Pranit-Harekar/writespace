@@ -1,8 +1,8 @@
-import { Fragment, useEffect, useState } from 'react';
+
+import { Fragment } from 'react';
 
 import { Separator } from '@/components/ui/separator';
 import { Editor } from '@tiptap/react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 import BlockMenu from './menu-items/BlockMenu';
 import AlignMenu from './menu-items/format/AlignMenu';
