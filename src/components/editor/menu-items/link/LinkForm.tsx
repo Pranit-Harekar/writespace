@@ -1,3 +1,4 @@
+
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -12,7 +13,7 @@ export interface LinkData {
 }
 
 const formSchema = z.object({
-  text: z.string().min(1, { message: 'Text is required' }),
+  text: z.string().optional(),
   link: z
     .string()
     .refine((value) => /^(https?):\/\/(?=.*\.[a-z]{2,})[^\s$.?#].[^\s]*$/i.test(value), {
@@ -24,13 +25,15 @@ interface LinkFormProps {
   initialValue?: LinkData;
   onSubmit: (values: LinkData) => void;
   onCancel: () => void;
+  isEditMode?: boolean;
 }
 
-export default function LinkForm({ initialValue, onSubmit, onCancel }: LinkFormProps) {
+export default function LinkForm({ initialValue, onSubmit, onCancel, isEditMode = false }: LinkFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ...initialValue,
+      text: initialValue?.text || '',
+      link: initialValue?.link || '',
     },
   });
 
@@ -38,39 +41,52 @@ export default function LinkForm({ initialValue, onSubmit, onCancel }: LinkFormP
     onSubmit(values);
   }
 
+  const hasSelectedText = !!initialValue?.text;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <h3 className="font-medium mb-3">Create a link</h3>
+        <h3 className="font-medium mb-3">{isEditMode ? 'Edit link' : 'Create a link'}</h3>
+        
         <FormField
           control={form.control}
           name="text"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} placeholder="example" autoFocus />
+                <Input 
+                  {...field} 
+                  placeholder="Link text" 
+                  autoFocus={!hasSelectedText} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="link"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} placeholder="https://example.com" autoFocus />
+                <Input 
+                  {...field} 
+                  placeholder="https://example.com" 
+                  autoFocus={hasSelectedText} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        
         <div className="flex justify-between">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Link</Button>
+          <Button type="submit">{isEditMode ? 'Update' : 'Link'}</Button>
         </div>
       </form>
     </Form>
