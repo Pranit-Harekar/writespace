@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -74,6 +75,14 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     setIsEditMode(!isLinkActive); // Go directly to edit mode for new links
     setIsLinkMenuOpen(true);
 
+    // Highlight the text selection when adding a new link
+    if (!isLinkActive && hasTextSelection) {
+      // This will maintain the selection when the popover opens
+      setTimeout(() => {
+        editor?.commands.focus();
+      }, 10);
+    }
+
     // Focus the URL input after a short delay if in edit mode
     if (!isLinkActive) {
       setTimeout(() => {
@@ -83,7 +92,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
         }
       }, 10);
     }
-  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes, isLinkActive]);
+  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes, isLinkActive, hasTextSelection, editor]);
 
   const handleSetLink = () => {
     if (!editor) return;
@@ -139,6 +148,14 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     }
   };
 
+  // Close popover when scrolling
+  const handleScroll = useCallback(() => {
+    if (isLinkMenuOpen) {
+      setIsLinkMenuOpen(false);
+      setIsEditMode(false);
+    }
+  }, [isLinkMenuOpen]);
+
   // Update position when scrolling or on window resize
   useEffect(() => {
     if (!isLinkMenuOpen) return;
@@ -147,14 +164,17 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
       calculatePopoverPosition();
     };
 
+    // Add scroll event listener to close the popover
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('scroll', handleUpdate, { passive: true });
     window.addEventListener('resize', handleUpdate, { passive: true });
 
     return () => {
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('scroll', handleUpdate);
       window.removeEventListener('resize', handleUpdate);
     };
-  }, [isLinkMenuOpen, calculatePopoverPosition]);
+  }, [isLinkMenuOpen, calculatePopoverPosition, handleScroll]);
 
   // Watch for selection changes to enable/disable the link button
   useEffect(() => {
