@@ -45,6 +45,8 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       }),
       Image,
       Link.configure({
+        autolink: false,
+        linkOnPaste: true,
         openOnClick: false,
         HTMLAttributes: {
           class: 'text-orange-500 underline hover:text-orange-600',
