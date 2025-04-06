@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Link } from 'lucide-react';
+import { Link, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
   const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
   const [url, setUrl] = useState<string>('');
   const [openInNewTab, setOpenInNewTab] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const urlInputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
 
@@ -71,16 +72,19 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     const attrs = getLinkAttributes();
     setUrl(attrs.href);
     setOpenInNewTab(attrs.target === '_blank');
+    setIsEditMode(!isLinkActive); // Go directly to edit mode for new links
     setIsLinkMenuOpen(true);
     
-    // Focus the URL input after a short delay
-    setTimeout(() => {
-      if (urlInputRef.current) {
-        urlInputRef.current.focus();
-        urlInputRef.current.select();
-      }
-    }, 10);
-  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes]);
+    // Focus the URL input after a short delay if in edit mode
+    if (!isLinkActive) {
+      setTimeout(() => {
+        if (urlInputRef.current) {
+          urlInputRef.current.focus();
+          urlInputRef.current.select();
+        }
+      }, 10);
+    }
+  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes, isLinkActive]);
 
   const handleSetLink = () => {
     if (!editor) return;
@@ -110,13 +114,27 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
       .run();
     
     setIsLinkMenuOpen(false);
+    setIsEditMode(false);
   };
   
   const handleDelete = () => {
     if (editor && isLinkActive) {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
       setIsLinkMenuOpen(false);
+      setIsEditMode(false);
     }
+  };
+
+  const handleEdit = () => {
+    setIsEditMode(true);
+    
+    // Focus the URL input after a short delay
+    setTimeout(() => {
+      if (urlInputRef.current) {
+        urlInputRef.current.focus();
+        urlInputRef.current.select();
+      }
+    }, 10);
   };
   
   // Add keyboard event handler for Enter key
@@ -152,6 +170,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
       // If popover is open and we click elsewhere, close it
       if (isLinkMenuOpen && !editor.isActive('link') && editor.state.selection.empty) {
         setIsLinkMenuOpen(false);
+        setIsEditMode(false);
       }
     };
     
@@ -211,49 +230,79 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
             width: 'auto',
           }}
         >
-          <div className="flex flex-col p-3 space-y-2 min-w-[300px]">
-            <div className="flex space-x-2">
-              <div className="relative flex-1">
-                <Link className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  ref={urlInputRef}
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Enter URL"
-                  className="pl-8"
-                  onKeyDown={handleKeyDown}
-                />
+          {isLinkActive && !isEditMode ? (
+            // Intermediate state UI - show a preview of the link with edit/delete options
+            <div className="flex items-center p-3 space-x-2 min-w-[200px]">
+              <div className="flex-1 truncate text-sm">
+                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate block">
+                  {url}
+                </a>
               </div>
               <Button 
-                onClick={handleSetLink}
-                size="sm"
-                className="whitespace-nowrap"
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7" 
+                title="Edit link"
+                onClick={handleEdit}
               >
-                Set Link
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 text-destructive hover:text-destructive/90 hover:bg-destructive/10" 
+                title="Remove link"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="text-sm">Open in new tab</div>
-              <Switch
-                checked={openInNewTab}
-                onCheckedChange={setOpenInNewTab}
-              />
-            </div>
-            
-            {isLinkActive && (
-              <div className="flex justify-end pt-1">
+          ) : (
+            // Edit mode UI
+            <div className="flex flex-col p-3 space-y-2 min-w-[300px]">
+              <div className="flex space-x-2">
+                <div className="relative flex-1">
+                  <Link className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    ref={urlInputRef}
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="Enter URL"
+                    className="pl-8"
+                    onKeyDown={handleKeyDown}
+                  />
+                </div>
                 <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleDelete}
-                  className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                  onClick={handleSetLink}
+                  size="sm"
+                  className="whitespace-nowrap"
                 >
-                  Remove
+                  Set Link
                 </Button>
               </div>
-            )}
-          </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="text-sm">Open in new tab</div>
+                <Switch
+                  checked={openInNewTab}
+                  onCheckedChange={setOpenInNewTab}
+                />
+              </div>
+              
+              {isLinkActive && (
+                <div className="flex justify-end pt-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleDelete}
+                    className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     </>
