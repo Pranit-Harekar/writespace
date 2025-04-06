@@ -1,9 +1,8 @@
-
 import React, { useState, useCallback } from 'react';
 import { Editor } from '@tiptap/react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Link, Unlink } from 'lucide-react';
+import { Link } from 'lucide-react';
 import LinkForm, { LinkData } from './LinkForm';
 
 interface LinkEditorProps {
@@ -150,22 +149,6 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="start">
         <div className="p-4">
-          {isLinkActive && (
-            <div className="mb-4 flex justify-end">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="flex gap-1 text-destructive hover:text-destructive/90"
-                onClick={() => {
-                  removeLink();
-                  setIsLinkMenuOpen(false);
-                }}
-              >
-                <Unlink className="h-4 w-4" />
-                Remove Link
-              </Button>
-            </div>
-          )}
           <LinkForm
             initialValue={{
               text: initialText,
@@ -176,6 +159,10 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
               handleSubmit(values);
               setIsLinkMenuOpen(false);
             }}
+            onRemoveLink={isLinkActive ? () => {
+              removeLink();
+              setIsLinkMenuOpen(false);
+            } : undefined}
             isEditMode={isLinkActive}
           />
         </div>

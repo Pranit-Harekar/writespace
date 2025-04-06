@@ -25,10 +25,17 @@ interface LinkFormProps {
   initialValue?: LinkData;
   onSubmit: (values: LinkData) => void;
   onCancel: () => void;
+  onRemoveLink?: () => void;
   isEditMode?: boolean;
 }
 
-export default function LinkForm({ initialValue, onSubmit, onCancel, isEditMode = false }: LinkFormProps) {
+export default function LinkForm({ 
+  initialValue, 
+  onSubmit, 
+  onCancel, 
+  onRemoveLink,
+  isEditMode = false 
+}: LinkFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -82,10 +89,22 @@ export default function LinkForm({ initialValue, onSubmit, onCancel, isEditMode 
           )}
         />
         
-        <div className="flex justify-between">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            {isEditMode && onRemoveLink && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="text-destructive hover:text-destructive/90"
+                onClick={onRemoveLink}
+              >
+                Remove Link
+              </Button>
+            )}
+          </div>
           <Button type="submit">{isEditMode ? 'Update' : 'Link'}</Button>
         </div>
       </form>
