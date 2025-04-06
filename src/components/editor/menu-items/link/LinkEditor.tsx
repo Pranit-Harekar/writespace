@@ -75,14 +75,6 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     setIsEditMode(!isLinkActive); // Go directly to edit mode for new links
     setIsLinkMenuOpen(true);
 
-    // Highlight the text selection when adding a new link
-    if (!isLinkActive && hasTextSelection) {
-      // This will maintain the selection when the popover opens
-      setTimeout(() => {
-        editor?.commands.focus();
-      }, 10);
-    }
-
     // Focus the URL input after a short delay if in edit mode
     if (!isLinkActive) {
       setTimeout(() => {
@@ -92,7 +84,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
         }
       }, 10);
     }
-  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes, isLinkActive, hasTextSelection, editor]);
+  }, [isLinkEditorEnabled, calculatePopoverPosition, getLinkAttributes, isLinkActive, editor]);
 
   const handleSetLink = () => {
     if (!editor) return;
