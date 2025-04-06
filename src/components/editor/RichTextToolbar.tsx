@@ -1,4 +1,3 @@
-
 import { Fragment, useEffect, useState } from 'react';
 
 import { Separator } from '@/components/ui/separator';
@@ -19,35 +18,31 @@ const VerticalSeparator = <Separator orientation="vertical" className="mx-1 h-6"
 
 const RichTextToolbar = ({ editor }: { editor: Editor | null }) => {
   const isMobile = useIsMobile();
-  
+
   if (!editor) {
     return null;
   }
 
   // Group menu items for better organization
-  const historyGroup = [
-    <HistoryMenu key="history" editor={editor} />
-  ];
-  
+  const historyGroup = [<HistoryMenu key="history" editor={editor} />];
+
   const textGroup = [
     <TextStyleMenu key="text-style" editor={editor} />,
-    <MarksMenu key="marks" editor={editor} />
+    <MarksMenu key="marks" editor={editor} />,
   ];
-  
+
   const formatGroup = [
     <AlignMenu key="align" editor={editor} />,
-    <ListMenu key="list" editor={editor} />
+    <ListMenu key="list" editor={editor} />,
   ];
-  
+
   const insertGroup = [
     <LinkEditor key="link-editor" editor={editor} />,
     <BlockMenu key="block-menu" editor={editor} />,
-    <MediaMenu key="media-menu" editor={editor} />
+    <MediaMenu key="media-menu" editor={editor} />,
   ];
-  
-  const moreGroup = [
-    <MoreMenu key="more-menu" editor={editor} />
-  ];
+
+  const moreGroup = [<MoreMenu key="more-menu" editor={editor} />];
 
   // Combine all groups with separators for the toolbar
   const menuItemGroups = [
@@ -55,7 +50,7 @@ const RichTextToolbar = ({ editor }: { editor: Editor | null }) => {
     { key: 'text', items: textGroup },
     { key: 'format', items: formatGroup },
     { key: 'insert', items: insertGroup },
-    { key: 'more', items: moreGroup }
+    { key: 'more', items: moreGroup },
   ];
 
   return (
@@ -64,18 +59,15 @@ const RichTextToolbar = ({ editor }: { editor: Editor | null }) => {
         <Fragment key={group.key}>
           <div className="flex items-center flex-wrap">
             {group.items.map((item, itemIndex) => (
-              <Fragment key={`${group.key}-${itemIndex}`}>
-                {item}
-              </Fragment>
+              <Fragment key={`${group.key}-${itemIndex}`}>{item}</Fragment>
             ))}
           </div>
-          {groupIndex < menuItemGroups.length - 1 && (
-            isMobile ? (
+          {groupIndex < menuItemGroups.length - 1 &&
+            (isMobile ? (
               groupIndex < menuItemGroups.length - 1 && <div className="w-full my-1"></div>
             ) : (
-              <Separator orientation="vertical" className="mx-1 h-6" />
-            )
-          )}
+              <Separator orientation="vertical" className="mx-2 h-6" />
+            ))}
         </Fragment>
       ))}
     </div>

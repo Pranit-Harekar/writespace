@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
@@ -76,7 +75,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   return (
     <div className="bg-white">
       <div className="px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
-        <div className="sticky top-0 z-10 bg-white border-b">
+        <div className="sticky top-0 z-10 bg-white">
           <RichTextToolbar editor={editor} />
         </div>
 
