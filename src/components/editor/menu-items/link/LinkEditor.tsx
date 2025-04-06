@@ -234,7 +234,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
                   rel="noopener noreferrer"
                   className="text-primary hover:underline truncate block"
                 >
-                  {url}
+                  {url.length > 30 ? `${url.slice(0, 30)}...` : url}
                 </a>
               </div>
               <Button
@@ -258,7 +258,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
             </div>
           ) : (
             // Edit mode UI
-            <div className="flex flex-col p-3 space-y-2 min-w-[300px]">
+            <div className="flex flex-col p-3 gap-2 space-y-2 min-w-[300px]">
               <div className="flex space-x-2">
                 <div className="relative flex-1">
                   <Link className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -267,7 +267,7 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
                     value={url}
                     onChange={e => setUrl(e.target.value)}
                     placeholder="Enter URL"
-                    className="pl-8"
+                    className="pl-8 h-9"
                     onKeyDown={handleKeyDown}
                   />
                 </div>
@@ -280,19 +280,6 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
                 <div className="text-sm">Open in new tab</div>
                 <Switch checked={openInNewTab} onCheckedChange={setOpenInNewTab} />
               </div>
-
-              {isLinkActive && (
-                <div className="flex justify-end pt-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              )}
             </div>
           )}
         </PopoverContent>
