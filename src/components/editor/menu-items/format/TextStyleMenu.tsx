@@ -38,13 +38,8 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
       },
       {
         id: 'paragraph',
-        label: 'Paragraph',
+        label: 'Normal',
         action: () => editor.chain().focus().setParagraph().run(),
-      },
-      {
-        id: 'blockquote',
-        label: 'Blockquote',
-        action: () => editor.chain().focus().toggleBlockquote().run(),
       },
     ],
     [editor],
@@ -62,8 +57,6 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
         setSelectedOption('heading2');
       } else if (editor.isActive('heading', { level: 3 })) {
         setSelectedOption('heading3');
-      } else if (editor.isActive('blockquote')) {
-        setSelectedOption('blockquote');
       } else {
         setSelectedOption('paragraph');
       }

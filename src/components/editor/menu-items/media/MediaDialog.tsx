@@ -12,14 +12,14 @@ import { Label } from '@/components/ui/label';
 
 type MediaType = 'image' | 'audio' | 'video' | 'button';
 
-interface LinkMediaDialogProps {
+interface MediaDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (url: string, text?: string) => void;
   type: MediaType;
 }
 
-const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({ open, onClose, onConfirm, type }) => {
+const MediaDialog: React.FC<MediaDialogProps> = ({ open, onClose, onConfirm, type }) => {
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
 
@@ -37,14 +37,6 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({ open, onClose, onConf
     switch (type) {
       case 'image':
         return 'Insert Image';
-      case 'audio':
-        return 'Insert Audio';
-      case 'video':
-        return 'Insert Video';
-      case 'button':
-        return 'Insert Button';
-      default:
-        return 'Insert Media';
     }
   };
 
@@ -52,14 +44,6 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({ open, onClose, onConf
     switch (type) {
       case 'image':
         return 'https://example.com/image.jpg';
-      case 'audio':
-        return 'https://example.com/audio.mp3';
-      case 'video':
-        return 'https://example.com/video.mp4';
-      case 'button':
-        return 'https://example.com';
-      default:
-        return 'https://';
     }
   };
 
@@ -111,4 +95,4 @@ const LinkMediaDialog: React.FC<LinkMediaDialogProps> = ({ open, onClose, onConf
   );
 };
 
-export default LinkMediaDialog;
+export default MediaDialog;
