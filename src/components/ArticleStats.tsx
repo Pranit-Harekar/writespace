@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { FileText, Clock, Brain, TextIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { stripHtml } from '@/lib/textUtils';
-import * as readability from 'text-readability';
+import readability from 'text-readability';
 
 interface ArticleStatsProps {
   content: string;
@@ -23,12 +23,19 @@ export const ArticleStats: React.FC<ArticleStatsProps> = ({ content }) => {
     let gradeLevel = '';
     
     if (plainText.length > 50) {
-      fleschScore = Math.round(readability.fleschReadingEase(plainText));
-      // Convert Flesch-Kincaid Grade Level to a readable format
-      const gradeScore = readability.fleschKincaidGrade(plainText);
-      gradeLevel = gradeScore <= 12 
-        ? `Grade ${Math.round(gradeScore)}`
-        : `College ${Math.round(gradeScore - 12)}`;
+      try {
+        fleschScore = Math.round(readability.fleschReadingEase(plainText));
+        // Convert Flesch-Kincaid Grade Level to a readable format
+        const gradeScore = readability.fleschKincaidGrade(plainText);
+        gradeLevel = gradeScore <= 12 
+          ? `Grade ${Math.round(gradeScore)}`
+          : `College ${Math.round(gradeScore - 12)}`;
+      } catch (error) {
+        console.error('Error calculating readability:', error);
+        // Provide fallback values if calculation fails
+        fleschScore = 0;
+        gradeLevel = 'Unknown';
+      }
     }
     
     return {
