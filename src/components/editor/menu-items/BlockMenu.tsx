@@ -1,4 +1,5 @@
-import { CodeSquareIcon, Quote, QuoteIcon, SquareCode } from 'lucide-react';
+
+import { Quote, SquareCode } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { Editor } from '@tiptap/react';

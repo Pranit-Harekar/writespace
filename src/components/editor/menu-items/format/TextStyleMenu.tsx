@@ -1,3 +1,4 @@
+
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -37,6 +38,21 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
         action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       },
       {
+        id: 'heading4',
+        label: 'Heading 4',
+        action: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
+      },
+      {
+        id: 'heading5',
+        label: 'Heading 5',
+        action: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
+      },
+      {
+        id: 'heading6',
+        label: 'Heading 6',
+        action: () => editor.chain().focus().toggleHeading({ level: 6 }).run(),
+      },
+      {
         id: 'paragraph',
         label: 'Normal',
         action: () => editor.chain().focus().setParagraph().run(),
@@ -57,6 +73,12 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
         setSelectedOption('heading2');
       } else if (editor.isActive('heading', { level: 3 })) {
         setSelectedOption('heading3');
+      } else if (editor.isActive('heading', { level: 4 })) {
+        setSelectedOption('heading4');
+      } else if (editor.isActive('heading', { level: 5 })) {
+        setSelectedOption('heading5');
+      } else if (editor.isActive('heading', { level: 6 })) {
+        setSelectedOption('heading6');
       } else {
         setSelectedOption('paragraph');
       }
@@ -80,7 +102,7 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
     <Menubar className="border-none p-0">
       <MenubarMenu>
         <MenubarTrigger className="font-normal px-3 flex items-center hover:bg-secondary">
-          {options.find((option) => option.id === selectedOption).label}
+          {options.find((option) => option.id === selectedOption)?.label || 'Normal'}
           <ChevronDown className="h-4 w-4 ml-1" />
         </MenubarTrigger>
         <MenubarContent>

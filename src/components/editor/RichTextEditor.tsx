@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 
 import Image from '@tiptap/extension-image';
@@ -27,7 +28,7 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3],
+          levels: [1, 2, 3, 4, 5, 6],
         },
       }),
       Image,
