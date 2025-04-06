@@ -94,6 +94,32 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
     );
   }, [editor]);
 
+  // Get link text even when just clicked (not selected)
+  const getLinkText = useCallback(() => {
+    if (!editor || !editor.isActive('link')) return '';
+    
+    // First extend the selection to encompass the entire link
+    const { from, to } = editor.state.selection;
+    
+    // Store current selection
+    const currentSelection = { from, to };
+    
+    // Temporarily extend selection to get link text
+    editor.chain().extendMarkRange('link').run();
+    
+    // Get the text of the now-selected link
+    const linkText = editor.state.doc.textBetween(
+      editor.state.selection.from,
+      editor.state.selection.to,
+      ' '
+    );
+    
+    // Restore original selection
+    editor.chain().setTextSelection(currentSelection).run();
+    
+    return linkText;
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
@@ -109,7 +135,8 @@ const LinkEditor: React.FC<LinkEditorProps> = ({ editor }) => {
           onClick={() => {
             if (isLinkActive) {
               setInitialUrl(editor.getAttributes('link').href || '');
-              setInitialText(getSelectedText());
+              // Use getLinkText to get the text of the link even when just clicked
+              setInitialText(getLinkText() || '');
             } else {
               const selectedText = getSelectedText();
               setInitialText(selectedText);
