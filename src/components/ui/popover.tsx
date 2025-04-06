@@ -24,7 +24,7 @@ const PopoverContent = React.forwardRef<
         className
       )}
       style={{
-        position: containerStyle?.position || '',
+        position: containerStyle?.position ? containerStyle.position : undefined,
         top: containerStyle?.top,
         left: containerStyle?.left,
         transform: containerStyle?.transform,
