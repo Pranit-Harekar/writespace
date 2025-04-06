@@ -28,6 +28,14 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
+          HTMLAttributes: {
+            class: 'font-sans',
+          },
+        },
+        horizontalRule: {
+          HTMLAttributes: {
+            class: 'my-4',
+          },
         },
       }),
       Image,

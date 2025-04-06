@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -42,6 +41,11 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
             class: 'font-sans',
           },
         },
+        horizontalRule: {
+          HTMLAttributes: {
+            class: 'my-4',
+          },
+        },
       }),
       Image,
       Link.configure({
@@ -60,11 +64,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         types: ['heading', 'paragraph'],
       }),
       Placeholder,
-      HorizontalRule.configure({
-        HTMLAttributes: {
-          class: 'my-4',
-        },
-      }),
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
