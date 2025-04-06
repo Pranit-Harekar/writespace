@@ -38,6 +38,9 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
+          HTMLAttributes: {
+            class: 'font-sans',
+          },
         },
       }),
       Image,
