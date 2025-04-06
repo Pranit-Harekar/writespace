@@ -33,8 +33,8 @@ export default function MoreMenu({ editor }: { editor: Editor }) {
   return (
     <Menubar className="border-none p-0">
       <MenubarMenu>
-        <MenubarTrigger className="px-1 flex items-center hover:bg-secondary">
-          More
+        <MenubarTrigger className="px-1 flex items-center hover:bg-secondary gap-1">
+          <span className="font-normal">More</span>
           <ChevronDown className="h-4 w-4" />
         </MenubarTrigger>
         <MenubarContent>

@@ -17,61 +17,28 @@ import MoreMenu from './menu-items/MoreMenu';
 const VerticalSeparator = <Separator orientation="vertical" className="mx-1 h-6" />;
 
 const RichTextToolbar = ({ editor }: { editor: Editor | null }) => {
-  const isMobile = useIsMobile();
-
   if (!editor) {
     return null;
   }
 
-  // Group menu items for better organization
-  const historyGroup = [<HistoryMenu key="history" editor={editor} />];
-
-  const textGroup = [
+  const menuItemGroups = [
+    <HistoryMenu key="history" editor={editor} />,
+    VerticalSeparator,
     <TextStyleMenu key="text-style" editor={editor} />,
+    VerticalSeparator,
     <MarksMenu key="marks" editor={editor} />,
-  ];
-
-  const formatGroup = [
+    VerticalSeparator,
     <AlignMenu key="align" editor={editor} />,
     <ListMenu key="list" editor={editor} />,
-  ];
-
-  const insertGroup = [
+    VerticalSeparator,
     <LinkEditor key="link-editor" editor={editor} />,
     <BlockMenu key="block-menu" editor={editor} />,
     <MediaMenu key="media-menu" editor={editor} />,
+    VerticalSeparator,
+    <MoreMenu key="more-menu" editor={editor} />,
   ];
 
-  const moreGroup = [<MoreMenu key="more-menu" editor={editor} />];
-
-  // Combine all groups with separators for the toolbar
-  const menuItemGroups = [
-    { key: 'history', items: historyGroup },
-    { key: 'text', items: textGroup },
-    { key: 'format', items: formatGroup },
-    { key: 'insert', items: insertGroup },
-    { key: 'more', items: moreGroup },
-  ];
-
-  return (
-    <div className="flex flex-wrap items-center p-1 border-b gap-1 bg-white">
-      {menuItemGroups.map((group, groupIndex) => (
-        <Fragment key={group.key}>
-          <div className="flex items-center flex-wrap">
-            {group.items.map((item, itemIndex) => (
-              <Fragment key={`${group.key}-${itemIndex}`}>{item}</Fragment>
-            ))}
-          </div>
-          {groupIndex < menuItemGroups.length - 1 &&
-            (isMobile ? (
-              groupIndex < menuItemGroups.length - 1 && <div className="w-full my-1"></div>
-            ) : (
-              <Separator orientation="vertical" className="mx-2 h-6" />
-            ))}
-        </Fragment>
-      ))}
-    </div>
-  );
+  return <div className="flex flex-wrap items-center p-1 border-b gap-1">{menuItemGroups}</div>;
 };
 
 export default RichTextToolbar;
