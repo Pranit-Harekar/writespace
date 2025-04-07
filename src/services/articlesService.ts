@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { extractExcerpt } from '@/lib/textUtils';
@@ -6,6 +7,7 @@ import { ArticleProps } from '@/components/ArticleCard';
 export interface ArticlesQueryParams {
   limit?: number;
   filterByCategory?: string;
+  filterByAuthor?: string;
   searchQuery?: string;
   page?: number;
 }
@@ -16,7 +18,7 @@ export const fetchArticles = async (
   articles: ArticleProps[];
   hasMore: boolean;
 }> => {
-  const { limit = 6, filterByCategory, searchQuery, page = 1 } = params;
+  const { limit = 6, filterByCategory, filterByAuthor, searchQuery, page = 1 } = params;
 
   try {
     // Calculate offset based on page number and limit
@@ -68,6 +70,11 @@ export const fetchArticles = async (
         // Use the category_id if we found a match
         query = query.eq('category_id', categoryData.id);
       }
+    }
+
+    // If author filter is provided
+    if (filterByAuthor) {
+      query = query.eq('author_id', filterByAuthor);
     }
 
     const { data: articlesData, error: articlesError } = await query;

@@ -11,6 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { FollowButton } from '@/components/FollowButton';
 import { Separator } from '@/components/ui/separator';
+import { ArticlesList } from '@/components/ArticlesList';
+import { ArticleProps } from '@/components/ArticleCard';
 
 type ProfileData = {
   id: string;
@@ -126,9 +128,9 @@ const PublicProfile = () => {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-8 max-w-4xl flex-grow">
         {isLoading ? (
           <ProfileSkeleton />
         ) : error ? (
@@ -200,6 +202,13 @@ const PublicProfile = () => {
                 </a>
               </div>
             )}
+
+            <div className="mt-10">
+              <h2 className="text-2xl font-bold mb-6">Recent Articles</h2>
+              {profile && (
+                <ArticlesList limit={6} filterByAuthor={profile.id} />
+              )}
+            </div>
           </div>
         ) : (
           <Alert variant="destructive" className="mb-6">
@@ -209,7 +218,7 @@ const PublicProfile = () => {
         )}
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 
@@ -234,6 +243,14 @@ const ProfileSkeleton = () => (
       <Skeleton className="h-4 w-full mb-2" />
       <Skeleton className="h-4 w-full mb-2" />
       <Skeleton className="h-4 w-3/4" />
+    </div>
+    <div>
+      <Skeleton className="h-8 w-48 mb-4" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Skeleton className="h-64 w-full rounded-md" />
+        <Skeleton className="h-64 w-full rounded-md" />
+        <Skeleton className="h-64 w-full rounded-md" />
+      </div>
     </div>
   </div>
 );

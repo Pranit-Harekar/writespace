@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
@@ -8,12 +9,14 @@ import { fetchArticles } from '@/services/articlesService';
 interface ArticlesListProps {
   limit?: number;
   filterByCategory?: string;
+  filterByAuthor?: string;
   searchQuery?: string;
 }
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
   limit = 6,
   filterByCategory,
+  filterByAuthor,
   searchQuery,
 }) => {
   const [articles, setArticles] = useState<ArticleProps[]>([]);
@@ -22,7 +25,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const initialLoadComplete = useRef(false);
-  const prevFiltersRef = useRef({ limit, filterByCategory, searchQuery });
+  const prevFiltersRef = useRef({ limit, filterByCategory, filterByAuthor, searchQuery });
 
   const loadArticles = useCallback(
     async (pageNumber: number, isLoadMore = false) => {
@@ -33,6 +36,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         const { articles: fetchedArticles, hasMore: moreAvailable } = await fetchArticles({
           limit,
           filterByCategory,
+          filterByAuthor,
           searchQuery,
           page: pageNumber,
         });
@@ -51,13 +55,13 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         loadingState(false);
       }
     },
-    [limit, filterByCategory, searchQuery]
+    [limit, filterByCategory, filterByAuthor, searchQuery]
   );
 
   // Initial load - only load once when props change
   useEffect(() => {
     // Check if filters have changed
-    const currentFilters = { limit, filterByCategory, searchQuery };
+    const currentFilters = { limit, filterByCategory, filterByAuthor, searchQuery };
     const filtersChanged =
       JSON.stringify(currentFilters) !== JSON.stringify(prevFiltersRef.current);
 
@@ -72,7 +76,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
       loadArticles(1);
       initialLoadComplete.current = true;
     }
-  }, [filterByCategory, searchQuery, limit, loadArticles]);
+  }, [filterByCategory, filterByAuthor, searchQuery, limit, loadArticles]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
