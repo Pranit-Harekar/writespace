@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -13,6 +12,7 @@ import { FollowButton } from '@/components/FollowButton';
 import { Separator } from '@/components/ui/separator';
 import { ArticlesList } from '@/components/ArticlesList';
 import { ArticleProps } from '@/components/ArticleCard';
+import { ViewMode } from '@/components/ViewSwitcher';
 
 type ProfileData = {
   id: string;
@@ -30,13 +30,12 @@ const PublicProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [articlesViewMode, setArticlesViewMode] = useState<ViewMode>('grid');
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch follower and following counts
   const fetchFollowCounts = async (userId: string) => {
     try {
-      // Get follower count
       const { data: followers, error: followerError } = await supabase.rpc('get_follower_count', {
         user_id: userId,
       });
@@ -44,7 +43,6 @@ const PublicProfile = () => {
       if (followerError) throw followerError;
       setFollowerCount(followers || 0);
 
-      // Get following count
       const { data: following, error: followingError } = await supabase.rpc('get_following_count', {
         user_id: userId,
       });
@@ -85,7 +83,6 @@ const PublicProfile = () => {
           return;
         }
 
-        // If the profile belongs to the current user, redirect to the profile page
         if (user && user.id === data.id) {
           navigate('/profile', { replace: true });
           return;
@@ -93,7 +90,6 @@ const PublicProfile = () => {
 
         setProfile(data as ProfileData);
 
-        // Fetch follower and following counts
         await fetchFollowCounts(data.id);
       } catch (err) {
         console.error('Error:', err);
@@ -122,7 +118,6 @@ const PublicProfile = () => {
     }
   };
 
-  // If we're redirecting to the user's own profile page, show a loading state
   if (user && profile && user.id === profile.id) {
     return <ProfileSkeleton />;
   }
@@ -204,9 +199,16 @@ const PublicProfile = () => {
             )}
 
             <div className="mt-10">
-              <h2 className="text-2xl font-bold mb-6">Recent Articles</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Recent Articles</h2>
+              </div>
               {profile && (
-                <ArticlesList limit={6} filterByAuthor={profile.id} />
+                <ArticlesList 
+                  limit={6} 
+                  filterByAuthor={profile.id} 
+                  showViewSwitcher={true} 
+                  defaultView={articlesViewMode}
+                />
               )}
             </div>
           </div>

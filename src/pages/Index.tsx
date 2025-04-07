@@ -1,11 +1,15 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { FeaturedArticlesCarousel } from '@/components/FeaturedArticlesCarousel';
 import { ArticlesList } from '@/components/ArticlesList';
 import { CategoryList } from '@/components/CategoryList';
 import { Footer } from '@/components/Footer';
+import { ViewMode } from '@/components/ViewSwitcher';
 
 const Index = () => {
+  const [articlesViewMode, setArticlesViewMode] = useState<ViewMode>('grid');
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -22,8 +26,14 @@ const Index = () => {
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
-            <ArticlesList limit={6} />
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Latest Articles</h2>
+            </div>
+            <ArticlesList 
+              limit={6} 
+              showViewSwitcher={true} 
+              defaultView={articlesViewMode}
+            />
           </section>
         </div>
       </main>

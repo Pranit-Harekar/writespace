@@ -1,16 +1,20 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
+import { ArticleListItem } from '@/components/ArticleListItem';
 import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
 import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
 import { LoadMoreButton } from '@/components/LoadMoreButton';
 import { fetchArticles } from '@/services/articlesService';
+import { ViewSwitcher, ViewMode } from '@/components/ViewSwitcher';
 
 interface ArticlesListProps {
   limit?: number;
   filterByCategory?: string;
   filterByAuthor?: string;
   searchQuery?: string;
+  showViewSwitcher?: boolean;
+  defaultView?: ViewMode;
 }
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
@@ -18,12 +22,15 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   filterByCategory,
   filterByAuthor,
   searchQuery,
+  showViewSwitcher = false,
+  defaultView = 'grid',
 }) => {
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>(defaultView);
   const initialLoadComplete = useRef(false);
   const prevFiltersRef = useRef({ limit, filterByCategory, filterByAuthor, searchQuery });
 
@@ -85,7 +92,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   };
 
   if (isLoading) {
-    return <ArticlesListSkeleton count={limit} />;
+    return <ArticlesListSkeleton count={limit} viewMode={viewMode} />;
   }
 
   if (articles.length === 0) {
@@ -94,11 +101,23 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {articles.map(article => (
-          <ArticleCard key={article.id} {...article} />
-        ))}
-      </div>
+      {showViewSwitcher && (
+        <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />
+      )}
+
+      {viewMode === 'grid' ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {articles.map(article => (
+            <ArticleCard key={article.id} {...article} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-0">
+          {articles.map(article => (
+            <ArticleListItem key={article.id} {...article} />
+          ))}
+        </div>
+      )}
 
       {hasMore && <LoadMoreButton isLoading={isLoadingMore} onClick={handleLoadMore} />}
     </div>
