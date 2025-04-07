@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -29,6 +30,7 @@ const Register = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
 
   const {
     register,
@@ -41,11 +43,18 @@ const Register = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     setError(null);
+    setEmailExists(false);
 
     const { error } = await signUp(data.email, data.password, data.name);
 
     if (error) {
       setError(error.message);
+      
+      // Check if the error is related to email already existing
+      if (error.message === 'Email already registered') {
+        setEmailExists(true);
+      }
+      
       setIsSuccess(false);
     } else {
       setIsSuccess(true);
@@ -70,9 +79,21 @@ const Register = () => {
           <p className="text-muted-foreground">Create an account to get started</p>
         </div>
 
-        {error && (
+        {error && !emailExists && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {emailExists && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>
+              This email is already registered. Please{' '}
+              <Link to="/login" className="font-medium underline">
+                sign in
+              </Link>{' '}
+              instead.
+            </AlertDescription>
           </Alert>
         )}
 

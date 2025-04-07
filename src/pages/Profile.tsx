@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -9,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Select,
@@ -33,6 +33,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ProfileAvatarUpload } from '@/components/ProfileAvatarUpload';
+import { toast } from '@/components/ui/use-toast';
 
 const profileSchema = z.object({
   username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
@@ -52,7 +54,7 @@ type UserData = {
 };
 
 const Profile = () => {
-  const { user, profile, updateProfile, signOut } = useAuth();
+  const { user, profile, updateProfile, signOut, checkUsernameAvailability, canChangeUsername } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
@@ -63,6 +65,10 @@ const Profile = () => {
   const [followingData, setFollowingData] = useState<UserData[]>([]);
   const [isLoadingFollowers, setIsLoadingFollowers] = useState(false);
   const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState(true);
+  const [usernameChanged, setUsernameChanged] = useState(false);
+  const [canChangeUsernameNow, setCanChangeUsernameNow] = useState(true);
+  const [usernameDebounceTimeout, setUsernameDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const { setLanguage } = useLanguage();
 
@@ -70,6 +76,7 @@ const Profile = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -81,6 +88,49 @@ const Profile = () => {
       preferred_language: profile?.preferred_language || 'en',
     },
   });
+
+  // Watch username value to check availability with debounce
+  const watchUsername = watch('username');
+  
+  useEffect(() => {
+    if (profile && watchUsername && watchUsername !== profile.username) {
+      setUsernameChanged(true);
+      
+      // Clear any existing timeout
+      if (usernameDebounceTimeout) {
+        clearTimeout(usernameDebounceTimeout);
+      }
+      
+      // Set a new timeout to check username availability
+      const timeout = setTimeout(async () => {
+        const { available } = await checkUsernameAvailability(watchUsername);
+        setUsernameAvailable(available);
+      }, 500); // 500ms debounce
+      
+      setUsernameDebounceTimeout(timeout);
+    } else {
+      setUsernameChanged(false);
+      setUsernameAvailable(true);
+    }
+    
+    return () => {
+      if (usernameDebounceTimeout) {
+        clearTimeout(usernameDebounceTimeout);
+      }
+    };
+  }, [watchUsername, profile]);
+  
+  // Check if user can change username
+  useEffect(() => {
+    if (user && profile) {
+      const checkUsernameChangeAbility = async () => {
+        const { canChange } = await canChangeUsername();
+        setCanChangeUsernameNow(canChange);
+      };
+      
+      checkUsernameChangeAbility();
+    }
+  }, [user, profile]);
 
   React.useEffect(() => {
     if (profile) {
@@ -208,6 +258,26 @@ const Profile = () => {
     setIsLoading(true);
     setError(null);
 
+    // Check username availability if it was changed
+    if (data.username !== profile.username) {
+      const { available } = await checkUsernameAvailability(data.username);
+      
+      if (!available) {
+        setError('Username is already taken');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Check if user can change username now
+      const { canChange } = await canChangeUsername();
+      
+      if (!canChange) {
+        setError('Username can only be changed once every 30 days');
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const { error } = await updateProfile(data);
 
     if (error) {
@@ -246,13 +316,12 @@ const Profile = () => {
 
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex flex-col items-center">
-              <Avatar className="h-24 w-24 mb-4">
-                <AvatarImage src={profile.avatar_url || ''} alt={profile.full_name || ''} />
-                <AvatarFallback>
-                  {profile.full_name ? getInitials(profile.full_name) : 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <p className="text-sm text-muted-foreground mb-2">{user.email}</p>
+              <ProfileAvatarUpload 
+                currentAvatarUrl={profile.avatar_url} 
+                fullName={profile.full_name} 
+              />
+              
+              <p className="text-sm text-muted-foreground mb-2 mt-2">{user.email}</p>
 
               {/* Follow stats */}
               <div className="flex justify-center gap-4 mb-4">
@@ -281,9 +350,19 @@ const Profile = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
-                  <Input id="username" {...register('username')} />
+                  <Input 
+                    id="username" 
+                    {...register('username')} 
+                    className={!usernameAvailable ? 'border-destructive' : ''}
+                  />
                   {errors.username && (
                     <p className="text-destructive text-sm">{errors.username.message}</p>
+                  )}
+                  {usernameChanged && !usernameAvailable && (
+                    <p className="text-destructive text-sm">This username is already taken</p>
+                  )}
+                  {usernameChanged && !canChangeUsernameNow && (
+                    <p className="text-amber-500 text-sm">You can only change your username once every 30 days</p>
                   )}
                 </div>
 
@@ -331,7 +410,10 @@ const Profile = () => {
                   )}
                 </div>
 
-                <Button type="submit" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || (usernameChanged && !usernameAvailable) || (usernameChanged && !canChangeUsernameNow)}
+                >
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </form>
