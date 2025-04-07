@@ -4,11 +4,11 @@ import { useInView } from 'react-intersection-observer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import FeaturedArticle from './FeaturedArticle';
-import FeaturedArticlesCarouselSkeleton from './FeaturedArticlesCarouselSkeleton';
-import FeaturedArticlesEmptyState from './FeaturedArticlesEmptyState';
+import { FeaturedArticle } from './FeaturedArticle';
+import { FeaturedArticlesCarouselSkeleton } from './FeaturedArticlesCarouselSkeleton';
+import { FeaturedArticlesEmptyState } from './FeaturedArticlesEmptyState';
 import { ArticleProps } from './ArticleCard';
-import { useFeaturedArticles } from '@/services/featuredArticlesService';
+import { useFeaturedArticlesService } from '@/services/featuredArticlesService';
 
 interface FeaturedArticlesCarouselProps {
   limit?: number;
@@ -21,7 +21,29 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
   const [current, setCurrent] = useState(0);
   
-  const { data: featuredArticles, isLoading, error } = useFeaturedArticles(limit, inView);
+  const { fetchFeaturedArticles } = useFeaturedArticlesService();
+  const [featuredArticles, setFeaturedArticles] = useState<ArticleProps[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (inView) {
+      const loadArticles = async () => {
+        try {
+          setIsLoading(true);
+          const articles = await fetchFeaturedArticles();
+          setFeaturedArticles(articles);
+        } catch (err) {
+          console.error('Error loading featured articles:', err);
+          setError(err as Error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      loadArticles();
+    }
+  }, [inView, fetchFeaturedArticles]);
 
   useEffect(() => {
     if (!api) {

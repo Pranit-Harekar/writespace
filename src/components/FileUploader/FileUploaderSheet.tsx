@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image, Link, Upload, X } from 'lucide-react';
@@ -212,7 +211,7 @@ export function FileUploaderSheet({
 
         <div className="mt-6 flex justify-between">
           <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-          <Button isLoading={isUploading} disabled={isUploading}>
+          <Button disabled={isUploading}>
             {isUploading ? 'Uploading...' : 'Done'}
           </Button>
         </div>

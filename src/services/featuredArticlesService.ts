@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArticleProps } from '@/components/ArticleCard';
 import { extractExcerpt } from '@/lib/textUtils';
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 export const useFeaturedArticlesService = () => {
   const { toast } = useToast();
@@ -148,4 +148,40 @@ export const useFeaturedArticlesService = () => {
   }, [toast]);
 
   return { fetchFeaturedArticles };
+};
+
+// Add a new hook that uses the service for simpler consumption
+export const useFeaturedArticles = (limit: number, shouldFetch: boolean = true) => {
+  const { toast } = useToast();
+  const [data, setData] = useState<ArticleProps[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  const { fetchFeaturedArticles } = useFeaturedArticlesService();
+  
+  useEffect(() => {
+    if (!shouldFetch) return;
+    
+    const loadArticles = async () => {
+      try {
+        setIsLoading(true);
+        const articles = await fetchFeaturedArticles();
+        setData(articles.slice(0, limit));
+      } catch (err) {
+        console.error('Error loading featured articles:', err);
+        setError(err as Error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load featured articles',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadArticles();
+  }, [fetchFeaturedArticles, limit, shouldFetch, toast]);
+  
+  return { data, isLoading, error };
 };
