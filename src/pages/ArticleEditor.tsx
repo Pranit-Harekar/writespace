@@ -52,6 +52,13 @@ const ArticleEditor = () => {
     isPublished: false,
   });
 
+  // Extract first image from content for use as fallback featured image
+  const extractFirstImage = (content: string): string => {
+    const imgRegex = /<img[^>]+src="([^">]+)"/i;
+    const match = content.match(imgRegex);
+    return match ? match[1] : '';
+  };
+
   // Save current state to the ref to preserve it when component unmounts
   useEffect(() => {
     articleDataRef.current = {
@@ -163,6 +170,10 @@ const ArticleEditor = () => {
     setIsLoading(true);
 
     try {
+      // Use first image from content as fallback for featured image if none is set
+      const firstImageFromContent = extractFirstImage(content);
+      const finalFeaturedImage = featuredImage || firstImageFromContent;
+
       const articleData = {
         title,
         content,
@@ -170,7 +181,7 @@ const ArticleEditor = () => {
         author_id: user.id,
         category_id: categoryId,
         language,
-        featured_image: featuredImage,
+        featured_image: finalFeaturedImage,
         read_time: readTime, // Use automatically calculated read time
         is_published: isPublished,
         published_at: isPublished ? new Date().toISOString() : null,
