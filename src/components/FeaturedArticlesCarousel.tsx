@@ -27,9 +27,12 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
 
   // Load featured articles when component comes into view
   useEffect(() => {
+    console.log('FeaturedArticlesCarousel - inView:', inView);
     if (inView) {
       const loadArticles = async () => {
+        console.log('FeaturedArticlesCarousel - Loading articles...');
         try {
+          // Start loading state
           setIsLoading(true);
           
           // Fetch articles data
@@ -41,19 +44,21 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
             page: 1,
           });
           
-          console.log('Featured articles loaded:', articles);
+          console.log('FeaturedArticlesCarousel - Articles loaded:', articles);
+          
+          // Make sure to set loading to false before handling the response
+          setIsLoading(false);
           
           if (articles && articles.length > 0) {
             setFeaturedArticles(articles);
             setError(null);
           } else {
             console.log('No featured articles found');
-            setFeaturedArticles([]); 
+            setFeaturedArticles([]);
           }
         } catch (err) {
           console.error('Error loading featured articles:', err);
           setError(err as Error);
-        } finally {
           setIsLoading(false);
         }
       };
@@ -82,18 +87,32 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
     api?.scrollNext();
   };
 
+  console.log('FeaturedArticlesCarousel - Rendering with state:', { 
+    isLoading, 
+    error, 
+    articlesCount: featuredArticles.length 
+  });
+
+  // Handle loading state
   if (isLoading) {
+    console.log('FeaturedArticlesCarousel - Showing loading skeleton');
     return <FeaturedArticlesCarouselSkeleton />;
   }
 
+  // Handle error state
   if (error) {
+    console.log('FeaturedArticlesCarousel - Showing error state');
     return <FeaturedArticlesEmptyState error={error} />;
   }
 
+  // Handle empty state
   if (!featuredArticles || featuredArticles.length === 0) {
+    console.log('FeaturedArticlesCarousel - Showing empty state');
     return <FeaturedArticlesEmptyState />;
   }
 
+  // Render the carousel with articles
+  console.log('FeaturedArticlesCarousel - Showing carousel with articles');
   return (
     <div ref={ref} className="relative">
       <div className="flex justify-center space-x-2 mb-4">
