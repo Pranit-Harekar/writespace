@@ -106,11 +106,11 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">{sectionTitle}</h2>
-        {showViewSwitcher && <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />}
+        {/* {showViewSwitcher && <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />} */}
       </div>
 
       <div className="space-y-8">
-        {viewMode === 'grid' ? (
+        {/* {viewMode === 'grid' ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {articles.map(article => (
               <ArticleCard key={article.id} {...article} />
@@ -122,7 +122,12 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
               <ArticleListItem key={article.id} {...article} />
             ))}
           </div>
-        )}
+        )} */}
+        <div className="space-y-0">
+          {articles.map(article => (
+            <ArticleListItem key={article.id} {...article} />
+          ))}
+        </div>
 
         {hasMore && <LoadMoreButton isLoading={isLoadingMore} onClick={handleLoadMore} />}
       </div>

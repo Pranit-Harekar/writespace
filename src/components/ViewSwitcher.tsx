@@ -36,5 +36,5 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewC
 
 // Helper function to get the persisted view mode from localStorage
 export const getPersistedViewMode = (): ViewMode => {
-  return getStorageItem<ViewMode>(STORAGE_KEYS.VIEW_MODE, 'grid');
+  return getStorageItem<ViewMode>(STORAGE_KEYS.VIEW_MODE, 'list');
 };
