@@ -1,4 +1,3 @@
-
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -79,13 +78,11 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              {/* New routes for static pages */}
               <Route path="/about" element={<About />} />
               <Route path="/help" element={<Help />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/category/:category" element={<CategoryView />} />
-              {/* Redirect old category URLs to the new structure */}
               <Route path="/category/redirect/:category" element={<CategoryRedirect />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
