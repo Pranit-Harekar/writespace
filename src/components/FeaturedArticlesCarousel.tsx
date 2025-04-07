@@ -104,7 +104,7 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
         <CarouselContent>
           {featuredArticles.map((article: ArticleProps) => (
             <CarouselItem key={article.id} className="pt-1 md:basis-1/2 lg:basis-1/3">
-              <FeaturedArticle article={article} />
+              <FeaturedArticle {...article} />
             </CarouselItem>
           ))}
         </CarouselContent>
