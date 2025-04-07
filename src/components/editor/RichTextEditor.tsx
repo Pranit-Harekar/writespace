@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 import Image from '@tiptap/extension-image';
@@ -49,9 +48,6 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
         autolink: false,
         linkOnPaste: true,
         protocols: ['http', 'https'],
-        HTMLAttributes: {
-          class: 'text-orange-500 underline hover:text-orange-600',
-        },
         validate: url =>
           /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
       }),
@@ -66,7 +62,7 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
       const html = editor.getHTML();
       lastContent.current = html;
       onValueChange(html);
-      
+
       // After initial load and first update, don't automatically update from props anymore
       // unless there's a significant difference
       if (html !== initialValue) {
@@ -104,11 +100,7 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
   // Handle initialValue changes, but be careful about overwriting user edits
   useEffect(() => {
     // Only update from props if we haven't edited yet or there's a significant change
-    if (
-      editor && 
-      shouldUpdateFromProps.current && 
-      initialValue !== editor.getHTML()
-    ) {
+    if (editor && shouldUpdateFromProps.current && initialValue !== editor.getHTML()) {
       editor.commands.setContent(initialValue);
       lastContent.current = initialValue;
     }

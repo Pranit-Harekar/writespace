@@ -54,7 +54,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
           </div>
           <div className="flex items-center gap-8">
             <LikeButton articleId={id} initialLikesCount={likesCount} readOnly={true} />
-            <Button asChild className="carousel-pause-trigger">
+            <Button variant="outline" asChild className="carousel-pause-trigger">
               <Link to={`/article/${id}`}>Read Full Article</Link>
             </Button>
           </div>

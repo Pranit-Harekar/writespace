@@ -53,9 +53,6 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         autolink: false,
         linkOnPaste: true,
         openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-orange-500 underline hover:text-orange-600',
-        },
         validate: url =>
           /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
         protocols: ['http', 'https'],
