@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -28,9 +29,10 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
   useEffect(() => {
     if (inView) {
       const loadArticles = async () => {
-        setIsLoading(true);
         try {
-          // Force loading some mock data if no articles returned
+          setIsLoading(true);
+          
+          // Fetch articles data
           const { articles } = await fetchArticles({
             limit,
             filterByCategory: '',
@@ -38,10 +40,16 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
             searchQuery: '',
             page: 1,
           });
-
-          console.log('Featured articles:', articles);
-          setFeaturedArticles(articles);
-          setError(null);
+          
+          console.log('Featured articles loaded:', articles);
+          
+          if (articles && articles.length > 0) {
+            setFeaturedArticles(articles);
+            setError(null);
+          } else {
+            console.log('No featured articles found');
+            setFeaturedArticles([]); 
+          }
         } catch (err) {
           console.error('Error loading featured articles:', err);
           setError(err as Error);
