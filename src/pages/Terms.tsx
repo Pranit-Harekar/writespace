@@ -120,7 +120,6 @@ const Terms = () => {
           <p className="font-medium">legal@writespace.com</p>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

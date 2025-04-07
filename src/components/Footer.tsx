@@ -13,9 +13,9 @@ export const Footer = () => {
             <span className="text-xl font-bold">WriteSpace</span>
           </div>
 
-          {/* <div className="flex items-center gap-6 mb-4 md:mb-0">
-            <DarkModeToggle />
-          </div> */}
+          <div className="text-center text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} WriteSpace - Multilingual Blog Platform
+          </div>
 
           <div className="flex gap-6">
             <Link to="/about" className="text-muted-foreground hover:text-foreground">
@@ -31,9 +31,6 @@ export const Footer = () => {
               Terms
             </Link>
           </div>
-        </div>
-        <div className="text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} WriteSpace - Multilingual Blog Platform for India
         </div>
       </div>
     </footer>

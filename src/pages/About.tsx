@@ -55,7 +55,6 @@ const About = () => {
           </p>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

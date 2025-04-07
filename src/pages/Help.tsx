@@ -133,7 +133,6 @@ const Help = () => {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

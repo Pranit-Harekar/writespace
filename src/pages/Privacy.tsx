@@ -127,7 +127,6 @@ const Privacy = () => {
           <p className="font-medium">privacy@writespace.com</p>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };
