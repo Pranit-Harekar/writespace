@@ -132,15 +132,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      const { data, error } = await supabase.rpc('can_change_username', {
-        user_id: user.id
-      });
+      // Use raw SQL query instead of RPC call since types are not updated yet
+      const { data, error } = await supabase
+        .from('username_changes')
+        .select('changed_at')
+        .eq('user_id', user.id)
+        .order('changed_at', { ascending: false })
+        .limit(1);
 
       if (error) {
         return { canChange: false, error };
       }
 
-      return { canChange: data, error: null };
+      // If no previous username changes or last change was more than 30 days ago
+      if (!data || data.length === 0) {
+        return { canChange: true, error: null };
+      }
+      
+      const lastChangeDate = new Date(data[0].changed_at);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      return { canChange: lastChangeDate < thirtyDaysAgo, error: null };
     } catch (error: any) {
       return { canChange: false, error };
     }

@@ -33,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProfileAvatarUpload } from '@/components/ProfileAvatarUpload';
 import { toast } from '@/components/ui/use-toast';
 
