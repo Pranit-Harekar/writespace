@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Grid2X2, List } from 'lucide-react';
+import { STORAGE_KEYS, getStorageItem, setStorageItem } from '@/lib/storage';
 
 export type ViewMode = 'grid' | 'list';
 
@@ -11,6 +12,11 @@ interface ViewSwitcherProps {
 }
 
 export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewChange }) => {
+  // Update localStorage when view changes
+  useEffect(() => {
+    setStorageItem(STORAGE_KEYS.VIEW_MODE, currentView);
+  }, [currentView]);
+
   return (
     <div className="flex items-center justify-end mb-4">
       <ToggleGroup type="single" value={currentView} onValueChange={(value: ViewMode) => value && onViewChange(value)}>
@@ -23,4 +29,9 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewC
       </ToggleGroup>
     </div>
   );
+};
+
+// Helper function to get the persisted view mode from localStorage
+export const getPersistedViewMode = (): ViewMode => {
+  return getStorageItem<ViewMode>(STORAGE_KEYS.VIEW_MODE, 'grid');
 };

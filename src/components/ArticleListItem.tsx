@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock } from 'lucide-react';
@@ -20,16 +21,6 @@ export const ArticleListItem: React.FC<ArticleProps> = ({
 }) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 border-b pb-6 mb-6 last:mb-0 last:border-b-0">
-      <div className="hidden sm:block md:w-1/4 lg:w-1/5">
-        <Link to={`/article/${id}`} className="block overflow-hidden rounded-md">
-          <img
-            src={featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'}
-            alt={title}
-            className="w-full h-48 md:h-28 object-cover hover:scale-105 transition-transform"
-          />
-        </Link>
-      </div>
-
       <div className="md:w-3/4 lg:w-4/5 flex flex-col">
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
           <span className="font-medium text-foreground">{category}</span>
@@ -62,6 +53,17 @@ export const ArticleListItem: React.FC<ArticleProps> = ({
             </span>
           </div>
         </div>
+      </div>
+
+      <div className="hidden md:block md:w-1/4 lg:w-1/5 order-first md:order-last">
+        <Link to={`/article/${id}`} className="block overflow-hidden rounded-md h-full">
+          <img
+            src={featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'}
+            alt={title}
+            className="w-full h-full object-cover hover:scale-105 transition-transform"
+            style={{ minHeight: "100%", aspectRatio: "16/9" }}
+          />
+        </Link>
       </div>
     </div>
   );

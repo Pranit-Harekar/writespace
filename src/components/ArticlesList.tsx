@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 import { ArticleListItem } from '@/components/ArticleListItem';
@@ -5,7 +6,7 @@ import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
 import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
 import { LoadMoreButton } from '@/components/LoadMoreButton';
 import { fetchArticles } from '@/services/articlesService';
-import { ViewSwitcher, ViewMode } from '@/components/ViewSwitcher';
+import { ViewSwitcher, ViewMode, getPersistedViewMode } from '@/components/ViewSwitcher';
 
 interface ArticlesListProps {
   limit?: number;
@@ -22,14 +23,18 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   filterByAuthor,
   searchQuery,
   showViewSwitcher = false,
-  defaultView = 'grid',
+  defaultView,
 }) => {
+  // Use persisted view mode or passed default
+  const [viewMode, setViewMode] = useState<ViewMode>(() => 
+    defaultView || getPersistedViewMode()
+  );
+  
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>(defaultView);
   const initialLoadComplete = useRef(false);
   const prevFiltersRef = useRef({ limit, filterByCategory, filterByAuthor, searchQuery });
 

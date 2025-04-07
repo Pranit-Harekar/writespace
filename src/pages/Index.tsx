@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Header } from '@/components/Header';
 import { FeaturedArticlesCarousel } from '@/components/FeaturedArticlesCarousel';
 import { ArticlesList } from '@/components/ArticlesList';
@@ -8,8 +8,6 @@ import { Footer } from '@/components/Footer';
 import { ViewMode } from '@/components/ViewSwitcher';
 
 const Index = () => {
-  const [articlesViewMode, setArticlesViewMode] = useState<ViewMode>('grid');
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -31,8 +29,7 @@ const Index = () => {
             </div>
             <ArticlesList 
               limit={6} 
-              showViewSwitcher={true} 
-              defaultView={articlesViewMode}
+              showViewSwitcher={true}
             />
           </section>
         </div>

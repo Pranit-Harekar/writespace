@@ -1,15 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ArticlesList } from '@/components/ArticlesList';
-import { ViewMode } from '@/components/ViewSwitcher';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [articlesViewMode, setArticlesViewMode] = useState<ViewMode>('grid');
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,7 +23,6 @@ const SearchResults = () => {
             searchQuery={query} 
             limit={9} 
             showViewSwitcher={true} 
-            defaultView={articlesViewMode}
           />
         </div>
       </main>

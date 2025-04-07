@@ -1,14 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ArticlesList } from '@/components/ArticlesList';
-import { ViewMode } from '@/components/ViewSwitcher';
 
 const CategoryView = () => {
   const { category } = useParams<{ category: string }>();
-  const [articlesViewMode, setArticlesViewMode] = useState<ViewMode>('grid');
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -22,7 +20,6 @@ const CategoryView = () => {
             filterByCategory={category} 
             limit={9} 
             showViewSwitcher={true} 
-            defaultView={articlesViewMode}
           />
         </div>
       </main>
