@@ -49,7 +49,7 @@ const ArticleEditor = () => {
     categoryName: '',
     language: 'en',
     featuredImage: '',
-    isPublished: false
+    isPublished: false,
   });
 
   // Save current state to the ref to preserve it when component unmounts
@@ -62,7 +62,7 @@ const ArticleEditor = () => {
       categoryName,
       language,
       featuredImage,
-      isPublished
+      isPublished,
     };
   }, [title, content, subtitle, categoryId, categoryName, language, featuredImage, isPublished]);
 
@@ -103,7 +103,7 @@ const ArticleEditor = () => {
         setLanguage(data.language);
         setFeaturedImage(data.featured_image || '');
         setIsPublished(data.is_published || false);
-        
+
         // Mark as loaded to avoid refetching
         setHasLoaded(true);
       } catch (error: unknown) {

@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 
 import Image from '@tiptap/extension-image';
@@ -80,7 +79,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
       },
     },
   });
-  
+
   // Handle visibility changes to ensure content persistence
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -91,7 +90,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         }
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -99,9 +98,9 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
   }, [editor, currentContent]);
 
   return (
-    <div className="bg-white">
+    <div className="">
       <div className="px-8 max-w-4xl mx-auto flex flex-col gap-8" ref={contentRef}>
-        <div className="sticky top-0 z-10 bg-white">
+        <div className="sticky top-0 z-10 bg-white dark:bg-gray-900">
           <RichTextToolbar editor={editor} />
         </div>
 
@@ -121,7 +120,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
           tagName="p"
         />
 
-        <div className="relative">
+        <div className="relative mb-10">
           <RichTextEditor
             initialValue={currentContent}
             onValueChange={onContentChange}

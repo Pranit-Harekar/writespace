@@ -4,7 +4,6 @@ import { Calendar, Clock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArticleProps } from './ArticleCard';
 import { stripHtml } from '@/lib/textUtils';
-import { LikeButton } from './LikeButton';
 
 export const ArticleListItem: React.FC<ArticleProps> = ({
   id,
