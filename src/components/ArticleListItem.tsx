@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock } from 'lucide-react';
@@ -61,7 +60,7 @@ export const ArticleListItem: React.FC<ArticleProps> = ({
             src={featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'}
             alt={title}
             className="w-full h-full object-cover hover:scale-105 transition-transform"
-            style={{ minHeight: "100%", aspectRatio: "16/9" }}
+            style={{ minHeight: '100%', aspectRatio: '16/9' }}
           />
         </Link>
       </div>

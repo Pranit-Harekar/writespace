@@ -25,73 +25,76 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import CategoryView from './pages/CategoryView';
 import { ConditionalFooter } from './components/ConditionalFooter';
+import { ThemeProvider } from './components/ThemeProvider';
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <LanguageProvider>
-          <AuthProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/search/category/:category" element={<SearchResults />} />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/profile/:username" element={<PublicProfile />} />
-              <Route path="/article/:id" element={<ArticleView />} />
-              <Route
-                path="/article/new"
-                element={
-                  <ProtectedRoute>
-                    <ArticleEditor />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/article/edit/:id"
-                element={
-                  <ProtectedRoute>
-                    <ArticleEditor />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-articles"
-                element={
-                  <ProtectedRoute>
-                    <MyArticles />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/about" element={<About />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/category/:category" element={<CategoryView />} />
-              <Route path="/category/redirect/:category" element={<CategoryRedirect />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <ConditionalFooter />
-          </AuthProvider>
-        </LanguageProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <LanguageProvider>
+            <AuthProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/search/category/:category" element={<SearchResults />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/profile/:username" element={<PublicProfile />} />
+                <Route path="/article/:id" element={<ArticleView />} />
+                <Route
+                  path="/article/new"
+                  element={
+                    <ProtectedRoute>
+                      <ArticleEditor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/article/edit/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ArticleEditor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-articles"
+                  element={
+                    <ProtectedRoute>
+                      <MyArticles />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/about" element={<About />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/category/:category" element={<CategoryView />} />
+                <Route path="/category/redirect/:category" element={<CategoryRedirect />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <ConditionalFooter />
+            </AuthProvider>
+          </LanguageProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

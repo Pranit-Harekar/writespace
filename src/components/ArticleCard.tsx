@@ -47,7 +47,7 @@ export const ArticleCard: React.FC<ArticleProps> = ({
               className="w-full h-full object-cover transition-transform group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <div className="bg-white/90 px-3 py-1 rounded-full flex items-center text-sm font-medium">
+              <div className="bg-white/90 dark:bg-black/70 px-3 py-1 rounded-full flex items-center text-sm font-medium">
                 <Clock className="h-3.5 w-3.5 mr-1" />
                 {readTime} min read
               </div>

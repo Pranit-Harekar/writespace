@@ -139,7 +139,6 @@
 
   body {
     @apply bg-background text-foreground;
-    @apply text-gray-800;
   }
 
   /* TipTap placeholder styles */
