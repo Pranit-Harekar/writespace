@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { DarkModeToggle } from './DarkModeToggle';
+// import { DarkModeToggle } from './DarkModeToggle';
 
 export const Footer = () => {
   return (
@@ -13,11 +12,11 @@ export const Footer = () => {
             <BookOpen className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">WriteSpace</span>
           </div>
-          
-          <div className="flex items-center gap-6 mb-4 md:mb-0">
+
+          {/* <div className="flex items-center gap-6 mb-4 md:mb-0">
             <DarkModeToggle />
-          </div>
-          
+          </div> */}
+
           <div className="flex gap-6">
             <Link to="/about" className="text-muted-foreground hover:text-foreground">
               About
