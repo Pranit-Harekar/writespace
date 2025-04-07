@@ -1,18 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 @import 'tailwindcss';
 
 @config '../tailwind.config.ts';
 
 @theme {
   --font-geist: 'Geist', sans;
+  --font-geist-mono: 'Geist Mono', monospace;
   --font-spectral: 'Spectral', serif;
   --font-sans: var(--font-geist);
   --font-serif: var(--font-spectral);
+  --font-mono: var(--font-geist-mono);
 }
 
 @utility prose {
   & blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4;
+    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 dark:text-gray-400 my-4;
   }
 
   & h1 {
@@ -60,11 +62,11 @@
   }
 
   & code {
-    @apply bg-gray-100 px-1 py-0.5 rounded text-gray-800 font-mono text-sm;
+    @apply bg-gray-100 dark:bg-gray-800 py-0.5 rounded text-gray-800 dark:text-gray-100 font-mono text-sm;
   }
 
   & pre {
-    @apply bg-gray-100 p-4 rounded my-4 overflow-x-auto;
+    @apply bg-gray-100 dark:bg-gray-800 p-4 rounded my-4 overflow-x-auto;
   }
 }
 
