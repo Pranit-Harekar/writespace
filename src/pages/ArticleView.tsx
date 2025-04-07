@@ -13,6 +13,7 @@ import { Comments } from '@/components/Comments';
 import { Separator } from '@/components/ui/separator';
 import { ProfileLink } from '@/components/ProfileLink';
 import { FollowButton } from '@/components/FollowButton';
+import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 
 interface Article {
   id: string;
@@ -52,6 +53,7 @@ const ArticleView = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [commentCount, setCommentCount] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
+  const placeholderImage = usePlaceholderImage();
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -196,7 +198,7 @@ const ArticleView = () => {
                 src={
                   article.featured_image && article.featured_image.length > 1
                     ? article.featured_image
-                    : '/placeholder.svg'
+                    : placeholderImage
                 }
                 alt={article.title}
                 className="w-full h-full object-cover"

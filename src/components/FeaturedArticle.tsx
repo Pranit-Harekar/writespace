@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArticleProps } from './ArticleCard';
 import { stripHtml } from '@/lib/textUtils';
 import { LikeButton } from './LikeButton';
+import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 
 export const FeaturedArticle: React.FC<ArticleProps> = ({
   id,
@@ -19,6 +20,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
   featuredImage,
   likesCount = 0,
 }) => {
+  const placeholderImage = usePlaceholderImage();
   return (
     <div className="grid md:grid-cols-5 gap-4 rounded-lg overflow-hidden border p-0 md:p-0 h-[240px]">
       <div className="md:col-span-3 order-2 md:order-1 p-4 flex flex-col justify-between">
@@ -61,7 +63,7 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
       <div className="md:col-span-2 order-1 md:order-2 h-[180px] md:h-auto relative">
         <div className="absolute inset-0">
           <img
-            src={featuredImage && featuredImage.length > 0 ? featuredImage : '/placeholder.svg'}
+            src={featuredImage && featuredImage.length > 0 ? featuredImage : placeholderImage}
             alt={title}
             className="w-full h-full object-cover"
           />

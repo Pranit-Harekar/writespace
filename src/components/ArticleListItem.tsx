@@ -1,9 +1,12 @@
+import { Calendar, Clock } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock } from 'lucide-react';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArticleProps } from './ArticleCard';
+import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 import { stripHtml } from '@/lib/textUtils';
+
+import { ArticleProps } from './ArticleCard';
 
 export const ArticleListItem: React.FC<ArticleProps> = ({
   id,
@@ -17,6 +20,7 @@ export const ArticleListItem: React.FC<ArticleProps> = ({
   likesCount = 0,
   commentsCount = 0,
 }) => {
+  const placeholderImage = usePlaceholderImage();
   return (
     <div className="flex flex-col md:flex-row gap-4 border-b pb-6 mb-6 last:mb-0 last:border-b-0">
       <div className="md:w-3/4 lg:w-4/5 flex flex-col">
@@ -56,7 +60,7 @@ export const ArticleListItem: React.FC<ArticleProps> = ({
       <div className="hidden md:block md:w-1/4 lg:w-1/5 order-first md:order-last">
         <Link to={`/article/${id}`} className="block overflow-hidden rounded-md h-full">
           <img
-            src={featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'}
+            src={featuredImage && featuredImage.length > 1 ? featuredImage : placeholderImage}
             alt={title}
             className="w-full h-full object-cover hover:scale-105 transition-transform"
             style={{ minHeight: '100%', aspectRatio: '16/9' }}

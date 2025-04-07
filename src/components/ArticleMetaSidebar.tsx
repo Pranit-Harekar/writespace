@@ -1,11 +1,13 @@
+import { CalendarCheck, Image as ImageIcon, Tag } from 'lucide-react';
 import React from 'react';
-import { Tag, Image as ImageIcon, CalendarCheck } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { CategorySelector } from '@/components/CategorySelector';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+
 import ArticleStats from '@/components/ArticleStats';
+import { CategorySelector } from '@/components/CategorySelector';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -30,6 +32,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
   onFeaturedImageChange,
   onPublishChange,
 }) => {
+  const placeholderImage = usePlaceholderImage();
   return (
     <div className="space-y-4">
       <ArticleStats content={content} />
@@ -66,13 +69,11 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
             {
               <div className="mt-2 rounded-md overflow-hidden border">
                 <img
-                  src={
-                    featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'
-                  }
+                  src={featuredImage && featuredImage.length > 1 ? featuredImage : placeholderImage}
                   alt="Featured"
                   className="w-full h-32 object-cover"
                   onError={e => {
-                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                    (e.target as HTMLImageElement).src = placeholderImage;
                   }}
                 />
               </div>

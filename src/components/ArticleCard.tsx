@@ -1,10 +1,13 @@
+import { Calendar, Clock } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, MessageSquare, Clock } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 import { stripHtml } from '@/lib/textUtils';
+
 import { LikeButton } from './LikeButton';
 
 export interface ArticleProps {
@@ -36,13 +39,14 @@ export const ArticleCard: React.FC<ArticleProps> = ({
   likesCount = 0,
   commentsCount = 0,
 }) => {
+  const placeholderImage = usePlaceholderImage();
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full">
       {
         <div className="w-full h-48 overflow-hidden relative group">
           <Link to={`/article/${id}`}>
             <img
-              src={featuredImage && featuredImage.length > 1 ? featuredImage : '/placeholder.svg'}
+              src={featuredImage && featuredImage.length > 1 ? featuredImage : placeholderImage}
               alt={title}
               className="w-full h-full object-cover transition-transform group-hover:scale-105"
             />
