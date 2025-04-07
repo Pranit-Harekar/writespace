@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 import { ArticleListItem } from '@/components/ArticleListItem';
@@ -9,6 +8,7 @@ import { fetchArticles } from '@/services/articlesService';
 import { ViewSwitcher, ViewMode, getPersistedViewMode } from '@/components/ViewSwitcher';
 
 interface ArticlesListProps {
+  sectionTitle?: string;
   limit?: number;
   filterByCategory?: string;
   filterByAuthor?: string;
@@ -18,6 +18,7 @@ interface ArticlesListProps {
 }
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
+  sectionTitle = 'Latest Articles',
   limit = 6,
   filterByCategory,
   filterByAuthor,
@@ -26,10 +27,8 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   defaultView,
 }) => {
   // Use persisted view mode or passed default
-  const [viewMode, setViewMode] = useState<ViewMode>(() => 
-    defaultView || getPersistedViewMode()
-  );
-  
+  const [viewMode, setViewMode] = useState<ViewMode>(() => defaultView || getPersistedViewMode());
+
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -104,24 +103,29 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   }
 
   return (
-    <div className="space-y-8">
-      {showViewSwitcher && <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />}
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">{sectionTitle}</h2>
+        {showViewSwitcher && <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />}
+      </div>
 
-      {viewMode === 'grid' ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map(article => (
-            <ArticleCard key={article.id} {...article} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-0">
-          {articles.map(article => (
-            <ArticleListItem key={article.id} {...article} />
-          ))}
-        </div>
-      )}
+      <div className="space-y-8">
+        {viewMode === 'grid' ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {articles.map(article => (
+              <ArticleCard key={article.id} {...article} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {articles.map(article => (
+              <ArticleListItem key={article.id} {...article} />
+            ))}
+          </div>
+        )}
 
-      {hasMore && <LoadMoreButton isLoading={isLoadingMore} onClick={handleLoadMore} />}
-    </div>
+        {hasMore && <LoadMoreButton isLoading={isLoadingMore} onClick={handleLoadMore} />}
+      </div>
+    </>
   );
 };

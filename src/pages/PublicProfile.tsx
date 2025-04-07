@@ -123,7 +123,7 @@ const PublicProfile = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="container mx-auto px-4 py-8 max-w-4xl flex-grow">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         {isLoading ? (
           <ProfileSkeleton />
         ) : error ? (
@@ -135,29 +135,36 @@ const PublicProfile = () => {
           <div className="space-y-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
               <Avatar className="h-24 w-24 md:h-32 md:w-32 border-2 border-background shadow-md">
-                <AvatarImage src={profile.avatar_url || ''} alt={profile.full_name || profile.username} />
+                <AvatarImage
+                  src={profile.avatar_url || ''}
+                  alt={profile.full_name || profile.username}
+                />
                 <AvatarFallback className="text-2xl md:text-4xl">
                   {profile.full_name
                     ? getInitials(profile.full_name)
                     : getInitials(profile.username)}
                 </AvatarFallback>
               </Avatar>
-              
+
               <div className="flex-1 space-y-2">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">{profile.full_name || profile.username}</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold">
+                      {profile.full_name || profile.username}
+                    </h1>
                     <p className="text-muted-foreground text-lg">@{profile.username}</p>
                   </div>
                   <FollowButton profileId={profile.id} onFollowChange={handleFollowChange} />
                 </div>
-                
+
                 <div className="flex items-center gap-6 mt-2">
                   <div className="flex items-center gap-1.5">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span>
                       <span className="font-medium">{followerCount}</span>{' '}
-                      <span className="text-muted-foreground">{followerCount === 1 ? 'follower' : 'followers'}</span>
+                      <span className="text-muted-foreground">
+                        {followerCount === 1 ? 'follower' : 'followers'}
+                      </span>
                     </span>
                   </div>
                   <div>
@@ -167,16 +174,16 @@ const PublicProfile = () => {
                 </div>
               </div>
             </div>
-            
+
             <Separator />
-            
+
             {profile.bio && (
               <div>
                 <h2 className="text-lg font-medium mb-2">About</h2>
                 <p className="text-muted-foreground whitespace-pre-wrap">{profile.bio}</p>
               </div>
             )}
-            
+
             {profile.website && (
               <div>
                 <h2 className="text-lg font-medium mb-2">Website</h2>
@@ -197,14 +204,12 @@ const PublicProfile = () => {
             )}
 
             <div className="mt-10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Recent Articles</h2>
-              </div>
               {profile && (
-                <ArticlesList 
-                  limit={6} 
-                  filterByAuthor={profile.id} 
-                  showViewSwitcher={true} 
+                <ArticlesList
+                  sectionTitle="Recent Articles"
+                  limit={6}
+                  filterByAuthor={profile.id}
+                  showViewSwitcher={true}
                   defaultView={articlesViewMode}
                 />
               )}

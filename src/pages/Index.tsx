@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Header } from '@/components/Header';
 import { FeaturedArticlesCarousel } from '@/components/FeaturedArticlesCarousel';
@@ -23,13 +22,7 @@ const Index = () => {
           </section>
 
           <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Latest Articles</h2>
-            </div>
-            <ArticlesList 
-              limit={6} 
-              showViewSwitcher={true}
-            />
+            <ArticlesList limit={6} showViewSwitcher={true} sectionTitle="Latest Articles" />
           </section>
         </div>
       </main>
