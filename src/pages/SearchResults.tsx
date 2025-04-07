@@ -3,6 +3,7 @@ import React from 'react';
 import { useSearchParams, useParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { ArticlesList } from '@/components/ArticlesList';
+import { CategoryList } from '@/components/CategoryList';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -16,19 +17,24 @@ const SearchResults = () => {
         <div className="max-w-4xl mx-auto">
           {category ? (
             <>
-              <h1 className="text-3xl font-bold mb-2 capitalize">{category}</h1>
-              <p className="text-muted-foreground mb-8">
-                {query ? `Search results for "${query}" in ${category}` : `Browse all articles in ${category}`}
+              <h1 className="text-3xl font-bold mb-2 capitalize">{category} Articles</h1>
+              <p className="text-muted-foreground mb-6">
+                Browse articles in this category
               </p>
             </>
           ) : (
             <>
               <h1 className="text-3xl font-bold mb-2">Search Results</h1>
-              <p className="text-muted-foreground mb-8">
-                Showing results for: <span className="font-medium">{query}</span>
+              <p className="text-muted-foreground mb-6">
+                {query ? `Showing results for: "${query}"` : 'All articles'}
               </p>
             </>
           )}
+          
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
+            <CategoryList />
+          </section>
           
           <ArticlesList 
             searchQuery={query}
@@ -38,7 +44,6 @@ const SearchResults = () => {
           />
         </div>
       </main>
-      {/* Footer removed */}
     </div>
   );
 };

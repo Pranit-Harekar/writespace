@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Grid2X2, List } from 'lucide-react';
+import { LayoutGrid, LayoutList } from 'lucide-react';
 import { STORAGE_KEYS, getStorageItem, setStorageItem } from '@/lib/storage';
 
 export type ViewMode = 'grid' | 'list';
@@ -21,10 +21,10 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewC
     <div className="flex items-center justify-end mb-4">
       <ToggleGroup type="single" value={currentView} onValueChange={(value: ViewMode) => value && onViewChange(value)}>
         <ToggleGroupItem value="grid" aria-label="Grid view">
-          <Grid2X2 className="h-4 w-4" />
+          <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
         <ToggleGroupItem value="list" aria-label="List view">
-          <List className="h-4 w-4" />
+          <LayoutList className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
