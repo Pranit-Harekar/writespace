@@ -1,4 +1,3 @@
-
 import React, { memo } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Editor } from '@tiptap/react';
@@ -21,26 +20,25 @@ const RichTextToolbar: React.FC<RichTextToolbarProps> = ({ editor }) => {
   if (!editor) {
     return null;
   }
-  
+
   return (
     <div className="flex flex-wrap items-center p-1 border-b gap-1">
-      <HistoryMenu editor={editor} />
+      <HistoryMenu key="history" editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <TextStyleMenu editor={editor} />
+      <TextStyleMenu key="text-style" editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <MarksMenu editor={editor} />
+      <MarksMenu key="marks" editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <AlignMenu editor={editor} />
-      <ListMenu editor={editor} />
+      <AlignMenu key="align" editor={editor} />
+      <ListMenu key="list" editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <LinkEditor editor={editor} />
-      <BlockMenu editor={editor} />
-      <MediaMenu editor={editor} />
+      <LinkEditor key="link-editor" editor={editor} />
+      <BlockMenu key="block-menu" editor={editor} />
+      <MediaMenu key="media-menu" editor={editor} />
       <Separator orientation="vertical" className="mx-1 h-6" />
-      <MoreMenu editor={editor} />
+      <MoreMenu key="more-menu" editor={editor} />
     </div>
   );
 };
 
-// Memoize the toolbar to prevent unnecessary re-renders
-export default memo(RichTextToolbar);
+export default RichTextToolbar;

@@ -22,10 +22,6 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
   className = 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md',
   editorInstance,
 }) => {
-  // Track if we should update content from initialValue
-  const shouldUpdateFromProps = useRef(true);
-  const lastContent = useRef(initialValue);
-
   // Only create a local editor if no external editor is provided
   const localEditor = useEditor({
     extensions: [
@@ -59,15 +55,7 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
     ],
     content: initialValue,
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      lastContent.current = html;
-      onValueChange(html);
-
-      // After initial load and first update, don't automatically update from props anymore
-      // unless there's a significant difference
-      if (html !== initialValue) {
-        shouldUpdateFromProps.current = false;
-      }
+      onValueChange(editor.getHTML());
     },
     editorProps: {
       attributes: {
@@ -79,32 +67,19 @@ const RichTextEditor: React.FC<FullEditorProps> = ({
   // Determine which editor to use
   const editor = editorInstance || localEditor;
 
-  // Use visibility change to preserve content
+  // Update content when initialValue changes for local editor
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && editor) {
-        // When coming back to the page, ensure editor has latest content
-        const currentHTML = editor.getHTML();
-        if (currentHTML !== lastContent.current) {
-          editor.commands.setContent(lastContent.current);
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [editor]);
-
-  // Handle initialValue changes, but be careful about overwriting user edits
-  useEffect(() => {
-    // Only update from props if we haven't edited yet or there's a significant change
-    if (editor && shouldUpdateFromProps.current && initialValue !== editor.getHTML()) {
-      editor.commands.setContent(initialValue);
-      lastContent.current = initialValue;
+    if (localEditor && initialValue !== localEditor.getHTML()) {
+      localEditor.commands.setContent(initialValue);
     }
-  }, [initialValue, editor]);
+  }, [initialValue, localEditor]);
+
+  // For external editor, ensure content matches initialValue
+  useEffect(() => {
+    if (editorInstance && initialValue !== editorInstance.getHTML()) {
+      editorInstance.commands.setContent(initialValue);
+    }
+  }, [initialValue, editorInstance]);
 
   return (
     <div className="relative">
