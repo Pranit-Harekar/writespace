@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -8,7 +7,7 @@ import { FeaturedArticle } from './FeaturedArticle';
 import { FeaturedArticlesCarouselSkeleton } from './FeaturedArticlesCarouselSkeleton';
 import { FeaturedArticlesEmptyState } from './FeaturedArticlesEmptyState';
 import { ArticleProps } from './ArticleCard';
-import { useFeaturedArticlesService } from '@/services/featuredArticlesService';
+import { fetchArticles } from '@/services/articlesService';
 
 interface FeaturedArticlesCarouselProps {
   limit?: number;
@@ -20,8 +19,7 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
   const [api, setApi] = useState<CarouselApi>();
   const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
   const [current, setCurrent] = useState(0);
-  
-  const { fetchFeaturedArticles } = useFeaturedArticlesService();
+
   const [featuredArticles, setFeaturedArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -33,28 +31,15 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
         setIsLoading(true);
         try {
           // Force loading some mock data if no articles returned
-          let articles = await fetchFeaturedArticles();
-          
-          // If no articles returned, create some mock data
-          if (!articles || articles.length === 0) {
-            articles = Array(5).fill(null).map((_, i) => ({
-              id: `mock-${i}`,
-              title: `Featured Article ${i + 1}`,
-              excerpt: 'This is a sample article excerpt. The actual content will be loaded from the database.',
-              author: {
-                id: `author-${i}`,
-                name: 'Demo Author',
-                profileImage: undefined,
-              },
-              publishedAt: new Date().toISOString(),
-              category: 'Sample',
-              readTime: 5,
-              featuredImage: undefined,
-              likesCount: 0,
-              commentsCount: 0,
-            }));
-          }
-          
+          const { articles } = await fetchArticles({
+            limit,
+            filterByCategory: '',
+            filterByAuthor: '',
+            searchQuery: '',
+            page: 1,
+          });
+
+          console.log('Featured articles:', articles);
           setFeaturedArticles(articles);
           setError(null);
         } catch (err) {
@@ -64,10 +49,10 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
           setIsLoading(false);
         }
       };
-      
+
       loadArticles();
     }
-  }, [inView, fetchFeaturedArticles]);
+  }, [inView, limit]);
 
   useEffect(() => {
     if (!api) {
@@ -123,7 +108,7 @@ export const FeaturedArticlesCarousel: React.FC<FeaturedArticlesCarouselProps> =
           <span className="sr-only">Next slide</span>
         </Button>
       </div>
-      
+
       <Carousel setApi={setApi} opts={{ loop: true, align: 'start' }}>
         <CarouselContent>
           {featuredArticles.map((article: ArticleProps) => (
