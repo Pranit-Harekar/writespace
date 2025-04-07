@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -90,23 +89,20 @@ const Profile = () => {
     },
   });
 
-  // Watch username value to check availability with debounce
   const watchUsername = watch('username');
   
   useEffect(() => {
     if (profile && watchUsername && watchUsername !== profile.username) {
       setUsernameChanged(true);
       
-      // Clear any existing timeout
       if (usernameDebounceTimeout) {
         clearTimeout(usernameDebounceTimeout);
       }
       
-      // Set a new timeout to check username availability
       const timeout = setTimeout(async () => {
         const { available } = await checkUsernameAvailability(watchUsername);
         setUsernameAvailable(available);
-      }, 500); // 500ms debounce
+      }, 500);
       
       setUsernameDebounceTimeout(timeout);
     } else {
@@ -121,7 +117,6 @@ const Profile = () => {
     };
   }, [watchUsername, profile]);
   
-  // Check if user can change username
   useEffect(() => {
     if (user && profile) {
       const checkUsernameChangeAbility = async () => {
@@ -148,7 +143,6 @@ const Profile = () => {
       if (!user) return;
 
       try {
-        // Get follower count
         const { data: followers, error: followerError } = await supabase.rpc('get_follower_count', {
           user_id: user.id,
         });
@@ -156,7 +150,6 @@ const Profile = () => {
         if (followerError) throw followerError;
         setFollowerCount(followers || 0);
 
-        // Get following count
         const { data: following, error: followingError } = await supabase.rpc(
           'get_following_count',
           { user_id: user.id }
@@ -177,7 +170,6 @@ const Profile = () => {
 
     setIsLoadingFollowers(true);
     try {
-      // Get followers
       const { data: userFollowers, error: followerError } = await supabase
         .from('user_followers')
         .select('follower_id')
@@ -188,7 +180,6 @@ const Profile = () => {
       if (userFollowers && userFollowers.length > 0) {
         const followerIds = userFollowers.map(f => f.follower_id);
 
-        // Get follower profiles
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, username, full_name, avatar_url')
@@ -211,7 +202,6 @@ const Profile = () => {
 
     setIsLoadingFollowing(true);
     try {
-      // Get following users
       const { data: userFollowing, error: followingError } = await supabase
         .from('user_followers')
         .select('following_id')
@@ -222,7 +212,6 @@ const Profile = () => {
       if (userFollowing && userFollowing.length > 0) {
         const followingIds = userFollowing.map(f => f.following_id);
 
-        // Get following profiles
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, username, full_name, avatar_url')
@@ -251,15 +240,24 @@ const Profile = () => {
   };
 
   if (!user || !profile) {
-    navigate('/login');
-    return null;
+    return (
+      <>
+        <Header />
+        <main className="container mx-auto px-4 py-8 flex-1">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </main>
+      </>
+    );
   }
 
   const onSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
     setError(null);
 
-    // Check username availability if it was changed
     if (data.username !== profile.username) {
       const { available } = await checkUsernameAvailability(data.username);
       
@@ -269,7 +267,6 @@ const Profile = () => {
         return;
       }
       
-      // Check if user can change username now
       const { canChange } = await canChangeUsername();
       
       if (!canChange) {
@@ -284,7 +281,6 @@ const Profile = () => {
     if (error) {
       setError(error.message);
     } else {
-      // Update the language in the app if the user changed it
       if (data.preferred_language !== profile?.preferred_language) {
         setLanguage(data.preferred_language as any);
       }
@@ -324,7 +320,6 @@ const Profile = () => {
               
               <p className="text-sm text-muted-foreground mb-2 mt-2">{user.email}</p>
 
-              {/* Follow stats */}
               <div className="flex justify-center gap-4 mb-4">
                 <button
                   onClick={openFollowersDialog}
@@ -421,7 +416,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Followers Dialog */}
           <Dialog open={showFollowersDialog} onOpenChange={setShowFollowersDialog}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
@@ -470,7 +464,6 @@ const Profile = () => {
             </DialogContent>
           </Dialog>
 
-          {/* Following Dialog */}
           <Dialog open={showFollowingDialog} onOpenChange={setShowFollowingDialog}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>

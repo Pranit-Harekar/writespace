@@ -4,7 +4,6 @@ import { Header } from '@/components/Header';
 import { FeaturedArticlesCarousel } from '@/components/FeaturedArticlesCarousel';
 import { ArticlesList } from '@/components/ArticlesList';
 import { CategoryList } from '@/components/CategoryList';
-import { Footer } from '@/components/Footer';
 import { ViewMode } from '@/components/ViewSwitcher';
 
 const Index = () => {
@@ -34,7 +33,7 @@ const Index = () => {
           </section>
         </div>
       </main>
-      <Footer />
+      {/* Footer is now handled by ConditionalFooter */}
     </div>
   );
 };

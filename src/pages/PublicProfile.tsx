@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { AlertCircle, Users, Link as LinkIcon } from 'lucide-react';
@@ -11,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FollowButton } from '@/components/FollowButton';
 import { Separator } from '@/components/ui/separator';
 import { ArticlesList } from '@/components/ArticlesList';
-import { ArticleProps } from '@/components/ArticleCard';
 import { ViewMode } from '@/components/ViewSwitcher';
 
 type ProfileData = {
@@ -219,7 +217,6 @@ const PublicProfile = () => {
           </Alert>
         )}
       </main>
-      <Footer />
     </div>
   );
 };
