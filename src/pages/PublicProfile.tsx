@@ -10,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FollowButton } from '@/components/FollowButton';
 import { Separator } from '@/components/ui/separator';
 import { ArticlesList } from '@/components/ArticlesList';
-import { ViewMode } from '@/components/ViewSwitcher';
 
 type ProfileData = {
   id: string;
@@ -28,7 +27,6 @@ const PublicProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
-  const [articlesViewMode, setArticlesViewMode] = useState<ViewMode>('grid');
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -210,7 +208,6 @@ const PublicProfile = () => {
                   limit={6}
                   filterByAuthor={profile.id}
                   showViewSwitcher={true}
-                  defaultView={articlesViewMode}
                 />
               )}
             </div>
