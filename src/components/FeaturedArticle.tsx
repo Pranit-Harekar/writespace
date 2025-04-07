@@ -24,46 +24,41 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
 
   return (
     <Link to={`/article/${id}`} className="block h-full">
-      <div className="relative w-full bg-card border rounded-lg overflow-hidden">
-        <div className="flex flex-col h-full">
-          {/* Image container */}
-          <div className="relative w-full h-48 md:h-64">
-            <img
-              src={featuredImage && featuredImage.length > 0 ? featuredImage : placeholderImage}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {/* Content section */}
-          <div className="p-4">
-            <div className="mb-2">
-              <Badge variant="outline" className="mb-3 w-fit">
+      <div className="relative w-full h-[300px] rounded-lg overflow-hidden border">
+        {/* Image */}
+        <div className="absolute inset-0">
+          <img
+            src={featuredImage && featuredImage.length > 0 ? featuredImage : placeholderImage}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        {/* Dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+          {/* Content */}
+          <div className="absolute inset-0 flex flex-col justify-between p-6">
+            <div>
+              <Badge variant="outline" className="mb-3 w-fit bg-black/40 text-white border-white/30">
                 {category}
               </Badge>
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-white line-clamp-2">
+                {title}
+              </h1>
+              <p className="text-white/80 text-sm md:text-base mb-4 line-clamp-2">{stripHtml(excerpt)}</p>
             </div>
             
-            <h1 className="text-lg md:text-xl font-bold mb-2 line-clamp-2">
-              {title}
-            </h1>
-            
-            <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-              {stripHtml(excerpt)}
-            </p>
-            
-            <div className="flex items-center justify-between mt-auto">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
+                <Avatar>
                   <AvatarImage src={author.profileImage} alt={author.name} />
-                  <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                    {author.name.charAt(0)}
-                  </AvatarFallback>
+                  <AvatarFallback className="bg-primary/20 text-primary">{author.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <span className="text-sm font-medium block">
+                  <span className="text-white font-medium block">
                     {author.name}
                   </span>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3 text-sm text-white/70">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {new Date(publishedAt).toLocaleDateString()}
@@ -71,6 +66,9 @@ export const FeaturedArticle: React.FC<ArticleProps> = ({
                     <span>{readTime} min read</span>
                   </div>
                 </div>
+              </div>
+              <div>
+                <LikeButton articleId={id} initialLikesCount={likesCount} readOnly={true} />
               </div>
             </div>
           </div>
