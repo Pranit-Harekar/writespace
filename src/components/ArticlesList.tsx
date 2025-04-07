@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArticleCard, ArticleProps } from '@/components/ArticleCard';
 import { ArticleListItem } from '@/components/ArticleListItem';
@@ -101,9 +100,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
 
   return (
     <div className="space-y-8">
-      {showViewSwitcher && (
-        <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />
-      )}
+      {showViewSwitcher && <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />}
 
       {viewMode === 'grid' ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
