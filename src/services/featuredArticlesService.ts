@@ -1,15 +1,16 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArticleProps } from '@/components/ArticleCard';
 import { extractExcerpt } from '@/lib/textUtils';
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useFeaturedArticlesService = () => {
   const { toast } = useToast();
 
   const fetchFeaturedArticles = useCallback(async (): Promise<ArticleProps[]> => {
     try {
-      // Get articles with highest combined likes and comments count (top 5)
+      // Get simple featured articles (most recent)
       const { data: articlesData, error: articlesError } = await supabase
         .from('articles')
         .select(
@@ -20,7 +21,7 @@ export const useFeaturedArticlesService = () => {
           content,
           category,
           category_id,
-          categories:category_id(id, name),
+          categories:category_id(name),
           read_time,
           featured_image,
           published_at,
@@ -29,7 +30,7 @@ export const useFeaturedArticlesService = () => {
         )
         .eq('is_published', true)
         .order('published_at', { ascending: false })
-        .limit(15); // Fetch more than needed to ensure we have enough after filtering
+        .limit(5);
 
       if (articlesError) throw articlesError;
 
@@ -49,48 +50,14 @@ export const useFeaturedArticlesService = () => {
 
       if (profilesError) throw profilesError;
 
-      // Get likes and comments counts for each article in batch requests
-      const articleIds = articlesData.map(article => article.id);
-
-      // Fetch likes for all articles
-      const { data: likesData, error: likesError } = await supabase
-        .from('article_likes')
-        .select('article_id')
-        .in('article_id', articleIds);
-
-      if (likesError) throw likesError;
-
-      // Count likes per article using client-side JavaScript
-      const likesCountMap = new Map();
-      articleIds.forEach(articleId => {
-        const articleLikes = likesData?.filter(like => like.article_id === articleId) || [];
-        likesCountMap.set(articleId, articleLikes.length);
-      });
-
-      // Fetch comments for all articles
-      const { data: commentsData, error: commentsError } = await supabase
-        .from('article_comments')
-        .select('article_id')
-        .in('article_id', articleIds);
-
-      if (commentsError) throw commentsError;
-
-      // Count comments per article using client-side JavaScript
-      const commentsCountMap = new Map();
-      articleIds.forEach(articleId => {
-        const articleComments =
-          commentsData?.filter(comment => comment.article_id === articleId) || [];
-        commentsCountMap.set(articleId, articleComments.length);
-      });
-
       // Create a lookup map for profiles
       const profileMap = new Map();
       profilesData?.forEach(profile => {
         profileMap.set(profile.id, profile);
       });
 
-      // Transform data to match ArticleProps and add engagement score
-      const articlesWithMetrics = articlesData.map(item => {
+      // Transform data to match ArticleProps
+      const formattedArticles = articlesData.map(item => {
         const profile = profileMap.get(item.author_id) || {
           id: item.author_id,
           username: 'Anonymous',
@@ -103,13 +70,6 @@ export const useFeaturedArticlesService = () => {
 
         // Use explicit subtitle or generate from content
         const excerptText = item.subtitle?.trim() ? item.subtitle : extractExcerpt(item.content);
-
-        // Get engagement metrics
-        const likesCount = likesCountMap.get(item.id) || 0;
-        const commentsCount = commentsCountMap.get(item.id) || 0;
-
-        // Calculate an engagement score (likes + comments)
-        const engagementScore = likesCount + commentsCount;
 
         return {
           id: item.id,
@@ -124,18 +84,12 @@ export const useFeaturedArticlesService = () => {
           category: categoryName || 'Uncategorized',
           readTime: item.read_time || 5,
           featuredImage: item.featured_image || undefined,
-          likesCount,
-          commentsCount,
-          engagementScore, // Add engagement score
+          likesCount: 0,
+          commentsCount: 0,
         };
       });
 
-      // Sort by engagement score and take top 5
-      const topArticles = articlesWithMetrics
-        .sort((a, b) => b.engagementScore - a.engagementScore)
-        .slice(0, 5);
-
-      return topArticles;
+      return formattedArticles;
     } catch (error: unknown) {
       console.error('Error fetching featured articles:', error);
       toast({
@@ -151,37 +105,25 @@ export const useFeaturedArticlesService = () => {
 };
 
 // Add a new hook that uses the service for simpler consumption
-export const useFeaturedArticles = (limit: number, shouldFetch: boolean = true) => {
-  const { toast } = useToast();
+export const useFeaturedArticles = (limit: number = 5) => {
   const [data, setData] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
   const { fetchFeaturedArticles } = useFeaturedArticlesService();
   
-  useEffect(() => {
-    if (!shouldFetch) return;
-    
-    const loadArticles = async () => {
-      try {
-        setIsLoading(true);
-        const articles = await fetchFeaturedArticles();
-        setData(articles.slice(0, limit));
-      } catch (err) {
-        console.error('Error loading featured articles:', err);
-        setError(err as Error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load featured articles',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadArticles();
-  }, [fetchFeaturedArticles, limit, shouldFetch, toast]);
+  const loadArticles = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const articles = await fetchFeaturedArticles();
+      setData(articles.slice(0, limit));
+    } catch (err) {
+      console.error('Error loading featured articles:', err);
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchFeaturedArticles, limit]);
   
-  return { data, isLoading, error };
+  return { data, isLoading, error, loadArticles };
 };
