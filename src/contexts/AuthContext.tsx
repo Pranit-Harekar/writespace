@@ -25,6 +25,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any | null }>;
   uploadAvatar: (file: File) => Promise<{ url: string | null; error: any | null }>;
+  removeAvatar: () => Promise<{ error: any | null }>;
   checkUsernameAvailability: (username: string) => Promise<{ available: boolean; error: any | null }>;
   canChangeUsername: () => Promise<{ canChange: boolean; error: any | null }>;
 };
@@ -96,6 +97,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { url: data.publicUrl, error: null };
     } catch (error: any) {
       return { url: null, error };
+    }
+  };
+
+  // Remove avatar image
+  const removeAvatar = async () => {
+    if (!user || !profile?.avatar_url) {
+      return { error: 'No user logged in or no avatar to remove' };
+    }
+
+    try {
+      // Extract the file path from the avatar URL
+      const urlParts = profile.avatar_url.split('profile-images/');
+      if (urlParts.length !== 2) {
+        return { error: 'Invalid avatar URL format' };
+      }
+      
+      const filePath = decodeURIComponent(urlParts[1]);
+      
+      // Remove the file from storage
+      const { error: removeError } = await supabase.storage
+        .from('profile-images')
+        .remove([filePath]);
+
+      if (removeError) {
+        return { error: removeError };
+      }
+
+      // Update the user's profile to remove the avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', user.id);
+
+      if (updateError) {
+        return { error: updateError };
+      }
+
+      // Refetch the profile to update state
+      await fetchProfile(user.id);
+
+      return { error: null };
+    } catch (error: any) {
+      return { error };
     }
   };
 
@@ -366,6 +410,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     updateProfile,
     uploadAvatar,
+    removeAvatar,
     checkUsernameAvailability,
     canChangeUsername,
   };

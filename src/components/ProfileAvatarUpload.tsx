@@ -15,8 +15,9 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
   currentAvatarUrl,
   fullName,
 }) => {
-  const { uploadAvatar } = useAuth();
+  const { uploadAvatar, removeAvatar } = useAuth();
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,11 +88,31 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
     fileInputRef.current?.click();
   };
 
-  const clearAvatar = () => {
+  const clearAvatar = async () => {
+    setIsRemoving(true);
+    
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    setPreviewUrl(null);
+    
+    // Call the removeAvatar function to delete from Supabase storage
+    const { error } = await removeAvatar();
+    
+    if (error) {
+      toast({
+        title: 'Error removing avatar',
+        description: error.message || 'Failed to remove profile picture',
+        variant: 'destructive',
+      });
+    } else {
+      setPreviewUrl(null);
+      toast({
+        title: 'Avatar removed',
+        description: 'Your profile picture has been removed successfully',
+      });
+    }
+    
+    setIsRemoving(false);
   };
 
   return (
@@ -108,6 +129,7 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
             onClick={clearAvatar}
             className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
             title="Remove avatar"
+            disabled={isRemoving}
           >
             <X className="h-4 w-4" />
           </button>
@@ -119,13 +141,13 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
         accept="image/*"
         onChange={handleFileChange}
         className="hidden"
-        disabled={isUploading}
+        disabled={isUploading || isRemoving}
       />
       <Button
         onClick={handleButtonClick}
         variant="outline"
         size="sm"
-        disabled={isUploading}
+        disabled={isUploading || isRemoving}
         className="mt-2"
       >
         <Upload className="h-4 w-4 mr-2" />
