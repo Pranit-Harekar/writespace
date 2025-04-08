@@ -44,6 +44,44 @@ export type Database = {
           },
         ]
       }
+      article_images: {
+        Row: {
+          article_id: string
+          author_id: string
+          created_at: string
+          id: string
+          image_path: string | null
+          is_uploaded: boolean
+          storage_url: string
+        }
+        Insert: {
+          article_id: string
+          author_id: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          is_uploaded?: boolean
+          storage_url: string
+        }
+        Update: {
+          article_id?: string
+          author_id?: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          is_uploaded?: boolean
+          storage_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_images_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       article_likes: {
         Row: {
           article_id: string

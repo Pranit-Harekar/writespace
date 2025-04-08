@@ -92,13 +92,15 @@ export function FileUploaderSheet({
         
         // If articleId is provided, associate this image with the article
         if (articleId && user) {
-          const { error: associationError } = await supabase.from('article_images').insert({
-            article_id: articleId,
-            image_path: data.path,
-            storage_url: publicUrl.publicUrl,
-            is_uploaded: true,
-            author_id: user.id
-          });
+          const { error: associationError } = await supabase
+            .from('article_images')
+            .insert({
+              article_id: articleId,
+              author_id: user.id,
+              image_path: data.path,
+              storage_url: publicUrl.publicUrl,
+              is_uploaded: true
+            });
           
           if (associationError) {
             console.error('Error associating image with article:', associationError);
@@ -142,16 +144,18 @@ export function FileUploaderSheet({
       
       // If articleId is provided, track this external URL
       if (articleId && user) {
-        supabase.from('article_images').insert({
-          article_id: articleId,
-          storage_url: urlInput,
-          is_uploaded: false, // This is an external URL, not uploaded to storage
-          author_id: user.id
-        }).then(({ error }) => {
-          if (error) {
-            console.error('Error tracking external image URL:', error);
-          }
-        });
+        supabase
+          .from('article_images')
+          .insert({
+            article_id: articleId,
+            author_id: user.id,
+            storage_url: urlInput,
+            is_uploaded: false // This is an external URL, not uploaded to storage
+          }).then(({ error }) => {
+            if (error) {
+              console.error('Error tracking external image URL:', error);
+            }
+          });
       }
       
       onUploadComplete(urlInput);

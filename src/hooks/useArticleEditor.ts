@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -238,11 +239,13 @@ export function useArticleEditor() {
         return;
       }
       
+      if (!articleImages) return;
+      
       // Find orphaned images (those in the DB but not in the content or featured image)
-      const orphanedImages = articleImages?.filter(img => !currentUrls.includes(img.storage_url));
+      const orphanedImages = articleImages.filter(img => !currentUrls.includes(img.storage_url));
       
       // Delete orphaned images that were uploaded (not external URLs)
-      for (const img of orphanedImages || []) {
+      for (const img of orphanedImages) {
         if (img.is_uploaded && img.image_path) {
           // Delete from storage bucket
           const { error: storageError } = await supabase.storage
@@ -265,7 +268,7 @@ export function useArticleEditor() {
         }
       }
       
-      console.log(`Cleaned up ${orphanedImages?.length || 0} orphaned images`);
+      console.log(`Cleaned up ${orphanedImages.length || 0} orphaned images`);
     } catch (error) {
       console.error('Error in image cleanup process:', error);
     }

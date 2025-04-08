@@ -13,6 +13,7 @@ import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 import { Alert, AlertDescription } from './ui/alert';
 import { stripHtml } from '@/lib/textUtils';
 import { FileUploaderSheet } from './FileUploaderSheet';
+import { Button } from '@/components/ui/button';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
