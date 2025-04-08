@@ -1,6 +1,5 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 export interface ArticleListItem {
   id: string;
@@ -40,6 +39,7 @@ export const fetchUserArticles = async (
   filters: FilterOptions = {}
 ): Promise<ArticlesResponse> => {
   try {
+    // Use SQL function call
     const { data, error } = await supabase.rpc('get_user_articles', {
       user_id_param: userId,
       page_param: page,
@@ -53,6 +53,7 @@ export const fetchUserArticles = async (
 
     if (error) throw error;
 
+    // Make sure we're returning the expected ArticlesResponse type
     return data as ArticlesResponse;
   } catch (error: any) {
     console.error('Error fetching user articles:', error);
