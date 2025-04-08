@@ -1,49 +1,43 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  fetchUserArticles, 
-  FilterOptions, 
-  ArticleListItem, 
-  PaginationData 
+import {
+  fetchUserArticles,
+  FilterOptions,
+  ArticleListItem,
+  PaginationData,
 } from '@/services/myArticlesService';
 
 export const useArticles = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  
+
   const [articles, setArticles] = useState<ArticleListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingDraft, setIsCreatingDraft] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     total: 0,
     page: 1,
-    pageSize: 10,
-    totalPages: 0
+    pageSize: 6,
+    totalPages: 0,
   });
-  
+
   const [filters, setFilters] = useState<FilterOptions>({});
   const [sortColumn, setSortColumn] = useState<string>('updated_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const fetchArticles = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
-      const response = await fetchUserArticles(
-        user.id,
-        pagination.page,
-        pagination.pageSize,
-        {
-          ...filters,
-          sortColumn,
-          sortDirection
-        }
-      );
-      
+      const response = await fetchUserArticles(user.id, pagination.page, pagination.pageSize, {
+        ...filters,
+        sortColumn,
+        sortDirection,
+      });
+
       setArticles(response.data || []);
       setPagination(response.pagination);
     } catch (error: any) {
@@ -82,9 +76,9 @@ export const useArticles = () => {
 
   const createDraftArticle = async () => {
     if (!user) return;
-    
+
     setIsCreatingDraft(true);
-    
+
     try {
       // Create a new draft article with minimal content
       const { data, error } = await supabase
@@ -98,7 +92,7 @@ export const useArticles = () => {
         .select();
 
       if (error) throw error;
-      
+
       if (data && data.length > 0) {
         // Return the newly created article ID
         return data[0].id;

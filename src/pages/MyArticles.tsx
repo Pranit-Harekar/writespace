@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArticlesFilter } from '@/components/ArticlesFilter';
 import { ArticlesTable } from '@/components/ArticlesTable';
 import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
 import { ArticlesPagination } from '@/components/ArticlesPagination';
@@ -14,17 +12,15 @@ import { useArticles } from '@/hooks/use-articles';
 const MyArticles = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const {
     articles,
     isLoading,
     isCreatingDraft,
     pagination,
-    filters,
     sortColumn,
     sortDirection,
     hasFilters,
-    handleFilterChange,
     handleSort,
     handlePageChange,
     createDraftArticle,
@@ -64,15 +60,13 @@ const MyArticles = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">My Articles</h1>
           <Button onClick={handleCreateDraft} disabled={isCreatingDraft}>
-            <Plus className="h-4 w-4 mr-2" /> 
+            <Plus className="h-4 w-4 mr-2" />
             {isCreatingDraft ? 'Creating Draft...' : 'Create New Article'}
           </Button>
         </div>
 
-        <ArticlesFilter onFilterChange={handleFilterChange} initialFilters={filters} />
-
         {articles.length === 0 ? (
-          <ArticlesEmptyState 
+          <ArticlesEmptyState
             hasFilters={hasFilters}
             isCreatingDraft={isCreatingDraft}
             onClearFilters={clearFilters}
@@ -80,17 +74,14 @@ const MyArticles = () => {
           />
         ) : (
           <>
-            <ArticlesTable 
+            <ArticlesTable
               articles={articles}
               sortColumn={sortColumn}
               sortDirection={sortDirection}
               handleSort={handleSort}
               total={pagination.total}
             />
-            <ArticlesPagination 
-              pagination={pagination} 
-              onPageChange={handlePageChange} 
-            />
+            <ArticlesPagination pagination={pagination} onPageChange={handlePageChange} />
           </>
         )}
       </div>
