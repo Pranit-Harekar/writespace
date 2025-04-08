@@ -11,7 +11,6 @@ import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 import { Alert, AlertDescription } from './ui/alert';
 import { stripHtml } from '@/lib/textUtils';
 import { FileUploaderSheet } from './FileUploaderSheet';
-import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface ArticleMetaSidebarProps {
@@ -115,37 +114,35 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               {/* Hover overlay with image controls */}
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <FileUploaderSheet
-                        onUploadComplete={handleFeaturedImageUpload}
-                        trigger={
-                          <Button variant="secondary" size="sm" className="rounded-full p-2">
-                            <Upload className="h-4 w-4" />
-                          </Button>
-                        }
-                        articleId={articleId}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Upload new image</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  {featuredImage && (
+                  {featuredImage ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="rounded-full p-2"
+                        <button
+                          className="bg-destructive text-destructive-foreground rounded-full p-2"
                           onClick={handleRemoveFeaturedImage}
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Remove image</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <FileUploaderSheet
+                          onUploadComplete={handleFeaturedImageUpload}
+                          trigger={
+                            <button className="bg-background rounded-full p-2">
+                              <Upload className="h-4 w-4" />
+                            </button>
+                          }
+                          articleId={articleId}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Upload new image</p>
                       </TooltipContent>
                     </Tooltip>
                   )}

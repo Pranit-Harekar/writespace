@@ -1,10 +1,12 @@
+import { Upload, X } from 'lucide-react';
+import React, { useRef, useState } from 'react';
 
-import React, { useState, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Upload, X } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+
+import { DeleteDialog } from './DeleteDialog';
 
 interface ProfileAvatarUploadProps {
   currentAvatarUrl: string | null;
@@ -79,7 +81,7 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
     }
 
     setIsUploading(false);
-    
+
     // Clean up the object URL to avoid memory leaks
     return () => URL.revokeObjectURL(objectUrl);
   };
@@ -90,14 +92,14 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
 
   const clearAvatar = async () => {
     setIsRemoving(true);
-    
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    
+
     // Call the removeAvatar function to delete from Supabase storage
     const { error } = await removeAvatar();
-    
+
     if (error) {
       toast({
         title: 'Error removing avatar',
@@ -111,7 +113,7 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
         description: 'Your profile picture has been removed successfully',
       });
     }
-    
+
     setIsRemoving(false);
   };
 
@@ -120,19 +122,24 @@ export const ProfileAvatarUpload: React.FC<ProfileAvatarUploadProps> = ({
       <div className="relative">
         <Avatar className="h-24 w-24 mb-2">
           <AvatarImage src={previewUrl || ''} alt={fullName || 'User avatar'} />
-          <AvatarFallback>
-            {fullName ? getInitials(fullName) : 'U'}
-          </AvatarFallback>
+          <AvatarFallback>{fullName ? getInitials(fullName) : 'U'}</AvatarFallback>
         </Avatar>
         {previewUrl && (
-          <button
-            onClick={clearAvatar}
-            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
-            title="Remove avatar"
-            disabled={isRemoving}
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <DeleteDialog
+            title="Remove Avatar"
+            message="Are you sure you want to remove your avatar?"
+            onDelete={clearAvatar}
+            isDeleting={isRemoving}
+            trigger={
+              <button
+                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+                title="Remove avatar"
+                disabled={isRemoving}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            }
+          />
         )}
       </div>
       <input

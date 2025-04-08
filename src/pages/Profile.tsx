@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+
 import { Header } from '@/components/Header';
+import { ProfileAvatarUpload } from '@/components/ProfileAvatarUpload';
+import { ProfileLink } from '@/components/ProfileLink';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/contexts/AuthContext';
 import {
   Select,
   SelectContent,
@@ -16,13 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LANGUAGES } from '@/contexts/LanguageContext';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ProfileLink } from '@/components/ProfileLink';
 import {
   Table,
   TableBody,
@@ -31,8 +28,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ProfileAvatarUpload } from '@/components/ProfileAvatarUpload';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/contexts/AuthContext';
+import { LANGUAGES, useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const profileSchema = z.object({
   username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
@@ -70,7 +70,6 @@ const Profile = () => {
   const [usernameDebounceTimeout, setUsernameDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
-  const navigate = useNavigate();
   const { setLanguage } = useLanguage();
 
   const {
