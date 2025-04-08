@@ -1,3 +1,4 @@
+
 import { ImageIcon } from 'lucide-react';
 
 import { FileUploaderSheet } from '@/components/FileUploaderSheet';
@@ -7,6 +8,8 @@ import { Editor } from '@tiptap/react';
 export default function MediaMenu({ editor }: { editor: Editor }) {
   const onUploadComplete = (url: string, text?: string) => {
     if (!editor || !url) return;
+    
+    // Insert the image into the editor
     editor
       .chain()
       .focus()

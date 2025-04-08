@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Save, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +18,7 @@ const ArticleEditor = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
   // Article content state
@@ -30,6 +32,15 @@ const ArticleEditor = () => {
   const [language, setLanguage] = useState<string>('en');
   const [featuredImage, setFeaturedImage] = useState<string>('');
   const [isPublished, setIsPublished] = useState<boolean>(false);
+  
+  // Auto-save timer reference
+  const autoSaveTimerRef = useRef<number | null>(null);
+  // Last saved state reference
+  const lastSavedStateRef = useRef({
+    title: '',
+    content: '',
+    subtitle: '',
+  });
 
   // Calculate read time automatically
   const readTime = useMemo(() => {
@@ -52,6 +63,53 @@ const ArticleEditor = () => {
     isPublished: false,
   });
 
+  // Check if the article has been modified
+  const hasBeenModified = useCallback(() => {
+    return (
+      title !== lastSavedStateRef.current.title ||
+      content !== lastSavedStateRef.current.content ||
+      subtitle !== lastSavedStateRef.current.subtitle
+    );
+  }, [title, content, subtitle]);
+
+  // Auto-save function
+  const autoSave = useCallback(async () => {
+    if (!user || !id || !hasBeenModified()) return;
+
+    setIsSaving(true);
+    try {
+      // Calculate a title for drafts if needed
+      const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
+      
+      await supabase
+        .from('articles')
+        .update({
+          title: finalTitle,
+          content,
+          subtitle,
+        })
+        .eq('id', id);
+      
+      // Update last saved state
+      lastSavedStateRef.current = {
+        title: finalTitle,
+        content,
+        subtitle,
+      };
+      
+      // If title was empty and we set a timestamp, update the local state
+      if (!title.trim()) {
+        setTitle(finalTitle);
+      }
+      
+      console.log('Auto-saved draft');
+    } catch (error) {
+      console.error('Error auto-saving:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [user, id, title, content, subtitle, hasBeenModified]);
+
   // Save current state to the ref to preserve it when component unmounts
   useEffect(() => {
     articleDataRef.current = {
@@ -65,6 +123,44 @@ const ArticleEditor = () => {
       isPublished,
     };
   }, [title, content, subtitle, categoryId, categoryName, language, featuredImage, isPublished]);
+
+  // Set up auto-save
+  useEffect(() => {
+    // Clear any existing timer
+    if (autoSaveTimerRef.current) {
+      window.clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set a new timer if we're editing (not creating) and there are changes
+    if (isEditing && hasBeenModified()) {
+      autoSaveTimerRef.current = window.setTimeout(autoSave, 5000);
+    }
+    
+    return () => {
+      if (autoSaveTimerRef.current) {
+        window.clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [autoSave, hasBeenModified, isEditing]);
+
+  // Auto-save before leaving the page
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasBeenModified()) {
+        autoSave();
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // Do a final auto-save when component unmounts
+      if (hasBeenModified()) {
+        autoSave();
+      }
+    };
+  }, [autoSave, hasBeenModified]);
 
   // Fetch article if editing and not already loaded
   useEffect(() => {
@@ -96,6 +192,13 @@ const ArticleEditor = () => {
         setTitle(data.title);
         setContent(data.content);
         setSubtitle(data.subtitle || '');
+
+        // Update last saved state
+        lastSavedStateRef.current = {
+          title: data.title,
+          content: data.content,
+          subtitle: data.subtitle || '',
+        };
 
         // Set the metadata
         setCategoryId(data.category_id);
@@ -151,20 +254,17 @@ const ArticleEditor = () => {
       return;
     }
 
+    // If title is empty, set a timestamp as title
+    const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
     if (!title.trim()) {
-      toast({
-        title: 'Title required',
-        description: 'Please provide a title for your article',
-        variant: 'destructive',
-      });
-      return;
+      setTitle(finalTitle);
     }
 
     setIsLoading(true);
 
     try {
       const articleData = {
-        title,
+        title: finalTitle,
         content,
         subtitle,
         author_id: user.id,
@@ -187,6 +287,13 @@ const ArticleEditor = () => {
       }
 
       if (response.error) throw response.error;
+      
+      // Update last saved state
+      lastSavedStateRef.current = {
+        title: finalTitle,
+        content,
+        subtitle,
+      };
 
       toast({
         title: isEditing ? 'Article updated' : 'Article created',
@@ -267,19 +374,22 @@ const ArticleEditor = () => {
             <ChevronLeft className="h-4 w-4" /> Back
           </Button>
 
-          <div className="flex gap-2">
-            {isEditing && (
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting || isLoading}
-              >
-                <Trash2 className="h-4 w-4 mr-2" /> Delete
+          <div className="flex items-center gap-2">
+            {isSaving && <span className="text-sm text-muted-foreground">Saving...</span>}
+            <div className="flex gap-2">
+              {isEditing && (
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting || isLoading}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                </Button>
+              )}
+              <Button onClick={handleSave} disabled={isLoading}>
+                <Save className="h-4 w-4 mr-2" /> Save
               </Button>
-            )}
-            <Button onClick={handleSave} disabled={isLoading}>
-              <Save className="h-4 w-4 mr-2" /> Save
-            </Button>
+            </div>
           </div>
         </div>
 

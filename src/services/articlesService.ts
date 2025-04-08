@@ -10,6 +10,7 @@ export interface ArticlesQueryParams {
   filterByAuthor?: string;
   searchQuery?: string;
   page?: number;
+  includeDrafts?: boolean;
 }
 
 export const fetchArticles = async (
@@ -18,7 +19,14 @@ export const fetchArticles = async (
   articles: ArticleProps[];
   hasMore: boolean;
 }> => {
-  const { limit = 6, filterByCategory, filterByAuthor, searchQuery, page = 1 } = params;
+  const { 
+    limit = 6, 
+    filterByCategory, 
+    filterByAuthor, 
+    searchQuery, 
+    page = 1,
+    includeDrafts = false 
+  } = params;
 
   try {
     // Calculate offset based on page number and limit
@@ -40,11 +48,17 @@ export const fetchArticles = async (
         read_time,
         featured_image,
         published_at,
-        author_id
+        author_id,
+        is_published
       `
-      )
-      .eq('is_published', true)
-      .order('published_at', { ascending: false })
+      );
+    
+    // Only include published articles unless explicitly requested to show drafts
+    if (!includeDrafts) {
+      query = query.eq('is_published', true);
+    }
+    
+    query = query.order('published_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     // Apply search filter if provided
@@ -170,6 +184,7 @@ export const fetchArticles = async (
         featuredImage: item.featured_image || undefined,
         likesCount: likesCountMap.get(item.id) || 0,
         commentsCount: commentsCountMap.get(item.id) || 0,
+        isDraft: !item.is_published,
       };
     });
 

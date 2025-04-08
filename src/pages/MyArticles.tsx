@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Eye } from 'lucide-react';
@@ -37,6 +38,7 @@ const MyArticles = () => {
   const navigate = useNavigate();
   const [articles, setArticles] = useState<ArticleListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreatingDraft, setIsCreatingDraft] = useState(false);
 
   useEffect(() => {
     // Redirect if not logged in
@@ -82,6 +84,41 @@ const MyArticles = () => {
     fetchArticles();
   }, [user, navigate, toast]);
 
+  const createDraftArticle = async () => {
+    if (!user) return;
+    
+    setIsCreatingDraft(true);
+    
+    try {
+      // Create a new draft article with minimal content
+      const { data, error } = await supabase
+        .from('articles')
+        .insert({
+          title: `Draft - ${new Date().toLocaleTimeString()}`,
+          content: '',
+          author_id: user.id,
+          is_published: false,
+        })
+        .select();
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Navigate to the edit page for the newly created draft
+        navigate(`/article/edit/${data[0].id}`);
+      }
+    } catch (error: any) {
+      console.error('Error creating draft article:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create draft article',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreatingDraft(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -99,10 +136,9 @@ const MyArticles = () => {
       <div className="container mx-auto px-4 py-8 flex-1">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">My Articles</h1>
-          <Button asChild>
-            <Link to="/article/new">
-              <Plus className="h-4 w-4 mr-2" /> Create New Article
-            </Link>
+          <Button onClick={createDraftArticle} disabled={isCreatingDraft}>
+            <Plus className="h-4 w-4 mr-2" /> 
+            {isCreatingDraft ? 'Creating Draft...' : 'Create New Article'}
           </Button>
         </div>
 
@@ -112,8 +148,8 @@ const MyArticles = () => {
             <p className="text-muted-foreground mb-6">
               Start writing and sharing your knowledge with the community
             </p>
-            <Button asChild>
-              <Link to="/article/new">Create Your First Article</Link>
+            <Button onClick={createDraftArticle} disabled={isCreatingDraft}>
+              {isCreatingDraft ? 'Creating Draft...' : 'Create Your First Article'}
             </Button>
           </div>
         ) : (
