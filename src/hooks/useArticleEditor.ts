@@ -167,6 +167,44 @@ export function useArticleEditor() {
     }
   }, [hasLoaded, isEditing]);
 
+  // Validate article for publishing
+  const validateForPublishing = () => {
+    // Check if title is a timestamp-based draft title
+    const isDraftTitle = /^Draft - \d{1,2}:\d{2}:\d{2}(?: [AP]M)?$/.test(title);
+    if (isDraftTitle) {
+      toast({
+        title: 'Publishing Failed',
+        description: 'Please provide a proper title before publishing',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    
+    // Check if content is less than 30 words
+    const plainText = stripHtml(content);
+    const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+    if (wordCount < 30) {
+      toast({
+        title: 'Publishing Failed',
+        description: 'Content must be at least 30 words',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    
+    // Check if category is selected
+    if (!categoryId) {
+      toast({
+        title: 'Publishing Failed',
+        description: 'Please select a category',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSave = async () => {
     if (!user) {
       toast({
@@ -179,6 +217,13 @@ export function useArticleEditor() {
 
     // Only create a timestamp-based title if the user is saving without a title
     const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
+    
+    // If trying to publish, validate first
+    if (isPublished && !validateForPublishing()) {
+      // Reset published state since validation failed
+      setIsPublished(false);
+      return;
+    }
     
     setIsLoading(true);
 

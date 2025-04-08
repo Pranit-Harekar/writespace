@@ -1,3 +1,4 @@
+
 import { CalendarCheck, Image as ImageIcon, Tag } from 'lucide-react';
 import React from 'react';
 
@@ -8,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
+import { Alert, AlertDescription } from './ui/alert';
+import { stripHtml } from '@/lib/textUtils';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -33,6 +36,12 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
   onPublishChange,
 }) => {
   const placeholderImage = usePlaceholderImage();
+  
+  // Calculate word count for validation
+  const plainText = stripHtml(content);
+  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+  const hasEnoughWords = wordCount >= 30;
+
   return (
     <div className="space-y-4">
       <ArticleStats content={content} />
@@ -53,6 +62,11 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               categoryId={categoryId}
               onChange={onCategoryChange}
             />
+            {!categoryId && (
+              <p className="text-xs text-amber-500 mt-1">
+                Required for publishing
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -94,6 +108,24 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                 : 'This article is in draft mode'}
             </p>
           </div>
+
+          {/* Publishing Requirements Alert */}
+          <Alert className="mt-3 bg-muted">
+            <AlertDescription className="text-xs">
+              <strong>Publishing requirements:</strong>
+              <ul className="list-disc pl-5 mt-1 space-y-1">
+                <li className={`${!hasEnoughWords ? 'text-amber-500' : ''}`}>
+                  At least 30 words of content
+                </li>
+                <li className={`${!categoryId ? 'text-amber-500' : ''}`}>
+                  Category must be selected
+                </li>
+                <li>
+                  Title cannot be a draft timestamp
+                </li>
+              </ul>
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     </div>
