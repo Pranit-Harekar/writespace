@@ -77,9 +77,9 @@ export default function AlignMenu({ editor }: { editor: Editor }) {
   }, [editor, options]);
 
   return (
-    <Menubar className="border-none p-0">
+    <Menubar className="border-none p-0 hover:bg-secondary">
       <MenubarMenu>
-        <MenubarTrigger className="px-1 flex items-center hover:bg-secondary">
+        <MenubarTrigger className="px-2 flex items-center">
           {options.find(option => option.id === selectedOption).icon}
           <ChevronDown className="h-4 w-4" />
         </MenubarTrigger>

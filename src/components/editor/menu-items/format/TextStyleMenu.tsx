@@ -98,9 +98,9 @@ export default function TextStyleMenu({ editor }: { editor: Editor }) {
   }, [editor]);
 
   return (
-    <Menubar className="border-none p-0">
+    <Menubar className="border-none p-0 hover:bg-secondary">
       <MenubarMenu>
-        <MenubarTrigger className="font-normal px-3 flex items-center hover:bg-secondary">
+        <MenubarTrigger className="font-normal px-2 flex items-center">
           {options.find(option => option.id === selectedOption)?.label || 'Normal'}
           <ChevronDown className="h-4 w-4 ml-1" />
         </MenubarTrigger>

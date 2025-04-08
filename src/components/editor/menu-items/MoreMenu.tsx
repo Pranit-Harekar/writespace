@@ -31,11 +31,11 @@ export default function MoreMenu({ editor }: { editor: Editor }) {
   );
 
   return (
-    <Menubar className="border-none p-0">
+    <Menubar className="border-none p-0 hover:bg-secondary">
       <MenubarMenu>
-        <MenubarTrigger className="px-1 flex items-center hover:bg-secondary gap-1">
+        <MenubarTrigger className="px-2 flex items-center gap-1">
           <span className="font-normal">More</span>
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDown className="h-4 w-4 ml-1" />
         </MenubarTrigger>
         <MenubarContent>
           {options.map(option => (
