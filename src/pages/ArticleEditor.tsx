@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Header } from '@/components/Header';
 import ArticleContentEditor from '@/components/ArticleContentEditor';
@@ -14,17 +13,17 @@ const ArticleEditor = () => {
     hasLoaded,
     isDeleting,
     isSaving,
-    
+
     title,
     content,
     subtitle,
-    
+
     categoryId,
     categoryName,
     language,
     featuredImage,
     isPublished,
-    
+
     setTitle,
     setContent,
     setSubtitle,
@@ -44,12 +43,12 @@ const ArticleEditor = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="container mx-auto px-4 py-8 flex-1">
-        <EditorToolbar 
-          isEditing={isEditing} 
-          isSaving={isSaving} 
-          isDeleting={isDeleting} 
-          isLoading={isLoading} 
-          onSave={handleSave} 
+        <EditorToolbar
+          isEditing={isEditing}
+          isSaving={isSaving}
+          isDeleting={isDeleting}
+          isLoading={isLoading}
+          onSave={handleSave}
           onDelete={handleDelete}
         />
 

@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,7 +37,7 @@ export function useArticleEditor() {
   const [language, setLanguage] = useState<string>('en');
   const [featuredImage, setFeaturedImage] = useState<string>('');
   const [isPublished, setIsPublished] = useState<boolean>(false);
-  
+
   // Auto-save timer reference
   const autoSaveTimerRef = useRef<number | null>(null);
   // Last saved state reference
@@ -86,7 +85,7 @@ export function useArticleEditor() {
     try {
       // Calculate a title for drafts if needed
       const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
-      
+
       await supabase
         .from('articles')
         .update({
@@ -95,19 +94,19 @@ export function useArticleEditor() {
           subtitle,
         })
         .eq('id', id);
-      
+
       // Update last saved state
       lastSavedStateRef.current = {
         title: finalTitle,
         content,
         subtitle,
       };
-      
+
       // If title was empty and we set a timestamp, update the local state
       if (!title.trim()) {
         setTitle(finalTitle);
       }
-      
+
       console.log('Auto-saved draft');
     } catch (error) {
       console.error('Error auto-saving:', error);
@@ -136,12 +135,12 @@ export function useArticleEditor() {
     if (autoSaveTimerRef.current) {
       window.clearTimeout(autoSaveTimerRef.current);
     }
-    
+
     // Set a new timer if we're editing (not creating) and there are changes
     if (isEditing && hasBeenModified()) {
       autoSaveTimerRef.current = window.setTimeout(autoSave, 5000);
     }
-    
+
     return () => {
       if (autoSaveTimerRef.current) {
         window.clearTimeout(autoSaveTimerRef.current);
@@ -156,11 +155,11 @@ export function useArticleEditor() {
         autoSave();
       }
     };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      
+
       // Do a final auto-save when component unmounts
       if (hasBeenModified()) {
         autoSave();
@@ -288,7 +287,7 @@ export function useArticleEditor() {
       }
 
       if (response.error) throw response.error;
-      
+
       // Update last saved state
       lastSavedStateRef.current = {
         title: finalTitle,
@@ -366,19 +365,19 @@ export function useArticleEditor() {
     isSaving,
     hasLoaded,
     isEditing,
-    
+
     // Article content
     title,
     content,
     subtitle,
-    
+
     // Metadata
     categoryId,
     categoryName,
     language,
     featuredImage,
     isPublished,
-    
+
     // Methods
     setTitle,
     setContent,
