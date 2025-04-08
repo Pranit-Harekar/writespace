@@ -17,6 +17,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
 
 interface ArticleListItem {
   id: string;
@@ -39,6 +49,11 @@ const MyArticles = () => {
   const [articles, setArticles] = useState<ArticleListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingDraft, setIsCreatingDraft] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     // Redirect if not logged in
@@ -49,6 +64,28 @@ const MyArticles = () => {
 
     const fetchArticles = async () => {
       try {
+        // First get the total count for pagination
+        const { count, error: countError } = await supabase
+          .from('articles')
+          .select('id', { count: 'exact' })
+          .eq('author_id', user.id);
+
+        if (countError) throw countError;
+        
+        // Calculate total pages
+        const totalItems = count || 0;
+        const calculatedTotalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+        setTotalPages(calculatedTotalPages);
+        
+        // Adjust current page if it's out of bounds
+        if (currentPage > calculatedTotalPages) {
+          setCurrentPage(1);
+        }
+        
+        // Calculate pagination range
+        const from = (currentPage - 1) * itemsPerPage;
+        const to = from + itemsPerPage - 1;
+
         const { data, error } = await supabase
           .from('articles')
           .select(
@@ -64,7 +101,8 @@ const MyArticles = () => {
           `
           )
           .eq('author_id', user.id)
-          .order('updated_at', { ascending: false });
+          .order('updated_at', { ascending: false })
+          .range(from, to);
 
         if (error) throw error;
 
@@ -82,7 +120,7 @@ const MyArticles = () => {
     };
 
     fetchArticles();
-  }, [user, navigate, toast]);
+  }, [user, navigate, toast, currentPage]);
 
   const createDraftArticle = async () => {
     if (!user) return;
@@ -119,6 +157,51 @@ const MyArticles = () => {
     }
   };
 
+  // Generate an array of page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    
+    if (totalPages <= maxPagesToShow) {
+      // Show all pages if there are few pages
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Calculate which pages to show
+      let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+      
+      // Adjust if we're near the end
+      if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+      }
+      
+      // Add first page and ellipsis if needed
+      if (startPage > 1) {
+        pageNumbers.push(1);
+        if (startPage > 2) {
+          pageNumbers.push('ellipsis');
+        }
+      }
+      
+      // Add middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      // Add last page and ellipsis if needed
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push('ellipsis');
+        }
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -143,56 +226,90 @@ const MyArticles = () => {
         </div>
 
         {articles.length === 0 ? (
-          <div className="text-center py-12">
-            <h2 className="text-xl font-medium mb-2">You haven't created any articles yet</h2>
-            <p className="text-muted-foreground mb-6">
-              Start writing and sharing your knowledge with the community
-            </p>
-            <Button onClick={createDraftArticle} disabled={isCreatingDraft}>
-              {isCreatingDraft ? 'Creating Draft...' : 'Create Your First Article'}
-            </Button>
-          </div>
+          <ArticlesEmptyState filterByCategory="" />
         ) : (
-          <Table>
-            <TableCaption>A list of your articles</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[300px]">Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {articles.map(article => (
-                <TableRow key={article.id}>
-                  <TableCell className="font-medium">{article.title}</TableCell>
-                  <TableCell>{article.categories?.name || article.category || '—'}</TableCell>
-                  <TableCell>
-                    <Badge variant={article.is_published ? 'default' : 'outline'}>
-                      {article.is_published ? 'Published' : 'Draft'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{new Date(article.updated_at).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="icon" asChild>
-                        <Link to={`/article/${article.id}`}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button variant="outline" size="icon" asChild>
-                        <Link to={`/article/edit/${article.id}`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </TableCell>
+          <>
+            <Table>
+              <TableCaption>Page {currentPage} of {totalPages}</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[300px]">Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Last Updated</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {articles.map(article => (
+                  <TableRow key={article.id}>
+                    <TableCell className="font-medium">{article.title}</TableCell>
+                    <TableCell>{article.categories?.name || article.category || '—'}</TableCell>
+                    <TableCell>
+                      <Badge variant={article.is_published ? 'default' : 'outline'}>
+                        {article.is_published ? 'Published' : 'Draft'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{new Date(article.updated_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="icon" asChild>
+                          <Link to={`/article/${article.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="outline" size="icon" asChild>
+                          <Link to={`/article/edit/${article.id}`}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            
+            {/* Pagination Controls */}
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  {/* Previous button */}
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  
+                  {/* Page numbers */}
+                  {getPageNumbers().map((pageNum, index) => (
+                    <PaginationItem key={index}>
+                      {pageNum === 'ellipsis' ? (
+                        <PaginationEllipsis />
+                      ) : (
+                        <PaginationLink 
+                          isActive={currentPage === pageNum}
+                          onClick={() => setCurrentPage(Number(pageNum))}
+                          className="cursor-pointer"
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      )}
+                    </PaginationItem>
+                  ))}
+                  
+                  {/* Next button */}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </>
         )}
       </div>
     </div>

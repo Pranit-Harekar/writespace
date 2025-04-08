@@ -294,6 +294,19 @@ export type Database = {
         Args: { user_id: string }
         Returns: number
       }
+      get_user_articles: {
+        Args: {
+          user_id_param: string
+          page_param?: number
+          page_size_param?: number
+          filter_title?: string
+          filter_category?: string
+          filter_status?: string
+          sort_column?: string
+          sort_direction?: string
+        }
+        Returns: Json
+      }
       is_following: {
         Args: { follower: string; following: string }
         Returns: boolean
