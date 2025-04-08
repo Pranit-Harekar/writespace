@@ -8,7 +8,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8 max-w-4xl flex flex-col gap-8">
+        <div className="container mx-auto px-4 py-4 max-w-4xl flex flex-col gap-4">
           <section>
             <CategoryList />
           </section>

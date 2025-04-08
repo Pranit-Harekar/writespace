@@ -47,7 +47,7 @@ export const CategoryList = () => {
   };
 
   return (
-    <div className="my-6">
+    <div className="my-2">
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex space-x-2 p-1">
           <Button variant={!category ? 'default' : 'outline'} className="rounded-full" asChild>
