@@ -6,6 +6,7 @@ import { ArticlesListSkeleton } from '@/components/ArticlesListSkeleton';
 import { ArticlesEmptyState } from '@/components/ArticlesEmptyState';
 import { fetchArticles } from '@/services/articlesService';
 import { ViewSwitcher, ViewMode, getPersistedViewMode } from '@/components/ViewSwitcher';
+import { LoadMoreButton } from '@/components/LoadMoreButton';
 import {
   Pagination,
   PaginationContent,
@@ -24,6 +25,8 @@ interface ArticlesListProps {
   searchQuery?: string;
   showViewSwitcher?: boolean;
   defaultView?: ViewMode;
+  hidePagination?: boolean; // Added prop to hide pagination
+  useLoadMoreButton?: boolean; // Optional prop to use Load More button instead of pagination
 }
 
 export const ArticlesList: React.FC<ArticlesListProps> = ({
@@ -34,12 +37,15 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   searchQuery,
   showViewSwitcher = false,
   defaultView,
+  hidePagination = false, // Default to showing pagination
+  useLoadMoreButton = false, // Default to using pagination links
 }) => {
   // Use persisted view mode or passed default
   const [viewMode, setViewMode] = useState<ViewMode>(() => defaultView || getPersistedViewMode());
 
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,8 +53,12 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   const prevFiltersRef = useRef({ limit, filterByCategory, filterByAuthor, searchQuery });
 
   const loadArticles = useCallback(
-    async (pageNumber: number) => {
-      setIsLoading(true);
+    async (pageNumber: number, append = false) => {
+      if (append) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+      }
 
       try {
         const { articles: fetchedArticles, hasMore: moreAvailable } = await fetchArticles({
@@ -60,7 +70,14 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         });
 
         setHasMore(moreAvailable);
-        setArticles(fetchedArticles);
+        
+        if (append) {
+          // Append new articles to existing ones
+          setArticles(prevArticles => [...prevArticles, ...fetchedArticles]);
+        } else {
+          // Replace existing articles
+          setArticles(fetchedArticles);
+        }
         
         // Estimate total pages
         if (pageNumber === 1) {
@@ -70,6 +87,7 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
         console.error('Error loading articles:', error);
       } finally {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
     },
     [limit, filterByCategory, filterByAuthor, searchQuery]
@@ -94,6 +112,14 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
       initialLoadComplete.current = true;
     }
   }, [filterByCategory, filterByAuthor, searchQuery, limit, loadArticles]);
+
+  const handleLoadMore = useCallback(() => {
+    if (hasMore && !isLoadingMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadArticles(nextPage, true); // true means append
+    }
+  }, [hasMore, isLoadingMore, page, loadArticles]);
 
   // Generate pagination items
   const paginationItems = () => {
@@ -213,44 +239,50 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           </div>
         )}
 
-        {hasMore && totalPages > 1 && (
-          <div className="mt-6">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (page > 1) {
-                        const prevPage = page - 1;
-                        setPage(prevPage);
-                        loadArticles(prevPage);
-                      }
-                    }}
-                    className={page <= 1 ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-                
-                {paginationItems()}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (hasMore) {
-                        const nextPage = page + 1;
-                        setPage(nextPage);
-                        loadArticles(nextPage);
-                      }
-                    }}
-                    className={!hasMore ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
+        {hasMore && !hidePagination && (
+          <>
+            {useLoadMoreButton ? (
+              <LoadMoreButton isLoading={isLoadingMore} onClick={handleLoadMore} />
+            ) : (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (page > 1) {
+                            const prevPage = page - 1;
+                            setPage(prevPage);
+                            loadArticles(prevPage);
+                          }
+                        }}
+                        className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {paginationItems()}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (hasMore) {
+                            const nextPage = page + 1;
+                            setPage(nextPage);
+                            loadArticles(nextPage);
+                          }
+                        }}
+                        className={!hasMore ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
         )}
       </div>
     </>

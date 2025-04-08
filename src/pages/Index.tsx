@@ -1,3 +1,4 @@
+
 import { Header } from '@/components/Header';
 import { FeaturedArticlesCarousel } from '@/components/FeaturedArticlesCarousel';
 import { ArticlesList } from '@/components/ArticlesList';
@@ -19,7 +20,7 @@ const Index = () => {
           </section>
 
           <section className="mb-12">
-            <ArticlesList limit={6} showViewSwitcher={true} sectionTitle="Latest Articles" />
+            <ArticlesList limit={6} showViewSwitcher={true} sectionTitle="Latest Articles" hidePagination={true} />
           </section>
         </div>
       </main>

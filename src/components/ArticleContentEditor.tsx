@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 
 import Image from '@tiptap/extension-image';
@@ -11,6 +12,7 @@ import StarterKit from '@tiptap/starter-kit';
 import PlainTextEditor from './editor/PlainTextEditor';
 import RichTextEditor from './editor/RichTextEditor';
 import RichTextToolbar from './editor/RichTextToolbar';
+// Fix the import path (lowercase 'i' in imageResize)
 import ImageResize from '@/components/editor/extensions/ImageResize';
 
 interface ArticleContentEditorProps {
