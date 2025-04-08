@@ -75,13 +75,13 @@ export const ArticlesTable: React.FC<ArticlesTableProps> = ({
         {articles.map(article => (
           <TableRow key={article.id}>
             <TableCell className="font-medium">{article.title}</TableCell>
-            <TableCell>{article.category_name || article.category || '—'}</TableCell>
+            <TableCell>{article.category || '—'}</TableCell>
             <TableCell>
-              <Badge variant={article.is_published ? 'default' : 'outline'}>
-                {article.is_published ? 'Published' : 'Draft'}
+              <Badge variant={article.isPublished ? 'default' : 'outline'}>
+                {article.isPublished ? 'Published' : 'Draft'}
               </Badge>
             </TableCell>
-            <TableCell>{new Date(article.updated_at).toLocaleDateString()}</TableCell>
+            <TableCell>{new Date(article.updatedAt).toLocaleDateString()}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
                 <Button variant="outline" size="icon" asChild>

@@ -20,7 +20,13 @@ const Index = () => {
           </section>
 
           <section className="mb-12">
-            <ArticlesList limit={6} showViewSwitcher={true} sectionTitle="Latest Articles" hidePagination={true} />
+            <ArticlesList 
+              limit={6} 
+              showViewSwitcher={true} 
+              sectionTitle="Latest Articles" 
+              hidePagination={true}
+              useLoadMoreButton={true}
+            />
           </section>
         </div>
       </main>
