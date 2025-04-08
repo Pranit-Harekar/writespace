@@ -11,6 +11,7 @@ import StarterKit from '@tiptap/starter-kit';
 import PlainTextEditor from './editor/PlainTextEditor';
 import RichTextEditor from './editor/RichTextEditor';
 import RichTextToolbar from './editor/RichTextToolbar';
+import ImageResize from '@/components/editor/extensions/imageResize';
 
 interface ArticleContentEditorProps {
   initialContent: string;
@@ -48,6 +49,7 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({
         },
       }),
       Image,
+      ImageResize,
       Link.configure({
         autolink: false,
         linkOnPaste: true,

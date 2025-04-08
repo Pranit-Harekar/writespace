@@ -1,4 +1,3 @@
-
 import { CalendarCheck, Image as ImageIcon, Tag, Upload, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -13,7 +12,6 @@ import { Alert, AlertDescription } from './ui/alert';
 import { stripHtml } from '@/lib/textUtils';
 import { FileUploaderSheet } from './FileUploaderSheet';
 import { Button } from '@/components/ui/button';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface ArticleMetaSidebarProps {
@@ -42,15 +40,15 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
   const placeholderImage = usePlaceholderImage();
   const [showValidationErrors, setShowValidationErrors] = useState<boolean>(false);
   const { id: articleId } = useParams();
-  
+
   // Calculate word count for validation
   const plainText = stripHtml(content);
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
   const hasEnoughWords = wordCount >= 30;
-  
+
   // Check if title is a timestamp-based draft title
   const isDraftTitle = false; // We can't check this here as we don't have title prop
-  
+
   // Handle publish toggle with validation
   const handlePublishChange = (newValue: boolean) => {
     // Only show validation errors if trying to publish
@@ -60,7 +58,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
       // Hide validation errors when unpublishing
       setShowValidationErrors(false);
     }
-    
+
     onPublishChange(newValue);
   };
 
@@ -93,9 +91,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               onChange={onCategoryChange}
             />
             {showValidationErrors && !categoryId && (
-              <p className="text-xs text-amber-500 mt-1">
-                Required for publishing
-              </p>
+              <p className="text-xs text-amber-500 mt-1">Required for publishing</p>
             )}
           </div>
 
@@ -115,7 +111,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                   }}
                 />
               </div>
-              
+
               {/* Hover overlay with image controls */}
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <TooltipProvider>
@@ -135,13 +131,13 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                       <p>Upload new image</p>
                     </TooltipContent>
                   </Tooltip>
-                  
+
                   {featuredImage && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
+                        <Button
+                          variant="destructive"
+                          size="sm"
                           className="rounded-full p-2"
                           onClick={handleRemoveFeaturedImage}
                         >
@@ -185,9 +181,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                   <li className={`${!categoryId ? 'text-amber-500' : ''}`}>
                     Category must be selected
                   </li>
-                  <li>
-                    Title cannot be a draft timestamp
-                  </li>
+                  <li>Title cannot be a draft timestamp</li>
                 </ul>
               </AlertDescription>
             </Alert>
