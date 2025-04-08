@@ -1,11 +1,10 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image, Link, Upload } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { articleImagesService } from '@/services/articleImagesService';
+
 import {
   Sheet,
   SheetContent,
@@ -77,37 +76,33 @@ export function FileUploaderSheet({
       setIsUploading(true);
 
       try {
-        // Generate a unique filename
-        const fileExtension = file.name.split('.').pop();
-        const fileName = `${folderPath ? folderPath + '/' : ''}${uuidv4()}.${fileExtension}`;
-
-        const { data, error } = await supabase.storage.from(bucketName).upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-
-        if (error) throw error;
-
-        const { data: publicUrl } = supabase.storage.from(bucketName).getPublicUrl(data.path);
+        // Upload file to storage
+        const { path, url, error } = await articleImagesService.uploadFile(
+          file,
+          bucketName,
+          folderPath
+        );
         
-        // If articleId is provided, associate this image with the article
+        if (error) throw error;
+        if (!url) throw new Error("Failed to get file URL");
+        
+        // If articleId is provided, track this image with the article
         if (articleId && user) {
-          const { error: associationError } = await supabase
-            .from('article_images')
-            .insert({
-              article_id: articleId,
-              author_id: user.id,
-              image_path: data.path,
-              storage_url: publicUrl.publicUrl,
-              is_uploaded: true
-            });
+          const { error: trackError } = await articleImagesService.trackImage(
+            articleId,
+            user.id,
+            url,
+            path,
+            true
+          );
           
-          if (associationError) {
-            console.error('Error associating image with article:', associationError);
+          if (trackError) {
+            console.error('Error tracking uploaded image:', trackError);
           }
         }
 
-        onUploadComplete(publicUrl.publicUrl, file.name);
+        // Pass the URL back to the parent component
+        onUploadComplete(url, file.name);
         setIsOpen(false);
 
         toast({
@@ -142,22 +137,22 @@ export function FileUploaderSheet({
     try {
       const url = new URL(urlInput);
       
-      // If articleId is provided, track this external URL
+      // If articleId is provided, track this external URL with the article
       if (articleId && user) {
-        supabase
-          .from('article_images')
-          .insert({
-            article_id: articleId,
-            author_id: user.id,
-            storage_url: urlInput,
-            is_uploaded: false // This is an external URL, not uploaded to storage
-          }).then(({ error }) => {
-            if (error) {
-              console.error('Error tracking external image URL:', error);
-            }
-          });
+        articleImagesService.trackImage(
+          articleId,
+          user.id,
+          urlInput,
+          null,
+          false // Not uploaded, just an external URL
+        ).then(({ error }) => {
+          if (error) {
+            console.error('Error tracking external URL:', error);
+          }
+        });
       }
       
+      // Pass the URL back to the parent component
       onUploadComplete(urlInput);
       setUrlInput('');
       setIsOpen(false);
