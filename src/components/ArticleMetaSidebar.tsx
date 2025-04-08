@@ -1,5 +1,4 @@
-
-import { CalendarCheck, Image as ImageIcon, Tag, Upload } from 'lucide-react';
+import { CalendarCheck, Image as ImageIcon, Tag } from 'lucide-react';
 import React from 'react';
 
 import ArticleStats from '@/components/ArticleStats';
@@ -9,8 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
-import { FileUploaderSheet } from '@/components/FileUploader/FileUploaderSheet';
-import { Button } from '@/components/ui/button';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -61,28 +58,14 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           <div className="space-y-2">
             <div className="flex items-center">
               <ImageIcon className="h-4 w-4 mr-2" />
-              <Label className="text-sm font-medium">Featured Image</Label>
+              <Label className="text-sm font-medium">Featured Image URL</Label>
             </div>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="https://example.com/image.jpg"
-                value={featuredImage}
-                onChange={e => onFeaturedImageChange(e.target.value)}
-                className="flex-1"
-              />
-              <FileUploaderSheet
-                onUploadComplete={onFeaturedImageChange}
-                trigger={
-                  <Button variant="outline" size="icon">
-                    <Upload className="h-4 w-4" />
-                  </Button>
-                }
-                title="Upload Featured Image"
-                description="Upload an image for your article's featured section"
-                allowedFileTypes={['image/jpeg', 'image/png', 'image/gif', 'image/webp']}
-              />
-            </div>
+            <Input
+              type="text"
+              placeholder="https://example.com/image.jpg"
+              value={featuredImage}
+              onChange={e => onFeaturedImageChange(e.target.value)}
+            />
             {
               <div className="mt-2 rounded-md overflow-hidden border">
                 <img
