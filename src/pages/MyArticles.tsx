@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,11 +48,11 @@ const MyArticles = () => {
   const [articles, setArticles] = useState<ArticleListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingDraft, setIsCreatingDraft] = useState(false);
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 7;
 
   useEffect(() => {
     // Redirect if not logged in
@@ -71,17 +70,17 @@ const MyArticles = () => {
           .eq('author_id', user.id);
 
         if (countError) throw countError;
-        
+
         // Calculate total pages
         const totalItems = count || 0;
         const calculatedTotalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
         setTotalPages(calculatedTotalPages);
-        
+
         // Adjust current page if it's out of bounds
         if (currentPage > calculatedTotalPages) {
           setCurrentPage(1);
         }
-        
+
         // Calculate pagination range
         const from = (currentPage - 1) * itemsPerPage;
         const to = from + itemsPerPage - 1;
@@ -90,13 +89,13 @@ const MyArticles = () => {
           .from('articles')
           .select(
             `
-            id, 
-            title, 
-            category, 
+            id,
+            title,
+            category,
             category_id,
             categories:category_id(id, name),
-            created_at, 
-            updated_at, 
+            created_at,
+            updated_at,
             is_published
           `
           )
@@ -124,9 +123,9 @@ const MyArticles = () => {
 
   const createDraftArticle = async () => {
     if (!user) return;
-    
+
     setIsCreatingDraft(true);
-    
+
     try {
       // Create a new draft article with minimal content
       const { data, error } = await supabase
@@ -140,7 +139,7 @@ const MyArticles = () => {
         .select();
 
       if (error) throw error;
-      
+
       if (data && data.length > 0) {
         // Navigate to the edit page for the newly created draft
         navigate(`/article/edit/${data[0].id}`);
@@ -161,7 +160,7 @@ const MyArticles = () => {
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxPagesToShow = 5;
-    
+
     if (totalPages <= maxPagesToShow) {
       // Show all pages if there are few pages
       for (let i = 1; i <= totalPages; i++) {
@@ -170,13 +169,13 @@ const MyArticles = () => {
     } else {
       // Calculate which pages to show
       let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-      
+      const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
       // Adjust if we're near the end
       if (endPage - startPage < maxPagesToShow - 1) {
         startPage = Math.max(1, endPage - maxPagesToShow + 1);
       }
-      
+
       // Add first page and ellipsis if needed
       if (startPage > 1) {
         pageNumbers.push(1);
@@ -184,12 +183,12 @@ const MyArticles = () => {
           pageNumbers.push('ellipsis');
         }
       }
-      
+
       // Add middle pages
       for (let i = startPage; i <= endPage; i++) {
         pageNumbers.push(i);
       }
-      
+
       // Add last page and ellipsis if needed
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
@@ -198,7 +197,7 @@ const MyArticles = () => {
         pageNumbers.push(totalPages);
       }
     }
-    
+
     return pageNumbers;
   };
 
@@ -220,7 +219,7 @@ const MyArticles = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">My Articles</h1>
           <Button onClick={createDraftArticle} disabled={isCreatingDraft}>
-            <Plus className="h-4 w-4 mr-2" /> 
+            <Plus className="h-4 w-4 mr-2" />
             {isCreatingDraft ? 'Creating Draft...' : 'Create New Article'}
           </Button>
         </div>
@@ -230,7 +229,9 @@ const MyArticles = () => {
         ) : (
           <>
             <Table>
-              <TableCaption>Page {currentPage} of {totalPages}</TableCaption>
+              <TableCaption>
+                Page {currentPage} of {totalPages}
+              </TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[300px]">Title</TableHead>
@@ -269,26 +270,28 @@ const MyArticles = () => {
                 ))}
               </TableBody>
             </Table>
-            
+
             {/* Pagination Controls */}
             <div className="mt-4">
               <Pagination>
                 <PaginationContent>
                   {/* Previous button */}
                   <PaginationItem>
-                    <PaginationPrevious 
+                    <PaginationPrevious
                       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      className={
+                        currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                      }
                     />
                   </PaginationItem>
-                  
+
                   {/* Page numbers */}
                   {getPageNumbers().map((pageNum, index) => (
                     <PaginationItem key={index}>
                       {pageNum === 'ellipsis' ? (
                         <PaginationEllipsis />
                       ) : (
-                        <PaginationLink 
+                        <PaginationLink
                           isActive={currentPage === pageNum}
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className="cursor-pointer"
@@ -298,12 +301,16 @@ const MyArticles = () => {
                       )}
                     </PaginationItem>
                   ))}
-                  
+
                   {/* Next button */}
                   <PaginationItem>
-                    <PaginationNext 
+                    <PaginationNext
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      className={
+                        currentPage === totalPages
+                          ? 'pointer-events-none opacity-50'
+                          : 'cursor-pointer'
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>
