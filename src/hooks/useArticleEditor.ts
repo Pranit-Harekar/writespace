@@ -203,6 +203,74 @@ export function useArticleEditor() {
     return true;
   };
 
+  const extractImageUrls = (htmlContent: string): string[] => {
+    const urls: string[] = [];
+    const imgRegex = /<img[^>]+src="([^">]+)"/g;
+    let match;
+    
+    while ((match = imgRegex.exec(htmlContent)) !== null) {
+      if (match[1]) {
+        urls.push(match[1]);
+      }
+    }
+    
+    return urls;
+  };
+
+  const cleanupOrphanedImages = async (articleId: string, content: string, featuredImage: string) => {
+    try {
+      // Get all image URLs currently in the article (content + featured image)
+      const contentImageUrls = extractImageUrls(content);
+      const currentUrls = [...contentImageUrls];
+      
+      if (featuredImage) {
+        currentUrls.push(featuredImage);
+      }
+      
+      // Get all images associated with this article from the database
+      const { data: articleImages, error: fetchError } = await supabase
+        .from('article_images')
+        .select('*')
+        .eq('article_id', articleId);
+      
+      if (fetchError) {
+        console.error('Error fetching article images:', fetchError);
+        return;
+      }
+      
+      // Find orphaned images (those in the DB but not in the content or featured image)
+      const orphanedImages = articleImages?.filter(img => !currentUrls.includes(img.storage_url));
+      
+      // Delete orphaned images that were uploaded (not external URLs)
+      for (const img of orphanedImages || []) {
+        if (img.is_uploaded && img.image_path) {
+          // Delete from storage bucket
+          const { error: storageError } = await supabase.storage
+            .from('article-images')
+            .remove([img.image_path]);
+          
+          if (storageError) {
+            console.error('Error deleting orphaned image from storage:', storageError);
+          }
+        }
+        
+        // Delete the record from article_images table
+        const { error: deleteError } = await supabase
+          .from('article_images')
+          .delete()
+          .eq('id', img.id);
+        
+        if (deleteError) {
+          console.error('Error deleting orphaned image record:', deleteError);
+        }
+      }
+      
+      console.log(`Cleaned up ${orphanedImages?.length || 0} orphaned images`);
+    } catch (error) {
+      console.error('Error in image cleanup process:', error);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) {
       toast({
@@ -244,9 +312,20 @@ export function useArticleEditor() {
       if (isEditing) {
         // Update existing article
         response = await supabase.from('articles').update(articleData).eq('id', id);
+        
+        // Clean up orphaned images if editing an existing article
+        if (id) {
+          await cleanupOrphanedImages(id, content, featuredImage);
+        }
       } else {
         // Create new article
         response = await supabase.from('articles').insert(articleData).select();
+        
+        // If a new article was created, clean up orphaned images
+        if (response.data && response.data.length > 0) {
+          const newArticleId = response.data[0].id;
+          await cleanupOrphanedImages(newArticleId, content, featuredImage);
+        }
       }
 
       if (response.error) throw response.error;

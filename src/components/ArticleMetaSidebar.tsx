@@ -1,6 +1,7 @@
 
 import { CalendarCheck, Image as ImageIcon, Tag } from 'lucide-react';
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import ArticleStats from '@/components/ArticleStats';
 import { CategorySelector } from '@/components/CategorySelector';
@@ -11,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
 import { Alert, AlertDescription } from './ui/alert';
 import { stripHtml } from '@/lib/textUtils';
+import { FileUploaderSheet } from './FileUploaderSheet';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -37,6 +39,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
 }) => {
   const placeholderImage = usePlaceholderImage();
   const [showValidationErrors, setShowValidationErrors] = useState<boolean>(false);
+  const { id: articleId } = useParams();
   
   // Calculate word count for validation
   const plainText = stripHtml(content);
@@ -57,6 +60,10 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
     }
     
     onPublishChange(newValue);
+  };
+
+  const handleFeaturedImageUpload = (url: string) => {
+    onFeaturedImageChange(url);
   };
 
   return (
@@ -87,9 +94,20 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center">
-              <ImageIcon className="h-4 w-4 mr-2" />
-              <Label className="text-sm font-medium">Featured Image URL</Label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <ImageIcon className="h-4 w-4 mr-2" />
+                <Label className="text-sm font-medium">Featured Image</Label>
+              </div>
+              <FileUploaderSheet
+                onUploadComplete={handleFeaturedImageUpload}
+                trigger={
+                  <Button variant="outline" size="sm" className="text-xs">
+                    Select Image
+                  </Button>
+                }
+                articleId={articleId}
+              />
             </div>
             <Input
               type="text"

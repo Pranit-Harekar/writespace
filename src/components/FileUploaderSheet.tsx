@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image, Link, Upload } from 'lucide-react';
@@ -27,6 +28,7 @@ interface FileUploaderSheetProps {
   description?: string;
   bucketName?: string;
   folderPath?: string;
+  articleId?: string | null; // Add article ID
 }
 
 export function FileUploaderSheet({
@@ -38,6 +40,7 @@ export function FileUploaderSheet({
   description = 'Upload a file from your device or paste a URL.',
   bucketName = 'article-images',
   folderPath = '',
+  articleId = null, // Default to null
 }: FileUploaderSheetProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
@@ -86,6 +89,21 @@ export function FileUploaderSheet({
         if (error) throw error;
 
         const { data: publicUrl } = supabase.storage.from(bucketName).getPublicUrl(data.path);
+        
+        // If articleId is provided, associate this image with the article
+        if (articleId && user) {
+          const { error: associationError } = await supabase.from('article_images').insert({
+            article_id: articleId,
+            image_path: data.path,
+            storage_url: publicUrl.publicUrl,
+            is_uploaded: true,
+            author_id: user.id
+          });
+          
+          if (associationError) {
+            console.error('Error associating image with article:', associationError);
+          }
+        }
 
         onUploadComplete(publicUrl.publicUrl, file.name);
         setIsOpen(false);
@@ -105,7 +123,7 @@ export function FileUploaderSheet({
         setIsUploading(false);
       }
     },
-    [user, bucketName, folderPath, maxFileSizeBytes, maxFileSize, toast, onUploadComplete]
+    [user, bucketName, folderPath, maxFileSizeBytes, maxFileSize, toast, onUploadComplete, articleId]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -121,6 +139,21 @@ export function FileUploaderSheet({
 
     try {
       const url = new URL(urlInput);
+      
+      // If articleId is provided, track this external URL
+      if (articleId && user) {
+        supabase.from('article_images').insert({
+          article_id: articleId,
+          storage_url: urlInput,
+          is_uploaded: false, // This is an external URL, not uploaded to storage
+          author_id: user.id
+        }).then(({ error }) => {
+          if (error) {
+            console.error('Error tracking external image URL:', error);
+          }
+        });
+      }
+      
       onUploadComplete(urlInput);
       setUrlInput('');
       setIsOpen(false);
