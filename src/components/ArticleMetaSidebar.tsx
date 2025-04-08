@@ -1,12 +1,11 @@
 
-import { CalendarCheck, Image as ImageIcon, Tag } from 'lucide-react';
+import { CalendarCheck, Image as ImageIcon, Tag, Upload, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import ArticleStats from '@/components/ArticleStats';
 import { CategorySelector } from '@/components/CategorySelector';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { usePlaceholderImage } from '@/hooks/use-placeholder-image';
@@ -14,6 +13,8 @@ import { Alert, AlertDescription } from './ui/alert';
 import { stripHtml } from '@/lib/textUtils';
 import { FileUploaderSheet } from './FileUploaderSheet';
 import { Button } from '@/components/ui/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface ArticleMetaSidebarProps {
   categoryId: string | null;
@@ -67,6 +68,10 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
     onFeaturedImageChange(url);
   };
 
+  const handleRemoveFeaturedImage = () => {
+    onFeaturedImageChange('');
+  };
+
   return (
     <div className="space-y-4">
       <ArticleStats content={content} />
@@ -95,29 +100,12 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <ImageIcon className="h-4 w-4 mr-2" />
-                <Label className="text-sm font-medium">Featured Image</Label>
-              </div>
-              <FileUploaderSheet
-                onUploadComplete={handleFeaturedImageUpload}
-                trigger={
-                  <Button variant="outline" size="sm" className="text-xs">
-                    Select Image
-                  </Button>
-                }
-                articleId={articleId}
-              />
+            <div className="flex items-center">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              <Label className="text-sm font-medium">Featured Image</Label>
             </div>
-            <Input
-              type="text"
-              placeholder="https://example.com/image.jpg"
-              value={featuredImage}
-              onChange={e => onFeaturedImageChange(e.target.value)}
-            />
-            {
-              <div className="mt-2 rounded-md overflow-hidden border">
+            <div className="relative group">
+              <div className="rounded-md overflow-hidden border">
                 <img
                   src={featuredImage && featuredImage.length > 1 ? featuredImage : placeholderImage}
                   alt="Featured"
@@ -127,7 +115,47 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                   }}
                 />
               </div>
-            }
+              
+              {/* Hover overlay with image controls */}
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <FileUploaderSheet
+                        onUploadComplete={handleFeaturedImageUpload}
+                        trigger={
+                          <Button variant="secondary" size="sm" className="rounded-full p-2">
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        }
+                        articleId={articleId}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Upload new image</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  
+                  {featuredImage && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          className="rounded-full p-2"
+                          onClick={handleRemoveFeaturedImage}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Remove image</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </TooltipProvider>
+              </div>
+            </div>
           </div>
 
           <div className="pt-2">
