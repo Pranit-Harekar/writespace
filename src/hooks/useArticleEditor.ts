@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,8 +39,6 @@ export function useArticleEditor() {
   const [featuredImage, setFeaturedImage] = useState<string>('');
   const [isPublished, setIsPublished] = useState<boolean>(false);
 
-  // Auto-save timer reference
-  const autoSaveTimerRef = useRef<number | null>(null);
   // Last saved state reference
   const lastSavedStateRef = useRef({
     title: '',
@@ -62,11 +61,11 @@ export function useArticleEditor() {
   const isEditing = Boolean(id);
 
   // Calculate read time automatically
-  const readTime = useMemo(() => {
+  const readTime = (() => {
     const plainText = stripHtml(content);
     const wordCount = plainText.split(/\s+/).filter(Boolean).length;
     return Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
-  }, [content]);
+  })();
 
   // Check if the article has been modified
   const hasBeenModified = useCallback(() => {
@@ -76,44 +75,6 @@ export function useArticleEditor() {
       subtitle !== lastSavedStateRef.current.subtitle
     );
   }, [title, content, subtitle]);
-
-  // Auto-save function
-  const autoSave = useCallback(async () => {
-    if (!user || !id || !hasBeenModified()) return;
-
-    setIsSaving(true);
-    try {
-      // Calculate a title for drafts if needed
-      const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
-
-      await supabase
-        .from('articles')
-        .update({
-          title: finalTitle,
-          content,
-          subtitle,
-        })
-        .eq('id', id);
-
-      // Update last saved state
-      lastSavedStateRef.current = {
-        title: finalTitle,
-        content,
-        subtitle,
-      };
-
-      // If title was empty and we set a timestamp, update the local state
-      if (!title.trim()) {
-        setTitle(finalTitle);
-      }
-
-      console.log('Auto-saved draft');
-    } catch (error) {
-      console.error('Error auto-saving:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [user, id, title, content, subtitle, hasBeenModified]);
 
   // Save current state to the ref to preserve it when component unmounts
   useEffect(() => {
@@ -128,44 +89,6 @@ export function useArticleEditor() {
       isPublished,
     };
   }, [title, content, subtitle, categoryId, categoryName, language, featuredImage, isPublished]);
-
-  // Set up auto-save
-  useEffect(() => {
-    // Clear any existing timer
-    if (autoSaveTimerRef.current) {
-      window.clearTimeout(autoSaveTimerRef.current);
-    }
-
-    // Set a new timer if we're editing (not creating) and there are changes
-    if (isEditing && hasBeenModified()) {
-      autoSaveTimerRef.current = window.setTimeout(autoSave, 5000);
-    }
-
-    return () => {
-      if (autoSaveTimerRef.current) {
-        window.clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [autoSave, hasBeenModified, isEditing]);
-
-  // Auto-save before leaving the page
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (hasBeenModified()) {
-        autoSave();
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-
-      // Do a final auto-save when component unmounts
-      if (hasBeenModified()) {
-        autoSave();
-      }
-    };
-  }, [autoSave, hasBeenModified]);
 
   // Fetch article if editing and not already loaded
   useEffect(() => {
@@ -214,11 +137,11 @@ export function useArticleEditor() {
 
         // Mark as loaded to avoid refetching
         setHasLoaded(true);
-      } catch (error: unknown) {
+      } catch (error: any) {
         console.error('Error fetching article:', error);
         toast({
           title: 'Error',
-          description: error['message'] || 'Failed to load article',
+          description: error.message || 'Failed to load article',
           variant: 'destructive',
         });
       } finally {
@@ -254,12 +177,9 @@ export function useArticleEditor() {
       return;
     }
 
-    // If title is empty, set a timestamp as title
+    // Only create a timestamp-based title if the user is saving without a title
     const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
-    if (!title.trim()) {
-      setTitle(finalTitle);
-    }
-
+    
     setIsLoading(true);
 
     try {
@@ -271,7 +191,7 @@ export function useArticleEditor() {
         category_id: categoryId,
         language,
         featured_image: featuredImage,
-        read_time: readTime, // Use automatically calculated read time
+        read_time: readTime,
         is_published: isPublished,
         published_at: isPublished ? new Date().toISOString() : null,
       };
@@ -295,6 +215,11 @@ export function useArticleEditor() {
         subtitle,
       };
 
+      // Update the title state if a timestamp was used
+      if (!title.trim()) {
+        setTitle(finalTitle);
+      }
+
       toast({
         title: isEditing ? 'Article updated' : 'Article created',
         description: `Your article has been ${isEditing ? 'updated' : 'created'} successfully`,
@@ -304,11 +229,11 @@ export function useArticleEditor() {
         // Navigate to the newly created article
         navigate(`/article/edit/${response.data[0].id}`);
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error saving article:', error);
       toast({
         title: 'Error',
-        description: error['message'] || `Failed to ${isEditing ? 'update' : 'create'} article`,
+        description: error.message || `Failed to ${isEditing ? 'update' : 'create'} article`,
         variant: 'destructive',
       });
     } finally {
@@ -340,11 +265,11 @@ export function useArticleEditor() {
       });
 
       navigate('/my-articles');
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error deleting article:', error);
       toast({
         title: 'Error',
-        description: error['message'] || 'Failed to delete article',
+        description: error.message || 'Failed to delete article',
         variant: 'destructive',
       });
     } finally {
