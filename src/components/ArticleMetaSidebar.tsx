@@ -1,6 +1,6 @@
 
 import { CalendarCheck, Image as ImageIcon, Tag } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import ArticleStats from '@/components/ArticleStats';
 import { CategorySelector } from '@/components/CategorySelector';
@@ -36,11 +36,28 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
   onPublishChange,
 }) => {
   const placeholderImage = usePlaceholderImage();
+  const [showValidationErrors, setShowValidationErrors] = useState<boolean>(false);
   
   // Calculate word count for validation
   const plainText = stripHtml(content);
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
   const hasEnoughWords = wordCount >= 30;
+  
+  // Check if title is a timestamp-based draft title
+  const isDraftTitle = false; // We can't check this here as we don't have title prop
+  
+  // Handle publish toggle with validation
+  const handlePublishChange = (newValue: boolean) => {
+    // Only show validation errors if trying to publish
+    if (newValue && !isPublished) {
+      setShowValidationErrors(true);
+    } else if (!newValue) {
+      // Hide validation errors when unpublishing
+      setShowValidationErrors(false);
+    }
+    
+    onPublishChange(newValue);
+  };
 
   return (
     <div className="space-y-4">
@@ -62,7 +79,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
               categoryId={categoryId}
               onChange={onCategoryChange}
             />
-            {!categoryId && (
+            {showValidationErrors && !categoryId && (
               <p className="text-xs text-amber-500 mt-1">
                 Required for publishing
               </p>
@@ -100,7 +117,7 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
                 <CalendarCheck className="h-4 w-4 mr-2" />
                 <Label className="text-sm font-medium">Publish Article</Label>
               </div>
-              <Switch checked={isPublished} onCheckedChange={onPublishChange} />
+              <Switch checked={isPublished} onCheckedChange={handlePublishChange} />
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               {isPublished
@@ -109,23 +126,25 @@ const ArticleMetaSidebar: React.FC<ArticleMetaSidebarProps> = ({
             </p>
           </div>
 
-          {/* Publishing Requirements Alert */}
-          <Alert className="mt-3 bg-muted">
-            <AlertDescription className="text-xs">
-              <strong>Publishing requirements:</strong>
-              <ul className="list-disc pl-5 mt-1 space-y-1">
-                <li className={`${!hasEnoughWords ? 'text-amber-500' : ''}`}>
-                  At least 30 words of content
-                </li>
-                <li className={`${!categoryId ? 'text-amber-500' : ''}`}>
-                  Category must be selected
-                </li>
-                <li>
-                  Title cannot be a draft timestamp
-                </li>
-              </ul>
-            </AlertDescription>
-          </Alert>
+          {/* Publishing Requirements Alert - only show when validation failed */}
+          {showValidationErrors && (
+            <Alert className="mt-3 bg-muted">
+              <AlertDescription className="text-xs">
+                <strong>Publishing requirements:</strong>
+                <ul className="list-disc pl-5 mt-1 space-y-1">
+                  <li className={`${!hasEnoughWords ? 'text-amber-500' : ''}`}>
+                    At least 30 words of content
+                  </li>
+                  <li className={`${!categoryId ? 'text-amber-500' : ''}`}>
+                    Category must be selected
+                  </li>
+                  <li>
+                    Title cannot be a draft timestamp
+                  </li>
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -167,7 +166,6 @@ export function useArticleEditor() {
     }
   }, [hasLoaded, isEditing]);
 
-  // Validate article for publishing
   const validateForPublishing = () => {
     // Check if title is a timestamp-based draft title
     const isDraftTitle = /^Draft - \d{1,2}:\d{2}:\d{2}(?: [AP]M)?$/.test(title);
@@ -225,7 +223,7 @@ export function useArticleEditor() {
       return;
     }
     
-    setIsLoading(true);
+    setIsSaving(true);
 
     try {
       const articleData = {
@@ -282,7 +280,7 @@ export function useArticleEditor() {
         variant: 'destructive',
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
