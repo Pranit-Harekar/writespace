@@ -162,7 +162,7 @@ export function useArticleEditor() {
       });
       return false;
     }
-    
+
     const plainText = stripHtml(content);
     const wordCount = plainText.split(/\s+/).filter(Boolean).length;
     if (wordCount < 30) {
@@ -173,7 +173,7 @@ export function useArticleEditor() {
       });
       return false;
     }
-    
+
     if (!categoryId) {
       toast({
         title: 'Publishing Failed',
@@ -182,7 +182,7 @@ export function useArticleEditor() {
       });
       return false;
     }
-    
+
     return true;
   };
 
@@ -197,12 +197,12 @@ export function useArticleEditor() {
     }
 
     const finalTitle = title.trim() || `Draft - ${new Date().toLocaleTimeString()}`;
-    
+
     if (isPublished && !validateForPublishing()) {
       setIsPublished(false);
       return;
     }
-    
+
     setIsSaving(true);
 
     try {
@@ -229,7 +229,7 @@ export function useArticleEditor() {
 
       if (response.error) throw response.error;
 
-      const articleIdToUse = isEditing ? id : (response.data?.[0]?.id);
+      const articleIdToUse = isEditing ? id : response.data?.[0]?.id;
       if (articleIdToUse) {
         await performImageCleanup(articleIdToUse, content, featuredImage);
       }
@@ -264,15 +264,19 @@ export function useArticleEditor() {
     }
   };
 
-  const performImageCleanup = async (articleId: string, htmlContent: string, featuredImageUrl: string) => {
+  const performImageCleanup = async (
+    articleId: string,
+    htmlContent: string,
+    featuredImageUrl: string
+  ) => {
     try {
       const contentImageUrls = articleImagesService.extractImageUrls(htmlContent);
       const currentUrls = [...contentImageUrls];
-      
+
       if (featuredImageUrl) {
         currentUrls.push(featuredImageUrl);
       }
-      
+
       await articleImagesService.cleanupOrphanedImages(articleId, currentUrls);
     } catch (error) {
       console.error('Error during image cleanup:', error);
@@ -281,10 +285,6 @@ export function useArticleEditor() {
 
   const handleDelete = async () => {
     if (!id || !user) return;
-
-    if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
-      return;
-    }
 
     setIsDeleting(true);
 

@@ -1,8 +1,18 @@
-
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Save, Trash2, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../ui/alert-dialog';
 
 interface EditorToolbarProps {
   isEditing: boolean;
@@ -33,16 +43,34 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         {isSaving && <span className="text-sm text-muted-foreground">Saving...</span>}
         <div className="flex gap-2">
           {isEditing && (
-            <Button
-              variant="destructive"
-              onClick={onDelete}
-              disabled={isDeleting || isLoading}
-            >
-              <Trash2 className="h-4 w-4 mr-2" /> Delete
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger disabled={isDeleting || isLoading}>
+                <Button variant="destructive">
+                  <Trash2 className="h-4 w-4" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Article</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this article? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className={buttonVariants({ variant: 'destructive' })}
+                    onClick={onDelete}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
           <Button onClick={onSave} disabled={isLoading}>
-            <Save className="h-4 w-4 mr-2" /> Save
+            <Save className="h-4 w-4" /> Save
           </Button>
         </div>
       </div>

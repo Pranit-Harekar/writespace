@@ -1,4 +1,3 @@
-import React from 'react';
 import { Header } from '@/components/Header';
 import ArticleContentEditor from '@/components/ArticleContentEditor';
 import ArticleMetaSidebar from '@/components/ArticleMetaSidebar';
