@@ -212,6 +212,23 @@ const MyArticles = () => {
     );
   }
 
+  const actions = articleId => {
+    return (
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="icon" asChild>
+          <Link to={`/article/${articleId}`}>
+            <Eye className="h-4 w-4" />
+          </Link>
+        </Button>
+        <Button variant="outline" size="icon" asChild>
+          <Link to={`/article/edit/${articleId}`}>
+            <Pencil className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -244,7 +261,9 @@ const MyArticles = () => {
               <TableBody>
                 {articles.map(article => (
                   <TableRow key={article.id}>
-                    <TableCell className="font-medium">{article.title}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link to={`/article/${article.id}`}>{article.title}</Link>
+                    </TableCell>
                     <TableCell>{article.categories?.name || article.category || '—'}</TableCell>
                     <TableCell>
                       <Badge variant={article.is_published ? 'default' : 'outline'}>
@@ -252,20 +271,7 @@ const MyArticles = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>{new Date(article.updated_at).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="icon" asChild>
-                          <Link to={`/article/${article.id}`}>
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <Button variant="outline" size="icon" asChild>
-                          <Link to={`/article/edit/${article.id}`}>
-                            <Pencil className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </TableCell>
+                    <TableCell className="text-right">{actions(article.id)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
