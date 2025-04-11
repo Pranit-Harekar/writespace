@@ -155,5 +155,14 @@
         "contactUsTitle": "10. Contact Us",
         "contactUsText": "If you have any questions about these Terms, please contact us at:",
         "legalEmail": "legal@writespace.com"
+    },
+    "header": {
+        "writeSpace": "WriteSpace",
+        "searchWriteSpace": "Search WriteSpace",
+        "myArticles": "My Articles",
+        "myProfile": "My Profile",
+        "logOut": "Log out",
+        "signIn": "Sign In",
+        "getStarted": "Get Started"
     }
 }

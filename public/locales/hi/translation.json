@@ -153,5 +153,14 @@
         "contactUsTitle": "10. हमसे संपर्क करें",
         "contactUsText": "यदि आपके इन शर्तों के बारे में कोई प्रश्न हैं, तो कृपया हमसे यहां संपर्क करें:",
         "legalEmail": "legal@writespace.com"
+    },
+    "header": {
+        "writeSpace": "WriteSpace",
+        "searchWriteSpace": "WriteSpace खोजें",
+        "myArticles": "मेरे आर्टिकल",
+        "myProfile": "मेरी प्रोफाइल",
+        "logOut": "लॉग आउट",
+        "signIn": "साइन इन करें",
+        "getStarted": "शुरू हो जाओ"
     }
 }

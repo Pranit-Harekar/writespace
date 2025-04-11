@@ -13,11 +13,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from 'react-i18next';
 
 export const Header = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation();
 
   const getInitials = (name: string) => {
     return name
@@ -40,7 +42,7 @@ export const Header = () => {
         <div className="flex items-center gap-2">
           <BookOpen className="h-6 w-6 text-primary" />
           <Link to="/" className="text-xl font-bold text-primary">
-            WriteSpace
+            {t('header.writeSpace')}
           </Link>
         </div>
 
@@ -48,7 +50,7 @@ export const Header = () => {
           <form onSubmit={handleSearchSubmit} className="w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search WriteSpace"
+              placeholder={t('header.searchWriteSpace')}
               className="pl-10 bg-background"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -63,7 +65,7 @@ export const Header = () => {
               <div className="hidden sm:flex gap-2">
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/my-articles">
-                    <FileText className="h-4 w-4 mr-1" /> My Articles
+                    <FileText className="h-4 w-4 mr-1" /> {t('header.myArticles')}
                   </Link>
                 </Button>
               </div>
@@ -92,19 +94,19 @@ export const Header = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer w-full">
                       <User className="mr-2 h-4 w-4" />
-                      <span>My Profile</span>
+                      <span>{t('header.myProfile')}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/my-articles" className="cursor-pointer w-full sm:hidden">
                       <FileText className="mr-2 h-4 w-4" />
-                      <span>My Articles</span>
+                      <span>{t('header.myArticles')}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>{t('header.logOut')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -113,11 +115,11 @@ export const Header = () => {
             <div className="hidden sm:flex gap-2">
               <Button variant="outline" size="sm" asChild>
                 <Link to="/login">
-                  <LogIn className="h-4 w-4 mr-1" /> Sign In
+                  <LogIn className="h-4 w-4 mr-1" /> {t('header.signIn')}
                 </Link>
               </Button>
               <Button size="sm" asChild>
-                <Link to="/register">Get Started</Link>
+                <Link to="/register">{t('header.getStarted')}</Link>
               </Button>
             </div>
           )}
