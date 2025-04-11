@@ -1,31 +1,33 @@
-import { Toaster } from '@/components/ui/toaster';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
 import { Toaster as Sonner } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import CategoryRedirect from './components/CategoryRedirect';
+import { ConditionalFooter } from './components/ConditionalFooter';
+import ProtectedRoute from './components/ProtectedRoute';
+import { ThemeProvider } from './components/ThemeProvider';
+import About from './pages/About';
+import ArticleEditor from './pages/ArticleEditor';
+import ArticleView from './pages/ArticleView';
+import CategoryView from './pages/CategoryView';
+import ForgotPassword from './pages/ForgotPassword';
+import Help from './pages/Help';
 import Index from './pages/Index';
 import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+import MyArticles from './pages/MyArticles';
+import NotFound from './pages/NotFound';
+import Privacy from './pages/Privacy';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
-import ArticleView from './pages/ArticleView';
-import ArticleEditor from './pages/ArticleEditor';
-import MyArticles from './pages/MyArticles';
+import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import SearchResults from './pages/SearchResults';
-import ProtectedRoute from './components/ProtectedRoute';
-import NotFound from './pages/NotFound';
-import CategoryRedirect from './components/CategoryRedirect';
-import About from './pages/About';
-import Help from './pages/Help';
-import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
-import CategoryView from './pages/CategoryView';
-import { ConditionalFooter } from './components/ConditionalFooter';
-import { ThemeProvider } from './components/ThemeProvider';
 
 const queryClient = new QueryClient();
 
