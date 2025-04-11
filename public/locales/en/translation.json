@@ -1,0 +1,21 @@
+{
+    "welcome": "Welcome to our application!",
+    "description": "This is an example description.",
+    "about": {
+        "title": "About WriteSpace",
+        "description": "WriteSpace is a multilingual blogging platform designed for the diverse linguistic landscape of India.",
+        "storyTitle": "Our Story",
+        "storyDescription": "Founded in 2025, WriteSpace emerged from a simple observation: while India has incredible linguistic diversity with over 22 official languages and hundreds of dialects, online content creation remains predominantly English-centric.",
+        "missionTitle": "Our Mission",
+        "missionDescription": "At WriteSpace, we believe that everyone's voice deserves to be heard. Our platform aims to:",
+        "missionPoint1": "Empower writers to publish in multiple Indian languages",
+        "missionPoint2": "Connect readers with diverse content they might otherwise never discover",
+        "missionPoint3": "Preserve and promote India's linguistic heritage",
+        "missionPoint4": "Foster cross-cultural understanding through translated content",
+        "missionPoint5": "Create a supportive community for writers of all backgrounds",
+        "teamTitle": "Our Team",
+        "teamDescription": "WriteSpace is built by a passionate team of writers, developers, and language enthusiasts from across India.",
+        "joinTitle": "Join Us",
+        "joinDescription": "Whether you're a writer looking to share your voice or a reader eager to explore diverse perspectives, WriteSpace welcomes you."
+    }
+}

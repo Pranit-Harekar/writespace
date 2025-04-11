@@ -1,10 +1,28 @@
-// This component is now a simplified placeholder as we're removing language selection
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { LANGUAGES, useLanguage } from '@/contexts/LanguageContext';
 
 export const LanguageSelector = () => {
+  const { language, setLanguage } = useLanguage();
+
   return (
-    <Button variant="outline" className="flex items-center gap-2">
-      English
-    </Button>
+    <Select defaultValue={language} onValueChange={setLanguage}>
+      <SelectTrigger className="w-24">
+        <SelectValue placeholder="Select Language" />
+      </SelectTrigger>
+      <SelectContent>
+        {Object.entries(LANGUAGES).map(([code, lang]) => (
+          <SelectItem key={code} value={code}>
+            {lang.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
