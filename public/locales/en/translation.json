@@ -164,5 +164,13 @@
         "logOut": "Log out",
         "signIn": "Sign In",
         "getStarted": "Get Started"
+    },
+    "footer": {
+        "writeSpace": "WriteSpace",
+        "copyright": "WriteSpace - Multilingual Blog Platform",
+        "about": "About",
+        "help": "Help",
+        "privacy": "Privacy",
+        "terms": "Terms"
     }
 }

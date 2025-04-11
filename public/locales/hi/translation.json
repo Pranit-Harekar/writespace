@@ -156,11 +156,19 @@
     },
     "header": {
         "writeSpace": "WriteSpace",
-        "searchWriteSpace": "WriteSpace खोजें",
+        "searchWriteSpace": "WriteSpace में खोजें",
         "myArticles": "मेरे आर्टिकल",
         "myProfile": "मेरी प्रोफाइल",
         "logOut": "लॉग आउट",
         "signIn": "साइन इन करें",
         "getStarted": "शुरू हो जाओ"
+    },
+    "footer": {
+        "writeSpace": "WriteSpace",
+        "copyright": "WriteSpace - बहुभाषी ब्लॉग प्लेटफॉर्म",
+        "about": "हमारे बारे में",
+        "help": "मदद",
+        "privacy": "गोपनीयता",
+        "terms": "शर्तें"
     }
 }
