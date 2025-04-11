@@ -1,90 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import TextAlign from '@tiptap/extension-text-align';
-import Underline from '@tiptap/extension-underline';
-import { Editor, EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { Editor, EditorContent } from '@tiptap/react';
 
 interface FullEditorProps {
-  initialValue: string;
-  onValueChange: (value: string) => void;
-  placeholder?: string;
   className?: string;
-  editorInstance?: Editor | null;
+  editorInstance: Editor;
 }
 
 const RichTextEditor: React.FC<FullEditorProps> = ({
-  initialValue,
-  onValueChange,
   className = 'prose prose-lg max-w-none outline-hidden min-h-[50vh] text-md',
   editorInstance,
 }) => {
-  // Only create a local editor if no external editor is provided
-  const localEditor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3, 4, 5, 6],
-          HTMLAttributes: {
-            class: 'font-sans',
-          },
-        },
-        horizontalRule: {
-          HTMLAttributes: {
-            class: 'my-4',
-          },
-        },
-      }),
-      Image,
-      Link.configure({
-        openOnClick: false,
-        autolink: false,
-        linkOnPaste: true,
-        protocols: ['http', 'https'],
-        validate: url =>
-          /^(https?:\/\/)?[\w-]+(\.[\w-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]$/.test(url),
-      }),
-      Underline,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Placeholder,
-    ],
-    content: initialValue,
-    onUpdate: ({ editor }) => {
-      onValueChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class: `${className} focus:outline-hidden`,
-      },
-    },
-  });
-
-  // Determine which editor to use
-  const editor = editorInstance || localEditor;
-
-  // Update content when initialValue changes for local editor
-  useEffect(() => {
-    if (localEditor && initialValue !== localEditor.getHTML()) {
-      localEditor.commands.setContent(initialValue);
-    }
-  }, [initialValue, localEditor]);
-
-  // For external editor, ensure content matches initialValue
-  useEffect(() => {
-    if (editorInstance && initialValue !== editorInstance.getHTML()) {
-      editorInstance.commands.setContent(initialValue);
-    }
-  }, [initialValue, editorInstance]);
-
   return (
     <div className="relative">
       <EditorContent
-        editor={editor}
+        editor={editorInstance}
         className={`${className} focus:outline-hidden ProseMirror font-serif text-lg`}
       />
     </div>
